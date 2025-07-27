@@ -1,0 +1,42 @@
+{
+  "name": "isaac-mineo-portfolio",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Isaac Mineo's personal portfolio website",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && vercel --prod",
+    "init-knowledge": "node scripts/initializeKnowledgeBase.js",
+    "test-chatbot": "node scripts/testChatbot.js",
+    "setup": "npm install && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && npm run init-knowledge",
+    "activate-python": "source venv/bin/activate",
+    "python-test": "source venv/bin/activate && python -c 'import openai, pinecone_client, redis; print(\"All Python packages working!\")'",
+    "health-check": "curl -X GET http://localhost:5173/api/health || echo 'Server not running'"
+  },
+  "keywords": [
+    "portfolio",
+    "react",
+    "vite",
+    "tailwind"
+  ],
+  "author": "Isaac Mineo",
+  "license": "MIT",
+  "dependencies": {
+    "@pinecone-database/pinecone": "^6.1.2",
+    "dotenv": "^17.2.1",
+    "openai": "^5.10.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "redis": "^5.6.1",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.3.0",
+    "vite": "^5.0.0"
+  }
+}

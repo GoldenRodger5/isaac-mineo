@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Isaac Mineo - Full-Stack Developer & AI Engineer</title>
+    <meta name="description" content="Isaac Mineo's professional portfolio - Full-stack developer specializing in AI-powered applications, scalable web solutions, and innovative technology." />
+    <meta name="keywords" content="Isaac Mineo, full-stack developer, AI engineer, React, Node.js, Python, portfolio, isaacmineo.com" />
+    <meta name="author" content="Isaac Mineo" />
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Isaac Mineo - Full-Stack Developer & AI Engineer" />
+    <meta property="og:description" content="Professional portfolio showcasing innovative AI-powered applications and scalable web solutions." />
+    <meta property="og:url" content="https://isaacmineo.com" />
+    <meta property="og:image" content="https://isaacmineo.com/icon-512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:site_name" content="Isaac Mineo Portfolio" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://isaacmineo.com" />
+    <meta property="twitter:title" content="Isaac Mineo - Full-Stack Developer & AI Engineer" />
+    <meta property="twitter:description" content="Professional portfolio showcasing innovative AI-powered applications and scalable web solutions." />
+    <meta property="twitter:image" content="https://isaacmineo.com/icon-512.png" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
+    
+    <!-- iOS Safari specific -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Isaac Mineo" />
+    <link rel="apple-touch-startup-image" href="/icon-512.png" />
+    
+    <!-- iPhone Dynamic Island & Notch Support -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#667eea" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#4c51bf" media="(prefers-color-scheme: dark)" />
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#667eea" />
+    
+    <!-- Security -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:; object-src 'none'; base-uri 'self';" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://isaacmineo.com" />
+  </head>
+  <body class="font-inter bg-gray-50">
+    <!-- Dynamic Island safe area for iPhone -->
+    <div id="safe-area-top" class="safe-area-top"></div>
+    
+    <div id="root"></div>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+              
+              // Check for updates
+              registration.addEventListener('updatefound', () => {
+                console.log('SW update found');
+              });
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+      
+      // PWA install prompt
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('PWA install prompt available');
+        deferredPrompt = e;
+      });
+      
+      // Track PWA usage
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('Running as PWA');
+      }
+    </script>
+    
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

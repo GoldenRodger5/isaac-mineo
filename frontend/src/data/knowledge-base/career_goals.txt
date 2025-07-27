@@ -1,0 +1,84 @@
+Isaac Mineo - Career Goals & Opportunities
+
+WHAT ISAAC IS LOOKING FOR:
+
+Position Types:
+- Backend Developer roles focusing on API development and architecture
+- AI Engineer positions integrating machine learning and AI technologies
+- Full-Stack Developer roles with emphasis on backend systems
+- Software Engineer positions at growth-stage companies
+- Technical roles with opportunities for AI and automation
+
+Company Types Isaac Is Excited About:
+- HealthTech companies improving people's wellbeing
+- AI/ML companies pushing the boundaries of technology
+- Productivity tools and software helping people work better
+- Developer tooling companies building better development experiences
+- EdTech companies making learning more accessible
+- Fintech companies with innovative financial solutions
+- SaaS companies with scalable, impactful products
+
+Company Size Preferences:
+- Startup environments (10-100 employees) for high impact and learning
+- Growth-stage companies (100-500 employees) for structured growth
+- Open to both established companies and early-stage startups
+- Values company culture and team dynamics over size
+
+IDEAL ROLE CHARACTERISTICS:
+
+Technical Responsibilities:
+- Building and maintaining scalable backend systems
+- Integrating AI/ML capabilities into existing products
+- Designing and implementing RESTful APIs
+- Database architecture and optimization
+- Performance monitoring and optimization
+- Code review and mentoring junior developers
+
+Work Environment:
+- Collaborative team environment with smart, creative people
+- Remote-friendly or hybrid work arrangements
+- Strong engineering culture with emphasis on quality
+- Opportunities for continuous learning and growth
+- Clear communication and well-defined processes
+- Feedback-driven culture for personal and professional development
+
+Growth Opportunities:
+- Learning new technologies and frameworks
+- Leading technical initiatives and projects
+- Mentoring other developers
+- Contributing to architectural decisions
+- Building products that have real-world impact
+- Working with cutting-edge AI and technology
+
+COMPENSATION & BENEFITS:
+- Competitive salary commensurate with experience
+- Health, dental, and vision insurance
+- Flexible time off and work-life balance
+- Professional development budget
+- Remote work stipend for home office setup
+- Stock options or equity participation (for startups)
+
+LOCATION PREFERENCES:
+- Fully remote positions preferred
+- Open to relocation for the right opportunity
+- Particularly interested in tech hubs but not limited to them
+- Values company culture over specific geographic location
+
+ISAAC'S VALUE PROPOSITION:
+- Proven ability to build production-ready applications (Nutrivize)
+- Strong problem-solving skills and attention to detail
+- Experience with modern development practices and tools
+- Passion for AI integration and emerging technologies
+- Collaborative mindset with excellent communication skills
+- Self-motivated and able to work independently
+- Continuous learner who stays current with technology trends
+
+IDEAL PROJECTS:
+- Building AI-powered features and integrations
+- Scaling backend systems for growing user bases
+- Implementing real-time features and data synchronization
+- Optimizing application performance and reliability
+- Creating developer tools and internal systems
+- Working on products that solve real problems for users
+
+Isaac is passionate about building meaningful technology that makes a positive impact. He's looking for opportunities to grow professionally while contributing to innovative products and working alongside talented, passionate teams.
