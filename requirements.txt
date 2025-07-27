@@ -1,0 +1,16 @@
+# FastAPI Backend Dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+python-dotenv==1.0.0
+python-multipart==0.0.6
+
+# AI/ML Dependencies
+openai==1.97.1
+pinecone-client==2.2.4
+
+# Database and Caching
+redis==5.0.1
+
+# Additional utilities
+requests==2.31.0

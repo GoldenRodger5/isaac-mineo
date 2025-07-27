@@ -9,6 +9,12 @@ dist/
 .env.local
 .env.production
 
+# Processing tracking
+.processed-docs.json
+
+# Keep knowledge base but ignore processing artifacts
+knowledge-base/.processed-docs.json
+
 # IDE/Editor files
 .vscode/
 .idea/

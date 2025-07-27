@@ -1,0 +1,32 @@
+# Render Blueprint for Isaac Mineo Portfolio Backend
+# Production deployment configuration
+
+services:
+  - type: web
+    name: isaac-mineo-api
+    env: python
+    plan: free
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: PINECONE_API_KEY
+        sync: false
+      - key: PINECONE_INDEX_NAME
+        value: isaac-info
+      - key: SENDER_EMAIL
+        sync: false
+      - key: SENDER_PASSWORD
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: DEBUG
+        value: false
+      - key: ENVIRONMENT
+        value: production
+      - key: ALLOWED_ORIGINS
+        value: https://isaacmineo.com,https://www.isaacmineo.com,https://isaac-mineo.vercel.app

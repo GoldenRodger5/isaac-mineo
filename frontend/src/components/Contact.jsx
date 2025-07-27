@@ -1,18 +1,20 @@
 import { useState } from 'react';
+import { apiClient } from '../services/apiClient';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    subject: '',
     message: '',
     interest: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
 
   const interests = [
     'Full-Stack Development',
-    'AI Engineering',
+    'AI Engineering', 
     'Backend Development',
     'HealthTech Projects',
     'Developer Tooling',
@@ -30,47 +32,47 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      setSubmitted(true);
-      setIsSubmitting(false);
-    }, 1000);
-  };
+    setSubmitStatus(null);
 
-  if (submitted) {
-    return (
-      <section id="contact" className="py-20">
-        <div className="animate-fadeInUp text-center">
-          <div className="max-w-md mx-auto bg-green-50 border border-green-200 rounded-xl p-8">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Message Sent!</h3>
-            <p className="text-gray-600 mb-4">
-              Thanks for reaching out. I'll get back to you as soon as possible.
-            </p>
-            <button
-              onClick={() => {
-                setSubmitted(false);
-                setFormData({ name: '', email: '', message: '', interest: '' });
-              }}
-              className="text-primary-600 hover:text-primary-700 font-medium"
-            >
-              Send Another Message
-            </button>
-          </div>
-        </div>
-      </section>
-    );
-  }
+    try {
+      const result = await apiClient.sendContactEmail(formData);
+      
+      if (result.success) {
+        setSubmitStatus({
+          type: 'success',
+          message: 'Thank you for your message! Isaac will get back to you soon.'
+        });
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: '',
+          interest: ''
+        });
+      } else {
+        setSubmitStatus({
+          type: 'error',
+          message: 'There was an issue sending your message. Please try again or email Isaac directly at IsaacMineo@gmail.com.'
+        });
+      }
+    } catch (error) {
+      setSubmitStatus({
+        type: 'error',
+        message: 'There was an issue sending your message. Please try again or email Isaac directly at IsaacMineo@gmail.com.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <section id="contact" className="py-20">
       <div className="animate-fadeInUp">
         <h2 className="text-4xl font-bold text-center mb-16 gradient-text">Get In Touch</h2>
+        <p className="text-xl text-center text-gray-600 mb-16 max-w-3xl mx-auto">
+          Ready to discuss opportunities, collaborate on projects, or just say hello? 
+          I'd love to hear from you!
+        </p>
         
         <div className="max-w-4xl mx-auto grid lg:grid-cols-2 gap-12">
           {/* Contact Info */}
@@ -95,16 +97,16 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">Email</p>
-                  <a href="mailto:isaac@isaacmineo.com" className="text-primary-600 hover:text-primary-700">
-                    isaac@isaacmineo.com
+                  <a href="mailto:IsaacMineo@gmail.com" className="text-primary-600 hover:text-primary-700">
+                    IsaacMineo@gmail.com
                   </a>
                 </div>
               </div>
 
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clipRule="evenodd" />
+                  <svg className="w-6 h-6 text-primary-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                   </svg>
                 </div>
                 <div>
@@ -117,34 +119,42 @@ export default function Contact() {
 
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z" clipRule="evenodd" />
+                  <svg className="w-6 h-6 text-primary-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                   </svg>
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">LinkedIn</p>
-                  <a href="https://linkedin.com/in/isaacmineo" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:text-primary-700">
-                    /in/isaacmineo
+                                    <a href="https://www.linkedin.com/in/isaacmineo2001/" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:text-primary-700">
+                    linkedin.com/in/isaacmineo2001
                   </a>
                 </div>
               </div>
             </div>
+
+            <div className="bg-primary-50 rounded-xl p-6">
+              <h4 className="font-semibold text-primary-900 mb-2">Quick Response Promise</h4>
+              <p className="text-primary-800 text-sm">
+                I typically respond to messages within 24 hours. For urgent inquiries, 
+                feel free to reach out directly via email or LinkedIn.
+              </p>
+            </div>
           </div>
 
           {/* Contact Form */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          <div>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Name
+                  Name *
                 </label>
                 <input
                   type="text"
                   id="name"
                   name="name"
+                  required
                   value={formData.name}
                   onChange={handleChange}
-                  required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
                   placeholder="Your name"
                 />
@@ -152,15 +162,15 @@ export default function Contact() {
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email
+                  Email *
                 </label>
                 <input
                   type="email"
                   id="email"
                   name="email"
+                  required
                   value={formData.email}
                   onChange={handleChange}
-                  required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
                   placeholder="your.email@example.com"
                 />
@@ -168,14 +178,13 @@ export default function Contact() {
 
               <div>
                 <label htmlFor="interest" className="block text-sm font-medium text-gray-700 mb-2">
-                  I'm interested in
+                  Type of Inquiry
                 </label>
                 <select
                   id="interest"
                   name="interest"
                   value={formData.interest}
                   onChange={handleChange}
-                  required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
                 >
                   <option value="">Select an option</option>
@@ -188,31 +197,72 @@ export default function Contact() {
               </div>
 
               <div>
+                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                  Subject *
+                </label>
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  required
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                  placeholder="What's this about?"
+                />
+              </div>
+
+              <div>
                 <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                  Message
+                  Message *
                 </label>
                 <textarea
                   id="message"
                   name="message"
+                  required
+                  rows={6}
                   value={formData.message}
                   onChange={handleChange}
-                  required
-                  rows="4"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
-                  placeholder="Tell me about your project or opportunity..."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors resize-none"
+                  placeholder="Tell me about your project, opportunity, or what you'd like to discuss..."
                 />
               </div>
+
+              {/* Status Message */}
+              {submitStatus && (
+                <div className={`p-4 rounded-lg border ${
+                  submitStatus.type === 'success' 
+                    ? 'bg-green-50 text-green-800 border-green-200' 
+                    : 'bg-red-50 text-red-800 border-red-200'
+                }`}>
+                  <div className="flex">
+                    <svg className={`w-5 h-5 mr-2 mt-0.5 ${
+                      submitStatus.type === 'success' ? 'text-green-600' : 'text-red-600'
+                    }`} fill="currentColor" viewBox="0 0 20 20">
+                      {submitStatus.type === 'success' ? (
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      ) : (
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      )}
+                    </svg>
+                    <span>{submitStatus.message}</span>
+                  </div>
+                </div>
+              )}
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-primary-600 text-white py-3 px-6 rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
-                  <div className="flex items-center justify-center">
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
                     Sending...
-                  </div>
+                  </span>
                 ) : (
                   'Send Message'
                 )}

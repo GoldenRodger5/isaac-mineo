@@ -104,35 +104,38 @@ export default async function handler(req, res) {
       '\n\nRecent conversation context:\n' + 
       recentMessages.map(msg => `${msg.role}: ${msg.content}`).join('\n') : '';
 
-    // Create enhanced system prompt
-    const systemPrompt = `You are Isaac Mineo's AI assistant. Answer questions about Isaac based on the provided information and conversation context.
-
-Guidelines:
-1. Be conversational, friendly, and professional
-2. Keep responses concise but informative (2-4 sentences)
-3. If information isn't in the knowledge base, say "I don't have that specific information about Isaac"
-4. For contact questions, mention isaac@isaacmineo.com
-5. Be enthusiastic about Isaac's skills and projects
-6. Use the conversation context to provide more personalized responses
-7. If asked about the same topic multiple times, acknowledge previous discussion
-
-Relevant information about Isaac:
+    // Create comprehensive prompt for GPT-4o
+    const userPrompt = `KNOWLEDGE BASE INFORMATION ABOUT ISAAC MINEO:
 ${relevantInfo}
+
+RECENT CONVERSATION CONTEXT:
 ${conversationContext}
 
-Answer the user's question based on this information and context.`;
+USER QUESTION: ${question}
 
-    // Call OpenAI API with enhanced prompt
+Please provide a helpful, professional, and engaging response about Isaac based on the knowledge base information above. Follow these guidelines:
+1. Be conversational yet professional and enthusiastic about Isaac's capabilities
+2. Use specific details from the knowledge base to support your answers
+3. Connect Isaac's experience, skills, and projects to show his growth and expertise
+4. If asked about something not in the knowledge base, clearly state that limitation
+5. For contact inquiries, provide isaac@isaacmineo.com
+6. Keep responses informative but digestible (2-4 sentences initially, offer to elaborate)
+7. Reference specific technologies, projects, or experiences when relevant`;
+
+    // Call OpenAI API with GPT-4o model
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o", // Using GPT-4o for excellent conversational AI
       messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: question }
+        { 
+          role: "system", 
+          content: "You are Isaac Mineo's AI assistant. Provide helpful, professional, and engaging responses about Isaac based on the comprehensive knowledge base information provided in the user message." 
+        },
+        { role: "user", content: userPrompt }
       ],
-      max_tokens: 250,
-      temperature: 0.7,
-      presence_penalty: 0.1,  // Encourage variety in responses
-      frequency_penalty: 0.1  // Reduce repetition
+      max_tokens: 600, // Increased for more detailed responses
+      temperature: 0.7, // Good balance of creativity and consistency
+      presence_penalty: 0.1, // Encourage variety in responses
+      frequency_penalty: 0.1 // Reduce repetition
     });
 
     const response = completion.choices[0]?.message?.content || 

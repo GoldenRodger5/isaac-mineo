@@ -6,7 +6,7 @@ export default function Resume() {
   const documents = {
     resume: {
       title: 'Professional Resume',
-      filename: 'IsaacMineo_Resume.pdf',
+      filename: 'Mineo, Isaac, Resume.pdf',
       description: 'Complete overview of my professional experience, skills, and achievements'
     },
     transcript: {

@@ -17,7 +17,7 @@
       "src": "/favicon-32.png",
       "sizes": "32x32",
       "type": "image/png",
-      "purpose": "favicon"
+      "purpose": "any"
     },
     {
       "src": "/icon-192.png",

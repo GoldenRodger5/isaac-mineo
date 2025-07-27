@@ -239,30 +239,47 @@ export const searchKnowledgeBase = async (query, openai) => {
     // Generate embedding for the query
     const queryEmbedding = await createEmbedding(query, openai);
     
-    // Search Pinecone
+    // Search Pinecone with higher topK for more comprehensive results
     const searchResults = await index.query({
       vector: queryEmbedding,
-      topK: 5,
+      topK: 10, // Increased for more comprehensive knowledge
       includeMetadata: true,
     });
     
-    // Extract and rank relevant information
+    // Extract and categorize relevant information
     const relevantChunks = searchResults.matches
-      .filter(match => match.score > 0.7) // Only include high-confidence matches
+      .filter(match => match.score > 0.6) // Slightly lower threshold for more results
       .map(match => ({
         text: match.metadata.text,
         score: match.score,
-        category: match.metadata.category,
         source: match.metadata.source,
-        type: match.metadata.type
+        chunkIndex: match.metadata.chunkIndex || 0
       }));
 
-    // Combine and deduplicate results
-    const combinedText = relevantChunks
-      .map(chunk => chunk.text)
-      .join('\n\n');
+    // Group by source for better organization
+    const groupedBySource = relevantChunks.reduce((acc, chunk) => {
+      const source = chunk.source || 'Unknown';
+      if (!acc[source]) {
+        acc[source] = [];
+      }
+      acc[source].push(chunk);
+      return acc;
+    }, {});
 
-    const result = combinedText || 'No specific information found.';
+    // Create structured knowledge base response
+    let structuredResult = '';
+    
+    Object.entries(groupedBySource).forEach(([source, chunks]) => {
+      structuredResult += `\n=== FROM ${source.toUpperCase()} ===\n`;
+      chunks
+        .sort((a, b) => (a.chunkIndex || 0) - (b.chunkIndex || 0)) // Sort by chunk order
+        .forEach(chunk => {
+          structuredResult += `${chunk.text}\n\n`;
+        });
+    });
+
+    // If we have relevant information, format it nicely
+    const result = structuredResult.trim() || 'No specific information found in the knowledge base.';
     
     // Cache the results
     await cacheManager.cacheSearchResults(query, result);
@@ -271,7 +288,7 @@ export const searchKnowledgeBase = async (query, openai) => {
     
   } catch (error) {
     console.error('Error searching knowledge base:', error);
-    return 'Error retrieving information.';
+    return 'Error retrieving information from knowledge base.';
   }
 };
 

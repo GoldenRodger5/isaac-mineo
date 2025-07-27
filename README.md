@@ -1,43 +1,182 @@
 # Isaac Mineo - AI-Powered Portfolio 🚀
 
-A comprehensive Progressive Web App (PWA) portfolio featuring advanced AI chatbot capabilities, semantic search, and modern responsive design.
+A modern, full-stack portfolio application with FastAPI backend and React frontend, featuring advanced AI chatbot capabilities and dynamic deployment scripts.
 
-## ✨ Features
-
-### Core Portfolio
-- **Progressive Web App** with offline support and service worker
-- **Responsive Design** with Tailwind CSS and dynamic island support  
-- **Professional Sections**: About, Projects, Resume, Contact
-- **Resume & Transcript PDFs** with downloadable links
-
-### AI-Powered Chatbot 🤖
-- **Dual AI APIs**: OpenAI GPT-4 and Claude integration
-- **Semantic Search** across resume, transcript, and knowledge base
-- **PDF Document Processing** with intelligent text chunking
-- **Conversation Context** with session management
-- **Real-time Responses** with typing indicators
-
-### Advanced Technology Stack
-- **Vector Database**: Pinecone for semantic search
-- **Caching**: Redis Cloud with write-through strategy
-- **Rate Limiting**: Production-ready with proper error handling
-- **Dual Environment**: Node.js frontend + Python AI processing
-
-## 🏗️ Architecture
+## 📁 Project Structure
 
 ```
 isaac-mineo/
-├── frontend/              # React PWA Application
-│   ├── src/
-│   │   ├── components/    # React components (About, Projects, AIChatbot, etc.)
-│   │   ├── utils/         # AI utilities (Pinecone, Cache, Document Processing)
-│   │   └── data/          # Knowledge base and static content
-│   ├── api/               # Serverless API functions
-│   ├── public/           # Static assets, PWA manifest, service worker
-│   └── scripts/          # Setup and testing utilities
-├── backend/              # Optional Node.js server (if needed)
-├── scripts/              # Project automation and deployment
-└── docs/                 # Comprehensive documentation
+├── backend/              # FastAPI backend with AI chatbot
+├── frontend/             # React + Vite frontend
+├── start-backend.sh      # Dynamic backend starter (auto port detection)
+├── start-frontend.sh     # Dynamic frontend starter (auto port detection) 
+├── start-dev.sh          # Start both backend & frontend with auto-config
+├── render-deploy.sh      # Production deployment to Render
+├── render.yaml          # Render deployment configuration
+└── README.md            # This file
+```
+
+## ✨ Features
+
+### AI-Powered Backend (FastAPI)
+- **GPT-4o Chatbot** with comprehensive knowledge base about Isaac
+- **Vector Search** using Pinecone for semantic question answering
+- **Redis Caching** for improved performance and rate limiting
+- **Dynamic Port Detection** - automatically finds available ports
+- **API Documentation** at `/docs` endpoint
+
+### Modern Frontend (React + Vite)
+- **Responsive Design** with Tailwind CSS
+- **Progressive Web App** capabilities
+- **Professional Sections**: About, Projects, Resume, Contact
+- **AI Chatbot Interface** connected to FastAPI backend
+
+## 🚀 Quick Start
+
+### Prerequisites
+- **Python 3.12+** for backend
+- **Node.js 18+** for frontend
+- **Git** for version control
+
+### Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/GoldenRodger5/isaac-mineo.git
+   cd isaac-mineo
+   ```
+
+2. **Configure Environment**
+   ```bash
+   # Copy the .env file and add your API keys
+   # The .env file contains all configuration in one place
+   # Update the following with your actual values:
+   # - OPENAI_API_KEY
+   # - PINECONE_API_KEY (optional)
+   # - REDIS_URL (optional)
+   # - Email settings (optional)
+   
+   # Validate your environment setup
+   ./validate-env.sh
+   ```
+
+3. **Start Development Environment**
+   ```bash
+   # Start both backend and frontend with automatic configuration
+   ./start-dev.sh
+   ```
+
+   This script will:
+   - Load environment variables from .env
+   - Automatically detect and use available ports
+   - Start FastAPI backend (usually port 8000)
+   - Start React frontend (usually port 5173)
+   - Configure frontend to communicate with backend
+
+### Manual Start (Alternative)
+
+**Backend Only:**
+```bash
+./start-backend.sh
+# Backend will be available at http://localhost:8001
+# API docs at http://localhost:8001/docs
+```
+
+**Frontend Only:**
+```bash
+./start-frontend.sh  
+# Frontend will be available at http://localhost:5173+
+```
+
+## 🌐 Deployment
+
+### Production Deployment to Render
+
+```bash
+./render-deploy.sh
+```
+
+This will deploy the FastAPI backend to Render. The frontend can be deployed to Vercel using their Git integration.
+
+## 📚 API Documentation
+
+Once the backend is running, visit:
+- **API Documentation**: http://localhost:8001/docs
+- **Health Check**: http://localhost:8001/health
+- **Chatbot Endpoint**: http://localhost:8001/api/chatbot
+
+## 🛠️ Technology Stack
+
+### Backend (FastAPI)
+- **FastAPI** - Modern Python web framework
+- **OpenAI GPT-4o** - AI chatbot responses
+- **Pinecone** - Vector database for semantic search
+- **Redis** - Caching and rate limiting
+- **Uvicorn** - ASGI server
+
+### Frontend (React + Vite)
+- **React 18** - UI framework
+- **Vite** - Build tool and dev server
+- **Tailwind CSS** - Styling framework
+- **JavaScript/JSX** - Programming language
+
+### DevOps & Deployment
+- **Render** - Backend hosting
+- **Vercel** - Frontend hosting  
+- **Dynamic Scripts** - Automatic port detection
+- **Git** - Version control
+
+## 📝 Environment Variables
+
+All configuration is centralized in a single `.env` file in the project root:
+
+```env
+# Site Configuration
+VITE_SITE_PASSWORD=Buddydog#41
+
+# AI API Keys
+OPENAI_API_KEY=your_openai_api_key_here
+PINECONE_API_KEY=your_pinecone_api_key_here
+
+# Email Configuration (for contact form)
+SENDER_EMAIL=noreply@isaacmineo.com
+SENDER_PASSWORD=your_gmail_app_password_here
+
+# Optional: Redis for caching
+REDIS_URL=redis://localhost:6379
+```
+
+**Required for basic functionality:**
+- `VITE_SITE_PASSWORD` - Already set to "Buddydog#41"
+- `OPENAI_API_KEY` - Get from https://platform.openai.com/api-keys
+
+**Optional but recommended:**
+- `PINECONE_API_KEY` - For enhanced vector search
+- `SENDER_EMAIL` & `SENDER_PASSWORD` - For contact form emails
+- `REDIS_URL` - For caching and performance
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test with `./start-dev.sh`
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 📧 Contact
+
+**Isaac Mineo**
+- **Email**: isaac@isaacmineo.com
+- **Portfolio**: [isaacmineo.com](https://isaacmineo.com)
+- **GitHub**: [@GoldenRodger5](https://github.com/GoldenRodger5)
+
+---
+---
+*Built with ❤️ using FastAPI, React, and AI*
 ```
 
 ## � Quick Start

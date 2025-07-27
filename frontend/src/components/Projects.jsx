@@ -23,60 +23,105 @@ export default function Projects() {
         "MongoDB for structured user data and logs",
         "Dual AI integration (Claude + GPT)"
       ],
-      githubUrl: "https://github.com/GoldenRodger5/nutrivize",
+      githubUrl: "https://github.com/GoldenRodger5/nutrivize/tree/master",
       liveUrl: "https://nutrivize.vercel.app",
       status: "Live",
       impact: "An intelligent nutrition companion designed to feel personal, lightweight, and helpful - not just a tracker"
     },
     {
+      title: "Quizium",
+      subtitle: "🧠 AI Flashcard Generator & Study Assistant",
+      description: "An intelligent web application that transforms PDFs and web content into interactive flashcards using Claude AI, featuring a beautiful study interface with advanced learning analytics.",
+      longDescription: "Quizium revolutionizes studying by automatically generating high-quality flashcards from PDFs, Wikipedia articles, and web content. The AI-powered study assistant provides smart answer evaluation, adaptive hints, and persistent study sessions that resume seamlessly across browser tabs.",
+      technologies: ["Python 3.11+", "FastAPI", "Claude AI (Anthropic)", "Uvicorn", "PyPDF2", "BeautifulSoup4", "Jinja2", "Vanilla JavaScript", "HTML5/CSS3"],
+      features: [
+        "PDF text extraction and auto-generation of flashcards",
+        "Wikipedia and web content integration support",
+        "3D flip animations with smooth card transitions",
+        "AI answer evaluation using Claude for flexible checking",
+        "Intelligent hints that guide without revealing answers",
+        "Persistent study sessions across browser tabs",
+        "Real-time progress tracking and completion percentage",
+        "Multiple study modes: Browse and Study with adaptive learning",
+        "Category organization by topic and difficulty",
+        "Batch processing for multiple content sources",
+        "WCAG compliant with keyboard navigation support"
+      ],
+      architecture: [
+        "FastAPI backend with modern Python architecture",
+        "Claude AI integration for content generation and evaluation",
+        "In-memory session storage with auto-recovery capabilities",
+        "Vanilla JavaScript frontend for optimal performance",
+        "RESTful API endpoints for all frontend interactions",
+        "Beautiful responsive UI with dark/light theme support",
+        "Web APIs for file handling and local storage"
+      ],
+      githubUrl: "https://github.com/GoldenRodger5/Quizium",
+      status: "Production Ready",
+      impact: "Revolutionizing study habits by transforming static materials into dynamic, AI-powered interactive learning experiences with persistent sessions and adaptive difficulty"
+    },
+    {
+      title: "EchoPodCast Generator",
+      subtitle: "🎙️ AI-Powered Podcast Creation",
+      description: "An intelligent AI-powered podcast generator that automatically transforms web content into engaging, conversation-style podcasts. Simply provide URLs, and the system creates professional-sounding podcasts with realistic voices and natural dialogue.",
+      longDescription: "EchoPodCast leverages cutting-edge AI technologies including OpenAI and ElevenLabs to analyze web content and transform it into dynamic, engaging podcasts. The system extracts key information from URLs, structures it into conversational format, and generates human-like speech using advanced text-to-speech models.",
+      technologies: ["FastAPI", "React", "OpenAI API", "ElevenLabs", "WebSockets", "Pydub", "YAML", "CSS3", "Python"],
+      features: [
+        "URL-to-podcast conversion from any web article or blog",
+        "Multi-voice conversations with realistic AI voice personalities",
+        "Real-time WebSocket updates during podcast generation",
+        "Customizable podcast name, tagline, and conversation style",
+        "Creativity controls from factual to inventive content (0.0-1.0 slider)",
+        "Voice selection for both questions and answers",
+        "Longform mode for extended podcast episodes",
+        "Multiple conversation styles: Engaging, Fast-Paced, Enthusiastic, Casual, Analytical",
+        "Dark/Light mode UI themes",
+        "Responsive design for desktop and mobile",
+        "Advanced mode with detailed customization controls",
+        "Background processing with status updates"
+      ],
+      architecture: [
+        "FastAPI backend with WebSocket real-time communication",
+        "React frontend with component-based UI architecture",
+        "OpenAI integration for AI content generation and TTS",
+        "ElevenLabs for high-quality, realistic voice synthesis",
+        "Pydub for audio processing and manipulation",
+        "YAML configuration management for podcast settings",
+        "Background task processing for podcast generation",
+        "CORS support for cross-origin resource sharing",
+        "Comprehensive error handling and file serving"
+      ],
+      githubUrl: "https://github.com/GoldenRodger5/EchoPodCastGenerator",
+      liveUrl: "https://echopodcastgenerator-frontend.onrender.com",
+      status: "Live",
+      impact: "Democratizing podcast creation by transforming any web content into professional-quality, multi-voice podcast episodes with advanced AI and realistic voice synthesis"
+    },
+    {
       title: "AI Development Portfolio",
       subtitle: "This Website",
-      description: "A modern, secure portfolio website with password protection, smooth animations, and optimized performance. Built to showcase professional work with innovative features.",
-      longDescription: "Features glassmorphism design, secure authentication, responsive layouts, and performance optimizations. Demonstrates modern web development practices and attention to detail.",
-      technologies: ["React", "Vite", "Tailwind CSS", "Vercel", "PWA", "PDF.js"],
+      description: "A modern, secure portfolio website with an integrated AI chatbot, smooth animations, and optimized performance. Built to showcase professional work with innovative features.",
+      longDescription: "Features glassmorphism design, secure authentication, responsive layouts, AI-powered chatbot for interactive Q&A, and performance optimizations. Demonstrates modern web development practices and attention to detail.",
+      technologies: ["React", "Vite", "Tailwind CSS", "FastAPI", "Pinecone", "OpenAI API", "Vercel", "PWA"],
       features: [
-        "Password-protected access with session management",
+        "AI-powered chatbot with knowledge base integration",
         "Glassmorphism UI with smooth animations",
         "Interactive document viewer for resume/transcript",
         "Responsive design optimized for all devices",
         "Performance-focused with lazy loading",
-        "SEO optimized with structured data"
+        "SEO optimized with structured data",
+        "Contact form with email integration"
       ],
       architecture: [
         "Vite for lightning-fast development",
         "Tailwind for utility-first styling",
-        "Custom animations and micro-interactions",
-        "Environment-based configuration"
+        "FastAPI backend with AI integration",
+        "Pinecone vector database for knowledge retrieval",
+        "Custom animations and micro-interactions"
       ],
       githubUrl: "https://github.com/GoldenRodger5/isaac-mineo",
       liveUrl: "https://isaacmineo.com",
       status: "Live",
-      impact: "Professional showcase demonstrating modern web development skills and design sensibility"
-    },
-    {
-      title: "Full-Stack Development Expertise",
-      subtitle: "Technical Capabilities",
-      description: "Comprehensive experience building scalable web applications with modern technologies, AI integration, and performance optimization.",
-      longDescription: "Specialized in creating end-to-end solutions that combine intelligent backend architecture with polished frontend experiences.",
-      technologies: ["Python", "JavaScript/TypeScript", "React Ecosystem", "AI APIs", "Cloud Platforms", "Database Design"],
-      features: [
-        "API design and architecture",
-        "Database modeling and optimization", 
-        "Authentication and security implementation",
-        "AI and automation integration",
-        "Performance monitoring and optimization",
-        "DevOps and deployment workflows"
-      ],
-      architecture: [
-        "Microservices and serverless architectures",
-        "RESTful API design patterns",
-        "Database normalization and indexing",
-        "Caching strategies with Redis",
-        "CI/CD pipeline implementation"
-      ],
-      githubUrl: "https://github.com/GoldenRodger5",
-      status: "Ongoing",
-      impact: "Building meaningful tools that solve real-world problems with clean, scalable code"
+      impact: "Professional showcase demonstrating modern web development skills, AI integration, and design sensibility"
     }
   ];
 
