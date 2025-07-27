@@ -39,7 +39,8 @@ function App() {
   // PWA install prompt
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
-      e.preventDefault();
+      // Don't prevent default to allow the banner to show
+      // e.preventDefault(); // Commented out to allow install banner
       setInstallPrompt(e);
     };
 

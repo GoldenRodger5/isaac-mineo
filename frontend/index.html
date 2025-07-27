@@ -79,10 +79,11 @@
         });
       }
       
-      // PWA install prompt
+      // PWA install prompt - Fixed to not prevent default
       let deferredPrompt;
       window.addEventListener('beforeinstallprompt', (e) => {
         console.log('PWA install prompt available');
+        // Don't prevent default to allow the banner to show
         deferredPrompt = e;
       });
       
