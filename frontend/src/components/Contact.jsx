@@ -38,9 +38,10 @@ export default function Contact() {
       const result = await apiClient.sendContactEmail(formData);
       
       if (result.success) {
+        const methodText = result.method === 'vercel' ? ' (via backup system)' : '';
         setSubmitStatus({
           type: 'success',
-          message: 'Thank you for your message! Isaac will get back to you soon.'
+          message: `Thank you for your message! Isaac will get back to you soon.${methodText}`
         });
         setFormData({
           name: '',
@@ -52,13 +53,13 @@ export default function Contact() {
       } else {
         setSubmitStatus({
           type: 'error',
-          message: 'There was an issue sending your message. Please try again or email Isaac directly at IsaacMineo@gmail.com.'
+          message: 'There was an issue sending your message. Please try again or email Isaac directly at isaacmineo@gmail.com.'
         });
       }
     } catch (error) {
       setSubmitStatus({
         type: 'error',
-        message: 'There was an issue sending your message. Please try again or email Isaac directly at IsaacMineo@gmail.com.'
+        message: 'There was an issue sending your message. Please try again or email Isaac directly at isaacmineo@gmail.com.'
       });
     } finally {
       setIsSubmitting(false);

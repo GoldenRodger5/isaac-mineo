@@ -92,8 +92,9 @@ class APIClient {
     }
   }
 
-  // Send contact form email
+  // Send contact form email with fallback to Vercel function
   async sendContactEmail(contactData) {
+    // Try primary backend first
     try {
       const response = await this.fetchWithRetry(`${this.baseURL}/contact`, {
         method: 'POST',
@@ -102,14 +103,36 @@ class APIClient {
 
       return {
         success: true,
-        data: response
+        data: response,
+        method: 'backend'
       };
-    } catch (error) {
-      console.error('Contact form error:', error);
-      return {
-        success: false,
-        error: error.message
-      };
+    } catch (backendError) {
+      console.warn('Backend contact failed, trying Vercel function:', backendError);
+      
+      // Fallback to Vercel serverless function
+      try {
+        const vercelResponse = await this.fetchWithRetry('/api/contact', {
+          method: 'POST',
+          body: JSON.stringify(contactData),
+        });
+
+        return {
+          success: true,
+          data: vercelResponse,
+          method: 'vercel'
+        };
+      } catch (vercelError) {
+        console.error('Both contact methods failed:', { backendError, vercelError });
+        
+        return {
+          success: false,
+          error: 'Both contact methods failed',
+          details: {
+            backend: backendError.message,
+            vercel: vercelError.message
+          }
+        };
+      }
     }
   }
 
