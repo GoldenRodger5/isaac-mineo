@@ -81,13 +81,17 @@ fi
 
 echo -e "${GREEN}✅ Backend started on port $BACKEND_PORT${NC}"
 
+# Create temporary environment file for frontend
+echo "VITE_BACKEND_URL=http://localhost:$BACKEND_PORT" > .env.backend
+echo "VITE_API_BASE_URL=http://localhost:$BACKEND_PORT/api" >> .env.backend
+
 # Update environment variable for frontend
 export VITE_BACKEND_URL="http://localhost:$BACKEND_PORT"
 export VITE_API_BASE_URL="http://localhost:$BACKEND_PORT/api"
 
 # Start frontend in background
 echo -e "${BLUE}🎨 Starting frontend server...${NC}"
-./start-frontend.sh > frontend.log 2>&1 &
+VITE_BACKEND_URL="http://localhost:$BACKEND_PORT" VITE_API_BASE_URL="http://localhost:$BACKEND_PORT/api" ./start-frontend.sh > frontend.log 2>&1 &
 FRONTEND_PID=$!
 
 # Wait for frontend to start

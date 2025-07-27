@@ -32,7 +32,6 @@
     
     <!-- iOS Safari specific -->
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Isaac Mineo" />
     <link rel="apple-touch-startup-image" href="/icon-512.png" />
@@ -51,8 +50,8 @@
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#667eea" />
     
-    <!-- Security -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https: ws: wss: http://localhost:* ws://localhost:*; object-src 'none'; base-uri 'self';" />
+    <!-- Security - Production CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https: wss: https://*.onrender.com https://isaac-mineo-api.onrender.com; object-src 'none'; base-uri 'self';" />
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://isaacmineo.com" />

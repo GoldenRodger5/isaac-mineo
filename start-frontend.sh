@@ -1,6 +1,20 @@
 #!/bin/bash
 
-# Isaac Mineo Portfolio - Dynamic Frontend Starter
+# Isaac Mineo Portfolio - Dynamic F# Load base environment variables
+if [ -f ".env" ]; then
+    echo -e "${YELLOW}🔧 Loading environment variables...${NC}"
+    source .env
+fi
+
+# Load dynamic backend configuration if available
+if [ -f ".env.backend" ]; then
+    echo -e "${YELLOW}🔧 Loading dynamic backend configuration...${NC}"
+    source .env.backend
+fi
+
+# Check for backend URL
+BACKEND_URL=${VITE_BACKEND_URL:-"http://localhost:8000"}
+echo -e "${GREEN}✅ Using backend URL: $BACKEND_URL${NC}"tarter
 # Automatically configures backend URL and starts Vite dev server
 
 set -e

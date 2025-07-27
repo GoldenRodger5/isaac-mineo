@@ -1,5 +1,5 @@
 import os
-from pinecone import Pinecone
+from pinecone import Pinecone, ServerlessSpec
 import openai
 from typing import Optional, List, Dict, Any, Tuple
 import hashlib
