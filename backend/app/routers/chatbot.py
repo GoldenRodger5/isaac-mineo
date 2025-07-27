@@ -105,40 +105,14 @@ async def chat_with_assistant(request: ChatRequest, req: Request):
             conversation_context = "\\n\\nRecent conversation context:\\n" + \
                 "\\n".join([f"{msg['role']}: {msg['content']}" for msg in recent_messages])
         
-        # Create comprehensive prompt for GPT-4o with categorized context
-        user_prompt = f"""ISAAC MINEO'S KNOWLEDGE BASE (Multi-Index Search Results):
-{relevant_info}
+        # Create concise prompt for GPT-4o
+        user_prompt = f"""KNOWLEDGE BASE: {relevant_info}
 
-RECENT CONVERSATION CONTEXT:
-{conversation_context}
+CONTEXT: {conversation_context}
 
-USER QUESTION: {request.question}
+QUESTION: {request.question}
 
-Please provide a helpful, professional, and engaging response about Isaac based on the categorized knowledge base above. Follow these enhanced guidelines:
-
-1. **Context Awareness**: Pay attention to the [PROJECT INFO], [PROFESSIONAL INFO], and [PERSONAL INFO] categories in the knowledge base
-2. **Comprehensive Responses**: Draw from multiple categories when relevant (e.g., projects + professional experience)
-3. **Specific Details**: Use concrete examples from Isaac's projects (Nutrivize, Quizium, EchoPodCast Generator) and technical stack
-4. **Professional Tone**: Be conversational yet professional, showcasing Isaac's expertise and enthusiasm
-5. **Technical Accuracy**: Reference specific technologies, frameworks, and architectures accurately
-6. **Contact Information**: For contact inquiries, provide isaacmineo@gmail.com
-7. **Scope Limitation**: If information isn't in the knowledge base, clearly state that limitation
-8. **Engagement**: Keep initial responses informative but digestible, offer to elaborate on complex topics
-
-FORMATTING REQUIREMENTS:
-- NO markdown symbols (*, #, -, etc.)
-- Use clear paragraph breaks with double line breaks
-- Use "•" for bullet points when listing items
-- Use BOLD text sparingly with **text** only for emphasis
-- Use proper sentence structure and natural language
-- Format technical terms naturally in sentences
-- Create clear visual hierarchy with spacing and proper paragraphs
-
-RESPONSE STRATEGY:
-- For project questions: Focus on technical details, architecture, and innovations
-- For career questions: Emphasize skills, experience, and professional growth
-- For personal questions: Share background, interests, and what motivates Isaac
-- For general questions: Provide a well-rounded view combining multiple aspects"""
+Provide a concise, professional response about Isaac. Be specific and helpful, but keep it brief and conversational. Use concrete details from the knowledge base when relevant."""
 
         # Call OpenAI API with GPT-4o
         completion = openai_client.chat.completions.create(
@@ -146,11 +120,11 @@ RESPONSE STRATEGY:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are Isaac Mineo's advanced AI assistant with access to a comprehensive, categorized knowledge base. You excel at providing detailed, accurate responses about Isaac's technical projects, professional background, and personal interests. Use the categorized information ([PROJECT INFO], [PROFESSIONAL INFO], [PERSONAL INFO]) to give nuanced, well-informed answers that showcase Isaac's expertise and personality. Always maintain a professional yet approachable tone that reflects Isaac's communication style."
+                    "content": "You are Isaac Mineo's AI assistant. Provide concise, professional responses about Isaac's projects, skills, and background using the knowledge base. Keep answers brief but informative. Use a conversational tone that reflects Isaac's personality. For contact: isaacmineo@gmail.com"
                 },
                 {"role": "user", "content": user_prompt}
             ],
-            max_tokens=600,
+            max_tokens=300,
             temperature=0.7,
             presence_penalty=0.1,
             frequency_penalty=0.1

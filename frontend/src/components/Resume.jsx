@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Resume() {
   const [activeDocument, setActiveDocument] = useState('resume');
+  const [iframeError, setIframeError] = useState(false);
 
   const documents = {
     resume: {
@@ -19,6 +20,11 @@ export default function Resume() {
   };
 
   const currentDoc = documents[activeDocument];
+
+  // Reset iframe error when document changes
+  useEffect(() => {
+    setIframeError(false);
+  }, [activeDocument]);
 
   return (
     <section id="resume" className="py-20">
@@ -77,27 +83,72 @@ export default function Resume() {
           {/* PDF Viewer */}
           <div className="relative">
             <div className="aspect-[8.5/11] bg-gray-100 flex items-center justify-center">
-              <iframe
-                src={`/${currentDoc.filename}#toolbar=0&navpanes=0&scrollbar=0`}
-                className="w-full h-full border-0"
-                title={currentDoc.title}
-                loading="lazy"
-              />
+              {!iframeError ? (
+                <iframe
+                  src={`/${currentDoc.filename}#toolbar=0&navpanes=0&scrollbar=0`}
+                  className="w-full h-full border-0"
+                  title={currentDoc.title}
+                  loading="lazy"
+                  onError={() => setIframeError(true)}
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center text-center p-8">
+                  <svg className="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">{currentDoc.title}</h3>
+                  <p className="text-gray-600 mb-6">PDF preview not available. Click below to view or download.</p>
+                  
+                  <div className="flex space-x-3">
+                    <a
+                      href={`/${currentDoc.filename}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      View PDF
+                    </a>
+                    <a
+                      href={`/${currentDoc.filename}`}
+                      download
+                      className="flex items-center px-6 py-3 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors font-medium"
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Download PDF
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
             
-            {/* Fallback for browsers that don't support PDF viewing */}
-            <div className="absolute inset-0 bg-gray-100 flex flex-col items-center justify-center text-center p-8 opacity-0 hover:opacity-100 transition-opacity duration-300">
-              <svg className="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-              <p className="text-gray-600 mb-4">Click to view document in full screen</p>
+            {/* Overlay with direct links - always visible */}
+            <div className="absolute top-4 right-4 flex space-x-2">
               <a
                 href={`/${currentDoc.filename}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+                className="bg-white/90 backdrop-blur-sm shadow-lg rounded-lg p-2 hover:bg-white transition-colors"
+                title="Open in new tab"
               >
-                Open PDF
+                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+              <a
+                href={`/${currentDoc.filename}`}
+                download
+                className="bg-white/90 backdrop-blur-sm shadow-lg rounded-lg p-2 hover:bg-white transition-colors"
+                title="Download PDF"
+              >
+                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
               </a>
             </div>
           </div>
