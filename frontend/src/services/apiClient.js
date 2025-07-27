@@ -3,10 +3,44 @@
 
 class APIClient {
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    // Smart environment detection
+    this.environment = this.detectEnvironment();
+    this.baseURL = this.getApiBaseUrl();
     this.timeout = 30000; // 30 seconds - increased for better reliability
     this.retryAttempts = 3;
     this.retryDelay = 1000; // 1 second
+    
+    console.log(`🌍 Environment: ${this.environment}`);
+    console.log(`🔗 API Base URL: ${this.baseURL}`);
+  }
+
+  // Detect current environment
+  detectEnvironment() {
+    const hostname = window.location.hostname;
+    const isDev = import.meta.env.DEV;
+    
+    if (isDev || hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'development';
+    } else if (hostname === 'isaacmineo.com' || hostname === 'www.isaacmineo.com') {
+      return 'production';
+    } else {
+      return 'preview'; // Vercel preview deployments
+    }
+  }
+
+  // Get API base URL based on environment
+  getApiBaseUrl() {
+    switch (this.environment) {
+      case 'development':
+        // Local development - try localhost backend
+        return 'http://localhost:8000/api';
+      case 'production':
+      case 'preview':
+        // Production/Preview - use Render backend
+        return 'https://isaac-mineo-api.onrender.com/api';
+      default:
+        return 'http://localhost:8000/api';
+    }
   }
 
   // Generic fetch wrapper with error handling and retry logic
@@ -92,44 +126,69 @@ class APIClient {
     }
   }
 
-  // Send contact form email with fallback to Vercel function
+  // Send contact form email with smart environment-aware fallback
   async sendContactEmail(contactData) {
-    // Try primary backend first
+    const startTime = Date.now();
+    
+    // In development, try localhost backend first, then Vercel function
+    // In production, try Render backend first, then Vercel function
+    
+    console.log(`📧 Sending contact email via ${this.environment} environment...`);
+    
+    // Primary method: Try main backend
     try {
+      console.log(`🎯 Trying primary backend: ${this.baseURL}/contact`);
       const response = await this.fetchWithRetry(`${this.baseURL}/contact`, {
         method: 'POST',
         body: JSON.stringify(contactData),
       });
 
+      const elapsed = Date.now() - startTime;
+      console.log(`✅ Primary backend success in ${elapsed}ms`);
+      
       return {
         success: true,
         data: response,
-        method: 'backend'
+        method: this.environment === 'development' ? 'localhost' : 'render',
+        duration: elapsed
       };
     } catch (backendError) {
-      console.warn('Backend contact failed, trying Vercel function:', backendError);
+      console.warn(`⚠️ Primary backend failed:`, backendError.message);
       
-      // Fallback to Vercel serverless function
+      // Fallback method: Try Vercel serverless function
       try {
+        console.log(`🚀 Trying Vercel function fallback...`);
         const vercelResponse = await this.fetchWithRetry('/api/contact', {
           method: 'POST',
           body: JSON.stringify(contactData),
         });
 
+        const elapsed = Date.now() - startTime;
+        console.log(`✅ Vercel function success in ${elapsed}ms`);
+        
         return {
           success: true,
           data: vercelResponse,
-          method: 'vercel'
+          method: 'vercel',
+          duration: elapsed,
+          fallback: true
         };
       } catch (vercelError) {
-        console.error('Both contact methods failed:', { backendError, vercelError });
+        console.error(`❌ Both contact methods failed:`, { 
+          primary: backendError.message, 
+          fallback: vercelError.message 
+        });
+        
+        const elapsed = Date.now() - startTime;
         
         return {
           success: false,
-          error: 'Both contact methods failed',
+          error: 'All contact methods failed',
+          duration: elapsed,
           details: {
-            backend: backendError.message,
-            vercel: vercelError.message
+            primary: backendError.message,
+            fallback: vercelError.message,
+            environment: this.environment
           }
         };
       }

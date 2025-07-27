@@ -38,11 +38,23 @@ export default function Contact() {
       const result = await apiClient.sendContactEmail(formData);
       
       if (result.success) {
-        const methodText = result.method === 'vercel' ? ' (via backup system)' : '';
+        // Create success message based on method used
+        let successMessage = 'Thank you for your message! Isaac will get back to you soon.';
+        
+        if (result.fallback) {
+          successMessage += ' (via backup system)';
+        }
+        
+        // Add performance info in development
+        if (import.meta.env.DEV && result.duration) {
+          successMessage += ` [${result.duration}ms via ${result.method}]`;
+        }
+        
         setSubmitStatus({
           type: 'success',
-          message: `Thank you for your message! Isaac will get back to you soon.${methodText}`
+          message: successMessage
         });
+        
         setFormData({
           name: '',
           email: '',
@@ -51,9 +63,16 @@ export default function Contact() {
           interest: ''
         });
       } else {
+        let errorMessage = 'There was an issue sending your message. Please try again or email Isaac directly at isaacmineo@gmail.com.';
+        
+        // Add debug info in development
+        if (import.meta.env.DEV && result.details) {
+          errorMessage += ` [Debug: ${result.details.environment} environment, both ${result.details.primary} and ${result.details.fallback} failed]`;
+        }
+        
         setSubmitStatus({
           type: 'error',
-          message: 'There was an issue sending your message. Please try again or email Isaac directly at isaacmineo@gmail.com.'
+          message: errorMessage
         });
       }
     } catch (error) {
