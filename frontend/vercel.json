@@ -18,7 +18,7 @@
       "destination": "/api/$1"
     },
     {
-      "source": "/((?!assets|api|sw\\.js|manifest\\.json|favicon|.*\\.(css|js|png|jpg|jpeg|gif|svg|ico|pdf)).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
