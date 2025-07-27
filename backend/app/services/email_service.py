@@ -13,9 +13,9 @@ class EmailService:
     def __init__(self):
         self.smtp_server = "smtp.gmail.com"
         self.smtp_port = 587
-        self.sender_email = os.getenv("SENDER_EMAIL", "noreply@isaacmineo.com")
+        self.sender_email = os.getenv("SENDER_EMAIL", "isaacmineo@gmail.com")
         self.sender_password = os.getenv("SENDER_PASSWORD")
-        self.recipient_email = "IsaacMineo@gmail.com"
+        self.recipient_email = "isaacmineo@gmail.com"
         
     async def send_contact_email(self, contact_data: Dict[str, Any]) -> Dict[str, Any]:
         """Send contact form email to Isaac"""

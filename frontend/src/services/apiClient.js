@@ -4,7 +4,7 @@
 class APIClient {
   constructor() {
     this.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-    this.timeout = 10000; // 10 seconds
+    this.timeout = 30000; // 30 seconds - increased for better reliability
     this.retryAttempts = 3;
     this.retryDelay = 1000; // 1 second
   }
@@ -147,14 +147,14 @@ class APIClient {
     }
     
     if (questionLower.includes('contact') || questionLower.includes('email') || questionLower.includes('reach')) {
-      return "You can reach Isaac at isaac@isaacmineo.com, GitHub at github.com/GoldenRodger5, or LinkedIn at linkedin.com/in/isaacmineo2001. He's always open to discussing opportunities and collaborations!";
+      return "You can reach Isaac at isaacmineo@gmail.com, GitHub at github.com/GoldenRodger5, or LinkedIn at linkedin.com/in/isaacmineo2001. He's always open to discussing opportunities and collaborations!";
     }
     
     if (questionLower.includes('job') || questionLower.includes('career') || questionLower.includes('hiring')) {
       return "Isaac is seeking backend, AI engineering, or full-stack roles with innovative teams. He's particularly interested in healthtech, AI-powered productivity tools, developer tooling, and startups focused on making real-world impact.";
     }
     
-    return "Isaac is a Full-Stack Developer specializing in AI-powered applications. Ask me about his tech stack, projects like Nutrivize, experience, or career goals. Contact him at isaac@isaacmineo.com for opportunities!";
+    return "Isaac is a Full-Stack Developer specializing in AI-powered applications. Ask me about his tech stack, projects like Nutrivize, experience, or career goals. Contact him at isaacmineo@gmail.com for opportunities!";
   }
 }
 

@@ -97,6 +97,11 @@ self.addEventListener('fetch', (event) => {
   if (url.protocol === 'chrome-extension:') {
     return;
   }
+
+  // Skip API requests (especially POST requests) - let them go directly to network
+  if (url.pathname.includes('/api/') || request.method !== 'GET') {
+    return;
+  }
   
   event.respondWith(handleFetch(request));
 });
@@ -135,8 +140,8 @@ async function networkFirst(request) {
   try {
     const networkResponse = await fetch(request);
     
-    if (networkResponse.ok) {
-      // Cache successful responses
+    if (networkResponse.ok && request.method === 'GET') {
+      // Only cache GET requests
       const cache = await caches.open(DYNAMIC_CACHE_NAME);
       cache.put(request, networkResponse.clone());
     }

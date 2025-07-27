@@ -52,13 +52,13 @@ export default function Contact() {
       } else {
         setSubmitStatus({
           type: 'error',
-          message: 'There was an issue sending your message. Please try again or email Isaac directly at IsaacMineo@gmail.com.'
+          message: 'There was an issue sending your message. Please try again or email Isaac directly at isaacmineo@gmail.com.'
         });
       }
     } catch (error) {
       setSubmitStatus({
         type: 'error',
-        message: 'There was an issue sending your message. Please try again or email Isaac directly at IsaacMineo@gmail.com.'
+        message: 'There was an issue sending your message. Please try again or email Isaac directly at isaacmineo@gmail.com.'
       });
     } finally {
       setIsSubmitting(false);
@@ -97,8 +97,8 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">Email</p>
-                  <a href="mailto:IsaacMineo@gmail.com" className="text-primary-600 hover:text-primary-700">
-                    IsaacMineo@gmail.com
+                  <a href="mailto:isaacmineo@gmail.com" className="text-primary-600 hover:text-primary-700">
+                    isaacmineo@gmail.com
                   </a>
                 </div>
               </div>
