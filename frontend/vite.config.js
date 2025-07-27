@@ -6,21 +6,15 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
-    strictPort: false, // Allow using alternative ports if 5173 is busy
+    strictPort: false,
     hmr: {
       port: 5173,
       clientPort: 5173,
-      overlay: false // Disable error overlay for better development experience
+      overlay: false
     }
   },
   build: {
     sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom']
-        }
-      }
-    }
+    outDir: 'dist'
   }
 });
