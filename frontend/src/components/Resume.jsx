@@ -3,18 +3,20 @@ import React, { useState } from 'react';
 export default function Resume() {
   const [activeDocument, setActiveDocument] = useState('resume');
 
-  const documents = {
-    resume: {
-      title: 'Professional Resume',
-      filename: 'IsaacMineo_Resume.pdf',
-      description: 'Complete overview of my professional experience, skills, and achievements'
+  const documents = [
+    {
+      id: 'resume',
+      title: 'Resume',
+      filename: 'Isaac_Mineo_Resume.pdf',
+      description: 'Comprehensive overview of experience, skills, and achievements'
     },
-    transcript: {
+    {
+      id: 'transcript',
       title: 'Academic Transcript',
-      filename: 'Mineo, Isaac, Transcript.pdf',
-      description: 'Official academic record showcasing my educational background'
+      filename: 'Isaac_Mineo_Transcript.pdf',
+      description: 'Official academic record from Middlebury College'
     }
-  };
+  ];
 
   const currentDoc = documents[activeDocument];
 

@@ -45,7 +45,7 @@ async function vectorizePDF() {
             console.log(`   Processing chunk ${i + 1}/${chunks.length}...`);
             
             const response = await openai.embeddings.create({
-                model: 'text-embedding-3-small',
+                model: 'text-embedding-3-large',
                 input: chunks[i].text
             });
             

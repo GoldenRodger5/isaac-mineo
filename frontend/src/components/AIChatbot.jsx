@@ -1,6 +1,57 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { apiClient } from '../services/apiClient';
 
+// Simple function to format AI responses
+const formatAIResponse = (text) => {
+  if (!text) return text;
+  
+  // Convert markdown-style formatting to HTML-like styling
+  return text
+    // Remove markdown headers and replace with bold
+    .replace(/#{1,6}\s+(.+)/g, '<strong>$1</strong>')
+    // Convert **bold** to <strong>
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Convert bullet points from * to •
+    .replace(/^\s*[\*\-]\s+(.+)/gm, '• $1')
+    // Ensure proper paragraph breaks
+    .replace(/\n\s*\n/g, '\n\n')
+    // Clean up any remaining markdown symbols
+    .replace(/\*+/g, '')
+    .replace(/#+/g, '');
+};
+
+// Component to render formatted text
+const FormattedText = ({ text }) => {
+  const formattedText = formatAIResponse(text);
+  
+  return (
+    <div className="text-sm">
+      {formattedText.split('\n\n').map((paragraph, index) => {
+        if (!paragraph.trim()) return null;
+        
+        // Handle bullet points
+        if (paragraph.includes('•')) {
+          const lines = paragraph.split('\n').filter(line => line.trim());
+          return (
+            <div key={index} className="mb-2">
+              {lines.map((line, lineIndex) => (
+                <div key={lineIndex} className="mb-1" 
+                     dangerouslySetInnerHTML={{ __html: line }} />
+              ))}
+            </div>
+          );
+        }
+        
+        // Handle regular paragraphs
+        return (
+          <p key={index} className="mb-2" 
+             dangerouslySetInnerHTML={{ __html: paragraph }} />
+        );
+      })}
+    </div>
+  );
+};
+
 const AIChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -214,7 +265,11 @@ const AIChatbot = () => {
                       : 'bg-blue-600 text-white'
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                  {message.isBot ? (
+                    <FormattedText text={message.text} />
+                  ) : (
+                    <FormattedText text={message.text} />
+                  )}
                   {message.metadata && (
                     <div className="mt-2 text-xs opacity-70 flex items-center gap-2">
                       {message.metadata.cached && <span>📋 Cached</span>}
