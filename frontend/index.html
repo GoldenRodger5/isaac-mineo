@@ -8,6 +8,11 @@
     <meta name="keywords" content="Isaac Mineo, full-stack developer, AI engineer, React, Node.js, Python, portfolio, isaacmineo.com" />
     <meta name="author" content="Isaac Mineo" />
     
+    <!-- Disable caching for development -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Isaac Mineo - Full-Stack Developer & AI Engineer" />
@@ -62,22 +67,15 @@
     
     <div id="root"></div>
     
-    <!-- Service Worker Registration -->
+    <!-- Service Worker Registration - DISABLED FOR DEVELOPMENT -->
     <script>
+      // Disable service worker caching for now
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-              console.log('SW registered: ', registration);
-              
-              // Check for updates
-              registration.addEventListener('updatefound', () => {
-                console.log('SW update found');
-              });
-            })
-            .catch((registrationError) => {
-              console.log('SW registration failed: ', registrationError);
-            });
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+            console.log('SW unregistered: ', registration);
+          }
         });
       }
       
