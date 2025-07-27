@@ -10,7 +10,7 @@ from app.services.error_handler import error_handler
 from app.utils.pinecone_service import initialize_pinecone_indexes
 
 # Load environment variables from root .env file
-load_dotenv(dotenv_path='../../.env')  # Load from project root
+load_dotenv(dotenv_path='../.env')  # Load from project root
 load_dotenv()  # Also check current directory
 
 app = FastAPI(

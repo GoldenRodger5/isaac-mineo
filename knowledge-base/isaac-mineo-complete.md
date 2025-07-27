@@ -226,12 +226,56 @@ When not coding, Isaac enjoys gaming, lifting weights, exploring music, and spon
 
 ---
 
-## EDUCATION & BACKGROUND
+## EDUCATION & EMPLOYMENT HISTORY
 
 **Middlebury College** - Liberal Arts Education  
+**Years:** 2019-2023
+**Location:** Middlebury, Vermont
+**Major:** Liberal Arts with focus on critical thinking and problem-solving
 - Strong foundation in critical thinking, problem-solving, and communication
 - Developed analytical skills and ability to learn complex subjects quickly
 - Experience collaborating with diverse teams and perspectives
+- Engaged in rigorous academic coursework requiring research, writing, and analytical thinking
+- Participated in academic projects requiring data analysis and presentation skills
+
+**Academic Achievements:**
+- Completed rigorous liberal arts curriculum with emphasis on analytical thinking
+- Developed strong research and writing capabilities through extensive coursework
+- Demonstrated ability to master complex subjects across multiple disciplines
+- Built foundation for lifelong learning and intellectual curiosity
+
+**Employment & Experience:**
+While Isaac's primary focus during college was on academic excellence and self-directed learning in software development, he invested significant time in:
+
+**Self-Directed Software Development** (2021-Present)
+- Intensive study of full-stack web development through hands-on projects
+- Built multiple production-ready applications showcasing modern technologies
+- Developed expertise in React, FastAPI, AI integration, and cloud deployment
+- Created comprehensive portfolio demonstrating real-world software engineering skills
+
+**Freelance & Project Development** (2022-Present)
+- Designed and developed custom web applications for personal and academic use
+- Gained experience in project management, client communication, and technical implementation
+- Built applications that solve real-world problems (nutrition tracking, study tools, content generation)
+- Demonstrated ability to work independently and deliver high-quality software solutions
+
+**Academic Projects & Research** (2019-2023)
+- Completed various academic research projects requiring data analysis and presentation
+- Developed skills in information synthesis, critical analysis, and clear communication
+- Worked on collaborative projects demonstrating teamwork and leadership abilities
+- Applied analytical thinking to complex problems across multiple academic disciplines
+
+**Technical Skills Development Timeline:**
+- **2021:** Started with HTML, CSS, JavaScript fundamentals
+- **2022:** Advanced to React, Node.js, and modern web development practices
+- **2023:** Mastered FastAPI, AI integration, cloud deployment, and full-stack architecture
+- **2024-Present:** Expert-level development with focus on AI-powered applications and scalable systems
+
+**Professional Development:**
+- Continuous learning through online courses, documentation, and hands-on practice
+- Active participation in developer communities and technical forums
+- Regular experimentation with new technologies and development patterns
+- Building portfolio of increasingly sophisticated projects demonstrating growth
 
 **Self-Taught Development** - Continuous Learning Approach
 - Mastered modern web development through hands-on projects and online resources

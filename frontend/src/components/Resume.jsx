@@ -3,20 +3,20 @@ import React, { useState } from 'react';
 export default function Resume() {
   const [activeDocument, setActiveDocument] = useState('resume');
 
-  const documents = [
-    {
+  const documents = {
+    resume: {
       id: 'resume',
       title: 'Resume',
       filename: 'Isaac_Mineo_Resume.pdf',
       description: 'Comprehensive overview of experience, skills, and achievements'
     },
-    {
+    transcript: {
       id: 'transcript',
       title: 'Academic Transcript',
       filename: 'Isaac_Mineo_Transcript.pdf',
       description: 'Official academic record from Middlebury College'
     }
-  ];
+  };
 
   const currentDoc = documents[activeDocument];
 
