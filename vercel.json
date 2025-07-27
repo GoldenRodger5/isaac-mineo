@@ -37,7 +37,7 @@
       ]
     },
     {
-      "source": "/assets/(.*)",
+      "source": "/assets/(.*)\\.css",
       "headers": [
         {
           "key": "Cache-Control",
@@ -45,13 +45,17 @@
         },
         {
           "key": "Content-Type",
-          "value": "application/javascript"
+          "value": "text/css"
         }
       ]
     },
     {
-      "source": "/(.*)\\.js",
+      "source": "/assets/(.*)\\.js",
       "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
         {
           "key": "Content-Type",
           "value": "application/javascript"
