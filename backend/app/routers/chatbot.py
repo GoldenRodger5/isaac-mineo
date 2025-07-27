@@ -105,14 +105,21 @@ async def chat_with_assistant(request: ChatRequest, req: Request):
             conversation_context = "\\n\\nRecent conversation context:\\n" + \
                 "\\n".join([f"{msg['role']}: {msg['content']}" for msg in recent_messages])
         
-        # Create concise prompt for GPT-4o
+        # Create detailed prompt for GPT-4o
         user_prompt = f"""KNOWLEDGE BASE: {relevant_info}
 
 CONTEXT: {conversation_context}
 
 QUESTION: {request.question}
 
-Provide a concise, professional response about Isaac. Be specific and helpful, but keep it brief and conversational. Use concrete details from the knowledge base when relevant."""
+Provide a comprehensive, detailed response about Isaac. Be thorough and informative, using specific examples and concrete details from the knowledge base. Use markdown formatting for better readability:
+- **Bold** for important points and key terms
+- *Italics* for emphasis 
+- Bullet points for lists
+- Line breaks for better structure
+- Code blocks for technical details when relevant
+
+Make your response engaging and conversational while maintaining professionalism. Aim for depth and detail rather than brevity."""
 
         # Call OpenAI API with GPT-4o
         completion = openai_client.chat.completions.create(
@@ -120,11 +127,11 @@ Provide a concise, professional response about Isaac. Be specific and helpful, b
             messages=[
                 {
                     "role": "system",
-                    "content": "You are Isaac Mineo's AI assistant. Provide concise, professional responses about Isaac's projects, skills, and background using the knowledge base. Keep answers brief but informative. Use a conversational tone that reflects Isaac's personality. For contact: isaacmineo@gmail.com"
+                    "content": "You are Isaac Mineo's AI assistant. Provide comprehensive, detailed responses about Isaac's projects, skills, and background using the knowledge base. Use markdown formatting extensively for better readability. Be thorough and informative while maintaining a conversational tone that reflects Isaac's personality and expertise. Include specific examples, technical details, and context. For contact: isaacmineo@gmail.com"
                 },
                 {"role": "user", "content": user_prompt}
             ],
-            max_tokens=300,
+            max_tokens=800,
             temperature=0.7,
             presence_penalty=0.1,
             frequency_penalty=0.1

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { apiClient } from '../services/apiClient';
 
 const AIChat = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "👋 Hi! I'm Isaac's AI assistant with comprehensive knowledge about his background, technical skills, projects, and career goals.\n\nI can help you learn about:\n• His technical expertise (React, Python, FastAPI, AI APIs)\n• Projects like Nutrivize, Quizium, and EchoPodCast\n• His education at Middlebury College\n• Career aspirations and what he's looking for\n• His development philosophy and approach\n\nWhat would you like to know about Isaac?",
+      text: "👋 **Welcome!** I'm Isaac's AI assistant with comprehensive knowledge about his background, technical skills, projects, and career journey.\n\n**I can help you discover:**\n\n• **Technical Expertise** - His proficiency in React, Python, FastAPI, AI APIs, and full-stack development\n• **Featured Projects** - Detailed insights into Nutrivize, Quizium, EchoPodCast, and other innovative solutions\n• **Educational Background** - His Computer Science studies at Middlebury College and academic achievements\n• **Career Aspirations** - What he's looking for in his next role and his development philosophy\n• **Personal Approach** - His problem-solving methodology and collaborative work style\n\n*What aspect of Isaac's background interests you most?*",
       isBot: true,
       timestamp: new Date()
     }
@@ -155,7 +156,7 @@ const AIChat = () => {
     setMessages([
       {
         id: 1,
-        text: "👋 Hi! I'm Isaac's AI assistant. I'm here to help you learn about Isaac's background, skills, projects, and career goals. What would you like to know?",
+        text: "👋 **Welcome back!** I'm Isaac's AI assistant, ready to help you learn about his background, skills, projects, and career goals.\n\n**Ask me about:**\n• Technical expertise and development approach\n• Project details and implementations\n• Education and professional experience\n• Career objectives and interests\n\n*What would you like to explore about Isaac?*",
         isBot: true,
         timestamp: new Date()
       }
@@ -232,7 +233,30 @@ const AIChat = () => {
                         </div>
                       )}
                       <div className="flex-1">
-                        <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                        {message.isBot ? (
+                          <ReactMarkdown 
+                            className="text-sm prose prose-sm max-w-none prose-gray"
+                            components={{
+                              p: ({children}) => <p className="mb-2 last:mb-0">{children}</p>,
+                              strong: ({children}) => <strong className="font-semibold text-gray-900">{children}</strong>,
+                              em: ({children}) => <em className="italic text-gray-700">{children}</em>,
+                              ul: ({children}) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                              ol: ({children}) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                              li: ({children}) => <li className="text-sm">{children}</li>,
+                              code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
+                              blockquote: ({children}) => <blockquote className="border-l-4 border-primary-200 pl-4 italic my-2">{children}</blockquote>,
+                              h1: ({children}) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                              h2: ({children}) => <h2 className="text-base font-semibold mb-2">{children}</h2>,
+                              h3: ({children}) => <h3 className="text-sm font-medium mb-1">{children}</h3>,
+                              hr: () => <hr className="my-3 border-gray-300" />,
+                              a: ({href, children}) => <a href={href} className="text-primary-600 hover:text-primary-800 underline" target="_blank" rel="noopener noreferrer">{children}</a>
+                            }}
+                          >
+                            {message.text}
+                          </ReactMarkdown>
+                        ) : (
+                          <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                        )}
                         <div className="flex items-center mt-2 space-x-2">
                           <p className={`text-xs ${message.isBot ? 'text-gray-500' : 'text-primary-100'}`}>
                             {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
