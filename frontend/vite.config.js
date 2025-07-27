@@ -18,8 +18,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          utils: ['./src/utils/apiClient']
+          vendor: ['react', 'react-dom']
         }
       }
     }
