@@ -6,8 +6,8 @@ import uvicorn
 import asyncio
 
 # Import services
-from backend.app.services.error_handler import error_handler
-from backend.app.utils.pinecone_service import initialize_pinecone_indexes
+from app.services.error_handler import error_handler
+from app.utils.pinecone_service import initialize_pinecone_indexes
 
 # Load environment variables from root .env file
 load_dotenv(dotenv_path='../../.env')  # Load from project root
@@ -79,7 +79,7 @@ async def get_metrics():
         raise HTTPException(status_code=500, detail="Failed to retrieve metrics")
 
 # Import routers
-from backend.app.routers import chatbot
+from app.routers import chatbot
 
 # Include routers
 app.include_router(chatbot.router, prefix="/api", tags=["chatbot"])

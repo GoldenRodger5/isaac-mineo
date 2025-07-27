@@ -9,10 +9,10 @@ import time
 from datetime import datetime
 
 # Import our utilities
-from backend.app.utils.pinecone_service import hybrid_search, initialize_pinecone_indexes
-from backend.app.utils.cache_manager import CacheManager
-from backend.app.utils.rate_limiter import RateLimiter
-from backend.app.services.email_service import email_service
+from app.utils.pinecone_service import hybrid_search, initialize_pinecone_indexes
+from app.utils.cache_manager import CacheManager
+from app.utils.rate_limiter import RateLimiter
+from app.services.email_service import email_service
 
 router = APIRouter()
 

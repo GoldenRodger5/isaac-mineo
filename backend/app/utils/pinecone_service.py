@@ -1,4 +1,5 @@
 import os
+import pinecone
 from pinecone import Pinecone, ServerlessSpec
 import openai
 from typing import Optional, List, Dict, Any, Tuple
@@ -8,7 +9,7 @@ import re
 from enum import Enum
 
 # Import knowledge service
-from backend.app.services.knowledge_service import knowledge_service
+from app.services.knowledge_service import knowledge_service
 
 # Multi-index configuration
 class IndexType(Enum):
