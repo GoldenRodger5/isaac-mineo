@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import About from './components/About';
 import Projects from './components/Projects';
 import Resume from './components/Resume';
@@ -430,6 +432,10 @@ function App() {
 
       {/* Floating AI Assistant */}
       <AIChatbot />
+      
+      {/* Vercel Analytics & Speed Insights */}
+      <Analytics />
+      <SpeedInsights />
     </div>
   );
 }
