@@ -3,7 +3,7 @@ uvicorn[standard]
 python-multipart
 python-dotenv
 openai
-pinecone-client
+pinecone
 redis
 pydantic
 requests
