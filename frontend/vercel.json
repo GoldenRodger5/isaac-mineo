@@ -4,14 +4,6 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "env": {
-    "RESEND_API_KEY": "@resend-api-key"
-  },
-  "build": {
-    "env": {
-      "RESEND_API_KEY": "@resend-api-key"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
