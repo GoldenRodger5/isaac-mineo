@@ -14,3 +14,7 @@ python-jose[cryptography]
 passlib[bcrypt]
 httpx
 aiohttp
+PyJWT
+pytest
+pytest-asyncio
+pytest-mock

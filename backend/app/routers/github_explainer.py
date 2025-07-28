@@ -11,6 +11,8 @@ import os
 
 from app.services.github_service import github_service
 from app.services.error_handler import error_handler
+from app.services.auth_service import auth_service
+from app.services.performance_service import performance_service
 
 
 router = APIRouter()
@@ -222,9 +224,49 @@ async def github_service_health():
 @router.post("/github/explain-code")
 async def explain_code(request: CodeExplanationRequest):
     """
-    Generate AI explanation for code using Claude Sonnet 4
+    Generate AI explanation for code using Claude Sonnet 4 with caching and performance optimization
     """
+    import time
+    start_time = time.time()
+    
     try:
+        # Sanitize input
+        sanitized_code = auth_service.sanitize_code_input(request.code)
+        
+        # Check for cached explanation first
+        cached_explanation = await performance_service.get_cached_explanation(
+            sanitized_code, 
+            request.mode, 
+            request.file_context
+        )
+        
+        if cached_explanation:
+            # Generate follow-up questions even for cached responses
+            follow_up_questions = generate_follow_up_questions(
+                sanitized_code, 
+                request.mode, 
+                request.file_context
+            )
+            
+            return {
+                "success": True,
+                "data": {
+                    "explanation": cached_explanation.get("explanation", ""),
+                    "mode": request.mode,
+                    "model": "claude-sonnet-4-20250514",
+                    "cached": True,
+                    "follow_up_questions": follow_up_questions,
+                    "context": {
+                        "file_path": request.file_context.get("path") if request.file_context else None,
+                        "language": request.file_context.get("language") if request.file_context else None,
+                        "has_selection": bool(request.selected_code)
+                    }
+                }
+            }
+        
+        # Optimize code for analysis
+        optimized_code = await performance_service.optimize_code_analysis(sanitized_code)
+        
         # Import Anthropic client
         import anthropic
         import os
@@ -235,7 +277,7 @@ async def explain_code(request: CodeExplanationRequest):
         
         # Generate contextual prompt based on mode and file context
         prompt = generate_explanation_prompt(
-            request.code, 
+            optimized_code, 
             request.mode, 
             request.file_context, 
             request.selected_code
@@ -257,12 +299,41 @@ async def explain_code(request: CodeExplanationRequest):
         
         response_text = response.content[0].text if response.content else "I'm having trouble analyzing this code right now."
         
+        # Cache the explanation
+        await performance_service.cache_explanation(
+            sanitized_code,
+            request.mode,
+            response_text,
+            request.file_context
+        )
+        
+        # Record performance metrics
+        duration = time.time() - start_time
+        await performance_service.record_performance_metric(
+            "explanation",
+            duration,
+            {
+                "mode": request.mode,
+                "code_length": len(request.code),
+                "language": request.file_context.get("language") if request.file_context else None
+            }
+        )
+        
+        # Generate follow-up questions
+        follow_up_questions = generate_follow_up_questions(
+            optimized_code, 
+            request.mode, 
+            request.file_context
+        )
+        
         return {
             "success": True,
             "data": {
                 "explanation": response_text,
                 "mode": request.mode,
                 "model": "claude-sonnet-4-20250514",
+                "cached": False,
+                "follow_up_questions": follow_up_questions,
                 "context": {
                     "file_path": request.file_context.get("path") if request.file_context else None,
                     "language": request.file_context.get("language") if request.file_context else None,
@@ -353,3 +424,71 @@ Code to Analyze:
 Please provide a clear, well-structured explanation in the requested style ({mode}). Use markdown formatting for better readability."""
 
     return prompt
+
+
+def generate_follow_up_questions(code: str, mode: str, file_context: Optional[Dict] = None) -> List[str]:
+    """Generate contextual follow-up questions based on code analysis"""
+    
+    # Base questions for all modes
+    base_questions = []
+    
+    # Language-specific questions
+    language = file_context.get("language", "").lower() if file_context else ""
+    
+    if "python" in language:
+        base_questions.extend([
+            "How could this code be optimized for better performance?",
+            "What Python best practices are demonstrated here?",
+            "Are there any potential security considerations?"
+        ])
+    elif "javascript" in language or "typescript" in language:
+        base_questions.extend([
+            "How would this work with different browser environments?",
+            "What modern ES6+ features could improve this code?",
+            "How does this handle asynchronous operations?"
+        ])
+    elif "java" in language:
+        base_questions.extend([
+            "What design patterns are being used here?",
+            "How does this handle memory management?",
+            "Are there any thread-safety considerations?"
+        ])
+    else:
+        base_questions.extend([
+            "What are the key design principles in this code?",
+            "How would you test this implementation?",
+            "What could be potential edge cases?"
+        ])
+    
+    # Mode-specific questions
+    if mode == "explain":
+        base_questions.extend([
+            "Can you explain any complex algorithms used here?",
+            "How does this integrate with the rest of the application?",
+            "What are the dependencies and external requirements?"
+        ])
+    elif mode == "summarize":
+        base_questions.extend([
+            "What are the main components we haven't discussed?",
+            "How does this fit into the overall system architecture?",
+            "What would be the impact of modifying this code?"
+        ])
+    elif mode == "teach":
+        base_questions.extend([
+            "What fundamental concepts should I understand first?",
+            "Can you explain this step-by-step with examples?",
+            "What are common mistakes beginners make with this pattern?"
+        ])
+    
+    # File-specific questions
+    if file_context and file_context.get("path"):
+        file_path = file_context["path"]
+        if "test" in file_path.lower():
+            base_questions.append("What testing strategies are being used here?")
+        elif "config" in file_path.lower():
+            base_questions.append("How do these configuration settings affect the application?")
+        elif "model" in file_path.lower() or "schema" in file_path.lower():
+            base_questions.append("How does this data model relate to the business logic?")
+    
+    # Return a selection of the most relevant questions
+    return base_questions[:4]  # Limit to 4 questions for better UX

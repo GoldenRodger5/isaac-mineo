@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { apiClient } from '../../services/apiClient';
+import FollowUpQuestions from './FollowUpQuestions';
 
 const ExplanationPanel = ({ 
   explanation, 
@@ -9,10 +10,12 @@ const ExplanationPanel = ({
   error, 
   explanationMode, 
   onExplainCode,
-  onClearExplanation 
+  onClearExplanation,
+  followUpQuestions 
 }) => {
   const [conversationHistory, setConversationHistory] = useState([]);
   const [followUpQuestion, setFollowUpQuestion] = useState('');
+  const [isAskingFollowUp, setIsAskingFollowUp] = useState(false);
 
   const formatExplanation = (text) => {
     if (!text) return '';
@@ -44,26 +47,30 @@ const ExplanationPanel = ({
     return colors[mode] || 'blue';
   };
 
-  const handleAskFollowUp = async () => {
-    if (!followUpQuestion.trim()) return;
+  const handleAskFollowUp = async (questionText = null) => {
+    const questionToAsk = questionText || followUpQuestion.trim();
+    if (!questionToAsk) return;
+
+    setIsAskingFollowUp(true);
 
     try {
       // Add question to history
       const newQuestion = {
         type: 'question',
-        content: followUpQuestion,
+        content: questionToAsk,
         timestamp: new Date()
       };
       
       setConversationHistory(prev => [...prev, newQuestion]);
-      const currentQuestion = followUpQuestion;
-      setFollowUpQuestion('');
+      if (!questionText) {
+        setFollowUpQuestion(''); // Only clear if it's from manual input
+      }
 
       // Create context for follow-up question
       const context = selectedCode || fileContext?.content;
       const followUpPrompt = `Previous context: ${explanationMode} mode explanation was provided for this code.
 
-Follow-up question: ${currentQuestion}
+Follow-up question: ${questionToAsk}
 
 Code being discussed:
 \`\`\`${fileContext?.language || 'text'}
@@ -104,6 +111,8 @@ Please provide a focused answer to the follow-up question in the context of this
         timestamp: new Date()
       };
       setConversationHistory(prev => [...prev, errorAnswer]);
+    } finally {
+      setIsAskingFollowUp(false);
     }
   };
 
@@ -164,7 +173,7 @@ Please provide a focused answer to the follow-up question in the context of this
   }
 
   return (
-    <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 h-full flex flex-col">
+    <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 flex flex-col h-full min-h-0">
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-white/10 flex-shrink-0">
         <div className="flex items-center space-x-2">
@@ -197,11 +206,7 @@ Please provide a focused answer to the follow-up question in the context of this
 
       {/* Content */}
       <div 
-        className="flex-1 p-3 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
-        style={{
-          scrollbarWidth: 'thin',
-          scrollbarColor: '#4B5563 #1F2937'
-        }}
+        className="flex-1 p-3 min-h-0 overflow-y-auto code-content"
       >
         {!explanation && !loading && !error && (
           <div className="text-center py-12 flex-1 flex flex-col justify-center">
@@ -245,6 +250,13 @@ Please provide a focused answer to the follow-up question in the context of this
                 }}
               />
             </div>
+
+            {/* Follow-up Questions */}
+            <FollowUpQuestions
+              questions={followUpQuestions}
+              onQuestionClick={handleAskFollowUp}
+              isLoading={isAskingFollowUp}
+            />
 
             {/* Conversation History */}
             {conversationHistory.length > 0 && (

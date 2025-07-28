@@ -8,6 +8,9 @@ import asyncio
 # Import services
 from app.services.error_handler import error_handler
 from app.utils.pinecone_service import initialize_pinecone_indexes
+from app.middleware.auth_middleware import AuthMiddleware
+from app.services.auth_service import auth_service
+from app.services.performance_service import performance_service
 
 # Load environment variables from root .env file
 load_dotenv(dotenv_path='../.env')  # Load from project root
@@ -15,8 +18,8 @@ load_dotenv()  # Also check current directory
 
 app = FastAPI(
     title="Isaac Mineo Portfolio API",
-    description="Advanced Backend API with Multi-Index Knowledge Base, Hybrid Search, and AI Chatbot",
-    version="3.0.0"
+    description="Advanced Backend API with Multi-Index Knowledge Base, Hybrid Search, AI Chatbot, and Code Explainer",
+    version="4.0.0"
 )
 
 # Configure CORS
@@ -29,6 +32,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Add authentication and performance middleware
+app.add_middleware(AuthMiddleware)
 
 @app.on_event("startup")
 async def startup_event():
@@ -43,8 +49,18 @@ async def startup_event():
         cache_manager = CacheManager()
         await cache_manager.connect()
         print("✅ Cache manager initialized")
+        
+        # Initialize auth service cache connection
+        await auth_service.cache_manager.connect()
+        print("✅ Authentication service initialized")
+        
+        # Initialize performance monitoring
+        await performance_service.cache_manager.connect()
+        print("✅ Performance monitoring initialized")
+        
     except Exception as e:
         print(f"❌ Error initializing services: {e}")
+        error_handler.log_error(e, {"startup": True})
 
 @app.get("/")
 async def root():
@@ -87,8 +103,10 @@ async def get_metrics():
 # Import routers
 from app.routers import chatbot
 from app.routers import github_explainer
+from app.routers import auth
 
 # Include routers
+app.include_router(auth.router, prefix="/api", tags=["authentication"])
 app.include_router(chatbot.router, prefix="/api", tags=["chatbot"])
 app.include_router(github_explainer.router, prefix="/api", tags=["github", "code-explainer"])
 

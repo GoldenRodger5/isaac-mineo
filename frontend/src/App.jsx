@@ -8,6 +8,8 @@ import Contact from './components/Contact';
 import AIChat from './components/AIChat';
 import AIChatbot from './components/AIChatbot';
 import CodeExplainer from './components/CodeExplainer';
+import AuthTest from './components/AuthTest';
+import { AuthProvider } from './contexts/AuthContext';
 
 const CORRECT_PASSWORD = import.meta.env.VITE_SITE_PASSWORD;
 
@@ -27,6 +29,7 @@ function App() {
     { id: 'resume', label: 'Resume', icon: '📄' },
     { id: 'ai-chat', label: 'AI Assistant', icon: '🤖' },
     { id: 'code-explainer', label: 'Claude Code Explorer', icon: '🔍' },
+    { id: 'auth-test', label: 'Auth Test', icon: '🔐' },
     { id: 'contact', label: 'Contact', icon: '📬' }
   ];
 
@@ -169,7 +172,8 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <AuthProvider>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* AI-themed background pattern */}
       <div className="fixed inset-0 opacity-20 pointer-events-none">
         <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full filter blur-3xl animate-pulse"></div>
@@ -374,6 +378,7 @@ function App() {
               {activeTab === 'resume' && <Resume />}
               {activeTab === 'ai-chat' && <AIChat />}
               {activeTab === 'code-explainer' && <CodeExplainer />}
+              {activeTab === 'auth-test' && <AuthTest />}
               {activeTab === 'contact' && <Contact />}
             </div>
           </div>
@@ -440,7 +445,8 @@ function App() {
       {/* Vercel Analytics & Speed Insights */}
       <Analytics />
       <SpeedInsights />
-    </div>
+      </div>
+    </AuthProvider>
   );
 }
 

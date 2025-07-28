@@ -18,6 +18,7 @@ const CodeExplainer = () => {
   const [selectedCode, setSelectedCode] = useState('');
   const [explanation, setExplanation] = useState('');
   const [explanationMode, setExplanationMode] = useState('explain'); // explain, summarize, teach
+  const [followUpQuestions, setFollowUpQuestions] = useState([]);
   
   // Loading states for better UX
   const [loadingStates, setLoadingStates] = useState({
@@ -157,10 +158,12 @@ const CodeExplainer = () => {
       
       if (response.success) {
         setExplanation(response.data.explanation);
+        setFollowUpQuestions(response.data.follow_up_questions || []);
       } else {
         // Handle fallback response
         if (response.fallback) {
           setExplanation(response.data.explanation);
+          setFollowUpQuestions(response.data.follow_up_questions || []);
         } else {
           setErrors(prev => ({ ...prev, explanation: response.error || 'Failed to generate explanation' }));
         }
@@ -207,6 +210,7 @@ Please provide a clear, detailed explanation.`;
 
   const handleClearExplanation = () => {
     setExplanation('');
+    setFollowUpQuestions([]);
   };
 
   // Main panel resizing handlers (for code viewer vs explanation panel)
@@ -329,9 +333,9 @@ Please provide a clear, detailed explanation.`;
       </div>
 
       {/* Navigation Tabs & Main Content */}
-      <div className="flex flex-col h-[calc(100vh-120px)]">
+      <div className="flex flex-col flex-1 min-h-0">
         {/* Navigation Tabs Bar */}
-        <div className="px-8 py-3 border-b border-white/10 bg-black/10">
+        <div className="px-8 py-3 border-b border-white/10 bg-black/10 flex-shrink-0">
           <div className="flex items-center justify-between">
             {/* Left: Navigation Tabs */}
             <div className="flex items-center space-x-1">
@@ -407,7 +411,7 @@ Please provide a clear, detailed explanation.`;
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex relative">
+        <div className="flex-1 flex relative min-h-0">
           {/* Navigation Sidebar (Overlay) */}
           {showNavigation && (
             <>
@@ -466,10 +470,10 @@ Please provide a clear, detailed explanation.`;
           )}
 
           {/* Main Content Panels */}
-          <div className="main-content-container flex w-full h-full px-8 py-6 gap-4">
+          <div className="main-content-container flex w-full flex-1 px-8 py-6 gap-4 min-h-0">
             {/* Code Viewer */}
             <div 
-              className="transition-all duration-200 h-full"
+              className="transition-all duration-200 flex flex-col min-h-0"
               style={{ width: `${mainPanelSplit}%` }}
             >
               <CodeViewer
@@ -485,7 +489,7 @@ Please provide a clear, detailed explanation.`;
 
             {/* Main Panel Resize Handle */}
             <div
-              className="w-2 bg-white/5 hover:bg-white/20 rounded-full cursor-col-resize transition-colors flex-shrink-0 group h-full"
+              className="w-2 bg-white/5 hover:bg-white/20 rounded-full cursor-col-resize transition-colors flex-shrink-0 group self-stretch"
               onMouseDown={handleMainPanelMouseDown}
             >
               <div className="w-full h-full rounded-full group-hover:bg-blue-400/50"></div>
@@ -493,7 +497,7 @@ Please provide a clear, detailed explanation.`;
 
             {/* Explanation Panel */}
             <div 
-              className="transition-all duration-200 h-full"
+              className="transition-all duration-200 flex flex-col min-h-0"
               style={{ width: `${100 - mainPanelSplit - 1}%` }} // Subtract 1% for the handle
             >
               <ExplanationPanel
@@ -505,6 +509,7 @@ Please provide a clear, detailed explanation.`;
                 explanationMode={explanationMode}
                 onExplainCode={handleExplainCode}
                 onClearExplanation={handleClearExplanation}
+                followUpQuestions={followUpQuestions}
               />
             </div>
           </div>

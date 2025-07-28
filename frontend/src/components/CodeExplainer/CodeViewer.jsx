@@ -125,7 +125,7 @@ const CodeViewer = ({
   }
 
   return (
-    <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 h-full flex flex-col">
+    <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 flex flex-col h-full min-h-0">
       {showSelectionTooltip && localSelectedCode && (
         <div 
           className="fixed z-50 bg-gray-800 text-white text-xs px-2 py-1 rounded shadow-lg border border-gray-600"
@@ -161,8 +161,8 @@ const CodeViewer = ({
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden bg-gray-900 rounded-lg">
-        <div className="p-4 border-b border-gray-700">
+      <div className="flex-1 overflow-hidden bg-gray-900 rounded-lg min-h-0">
+        <div className="p-4 border-b border-gray-700 flex-shrink-0">
           <h3 className="text-lg font-semibold text-gray-100">
             {fileContent?.name || 'No file selected'}
           </h3>
@@ -173,11 +173,11 @@ const CodeViewer = ({
           )}
         </div>
         
-        <div className="h-full overflow-hidden">
-          <div className="code-content h-full overflow-auto scrollbar-thin">
+        <div className="flex-1 overflow-hidden min-h-0">
+          <div className="code-content h-full overflow-y-auto overflow-x-auto">
             <pre 
               ref={codeRef}
-              className="p-4 text-sm leading-relaxed text-gray-100 font-mono whitespace-pre-wrap" 
+              className="p-4 text-sm leading-relaxed text-gray-100 font-mono whitespace-pre-wrap block min-h-full" 
               dangerouslySetInnerHTML={{ __html: syntaxHighlight(fileContent?.content || '', fileContent?.language) }}
             />
           </div>
