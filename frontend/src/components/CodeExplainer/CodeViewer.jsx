@@ -48,7 +48,7 @@ const CodeViewer = ({
     });
 
     // Highlight strings (single, double quotes, and template literals)
-    highlighted = highlighted.replace(/(["'`])((?:\\.|(?!\1)[^\\])*)\1/g, '<span style="color: #22c55e;">$1$2$1</span>');
+    highlighted = highlighted.replace(/(["'\`])((?:\\.|(?!\1)[^\\])*)\1/g, '<span style="color: #22c55e;">$1$2$1</span>');
 
     // Highlight numbers
     highlighted = highlighted.replace(/\b(\d+\.?\d*)\b/g, '<span style="color: #3b82f6;">$1</span>');
