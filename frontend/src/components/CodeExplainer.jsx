@@ -40,11 +40,10 @@ const CodeExplainer = () => {
 
   const checkGitHubHealth = async () => {
     try {
-      const response = await fetch('/api/github/health');
-      const data = await response.json();
-      setGithubHealthy(data.success);
+      const response = await apiClient.fetchWithRetry(`${apiClient.baseURL}/github/health`);
+      setGithubHealthy(response.success);
       
-      if (data.success) {
+      if (response.success) {
         loadRepositories();
       }
     } catch (error) {
@@ -58,11 +57,10 @@ const CodeExplainer = () => {
     setErrors(prev => ({ ...prev, repositories: null }));
 
     try {
-      const response = await fetch('/api/github/repos?username=GoldenRodger5');
-      const data = await response.json();
+      const response = await apiClient.fetchWithRetry(`${apiClient.baseURL}/github/repos?username=GoldenRodger5`);
       
-      if (data.success) {
-        setRepositories(data.data);
+      if (response.success) {
+        setRepositories(response.data);
       } else {
         setErrors(prev => ({ ...prev, repositories: 'Failed to load repositories' }));
       }
@@ -85,11 +83,10 @@ const CodeExplainer = () => {
     setErrors(prev => ({ ...prev, files: null }));
 
     try {
-      const response = await fetch(`/api/github/repo/${repo.full_name}/tree`);
-      const data = await response.json();
+      const response = await apiClient.fetchWithRetry(`${apiClient.baseURL}/github/repo/${repo.full_name}/tree`);
       
-      if (data.success) {
-        setRepoFiles(data.data.files);
+      if (response.success) {
+        setRepoFiles(response.data.files);
       } else {
         setErrors(prev => ({ ...prev, files: 'Failed to load repository files' }));
       }
@@ -111,13 +108,12 @@ const CodeExplainer = () => {
     setErrors(prev => ({ ...prev, fileContent: null }));
 
     try {
-      const response = await fetch(
-        `/api/github/repo/${selectedRepo.full_name}/file?file_path=${encodeURIComponent(file.path)}`
+      const response = await apiClient.fetchWithRetry(
+        `${apiClient.baseURL}/github/repo/${selectedRepo.full_name}/file?file_path=${encodeURIComponent(file.path)}`
       );
-      const data = await response.json();
       
-      if (data.success) {
-        setFileContent(data.data);
+      if (response.success) {
+        setFileContent(response.data);
       } else {
         setErrors(prev => ({ ...prev, fileContent: 'Failed to load file content' }));
       }
