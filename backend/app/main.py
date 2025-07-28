@@ -37,8 +37,14 @@ async def startup_event():
         print("🚀 Initializing Advanced Knowledge Base System...")
         await initialize_pinecone_indexes()
         print("✅ Multi-index knowledge base system ready")
+        
+        # Initialize cache manager
+        from app.utils.cache_manager import CacheManager
+        cache_manager = CacheManager()
+        await cache_manager.connect()
+        print("✅ Cache manager initialized")
     except Exception as e:
-        print(f"❌ Error initializing knowledge base: {e}")
+        print(f"❌ Error initializing services: {e}")
 
 @app.get("/")
 async def root():

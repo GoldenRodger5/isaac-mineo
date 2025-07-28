@@ -40,14 +40,12 @@ class CacheManager:
             print(f"Error getting session: {error}")
             return None
     
-    async def cache_session(self, session_id: str, messages: list):
-        """Cache session data"""
+    async def cache_session(self, session_id: str, session_data: Dict[str, Any]):
+        """Cache complete session data including entities"""
         try:
             if self.redis_client:
-                session_data = {
-                    "messages": messages,
-                    "lastUpdated": time.time()
-                }
+                # Update timestamp
+                session_data["lastUpdated"] = time.time()
                 self.redis_client.setex(
                     f"session:{session_id}", 
                     3600,  # 1 hour expiry

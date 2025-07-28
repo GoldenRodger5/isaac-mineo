@@ -1,11 +1,13 @@
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List, Dict, Any
 import openai
 import os
 from uuid import uuid4
 import time
+import json
+import re
 from datetime import datetime
 
 # Import our utilities
@@ -34,6 +36,8 @@ class ChatResponse(BaseModel):
     conversationLength: int
     cached: bool = False
     timestamp: str
+    entities: Optional[Dict[str, Any]] = None
+    contextUsed: Optional[List[str]] = None
 
 class ContactRequest(BaseModel):
     name: str
@@ -46,10 +50,85 @@ class ContactResponse(BaseModel):
     status: str
     message: str
 
+def extract_entities(text: str) -> Dict[str, List[str]]:
+    """Extract entities and topics from user messages for context tracking"""
+    entities = {
+        "projects": [],
+        "topics": [],
+        "skills": [],
+        "companies": []
+    }
+    
+    text_lower = text.lower()
+    
+    # Projects
+    project_patterns = {
+        "nutrivize": ["nutrivize", "nutrition tracker", "food recognition"],
+        "echopod": ["echopod", "podcast", "echo pod"],
+        "quizium": ["quizium", "quiz", "flashcard"]
+    }
+    
+    for project, keywords in project_patterns.items():
+        if any(keyword in text_lower for keyword in keywords):
+            entities["projects"].append(project)
+    
+    # Topics
+    topic_patterns = {
+        "tech_stack": ["tech stack", "technology", "technologies", "programming languages"],
+        "experience": ["experience", "background", "career", "work history"],
+        "skills": ["skills", "abilities", "expertise", "proficient"],
+        "education": ["education", "degree", "university", "college", "school"],
+        "contact": ["contact", "reach", "email", "phone", "connect"]
+    }
+    
+    for topic, keywords in topic_patterns.items():
+        if any(keyword in text_lower for keyword in keywords):
+            entities["topics"].append(topic)
+    
+    # Skills
+    skill_keywords = ["react", "fastapi", "python", "javascript", "ai", "machine learning", "mongodb", "redis"]
+    for skill in skill_keywords:
+        if skill in text_lower:
+            entities["skills"].append(skill)
+    
+    return entities
+
+def get_contextual_instructions(entities: Dict[str, List[str]], conversation_history: List[Dict]) -> str:
+    """Generate contextual instructions based on detected entities and conversation history"""
+    instructions = []
+    
+    # Check conversation history for context
+    recent_entities = set()
+    for msg in conversation_history[-4:]:  # Last 2 exchanges
+        if msg.get("role") == "user":
+            msg_entities = extract_entities(msg.get("content", ""))
+            for entity_type, entity_list in msg_entities.items():
+                recent_entities.update(entity_list)
+    
+    # Current message entities
+    current_entities = set()
+    for entity_type, entity_list in entities.items():
+        current_entities.update(entity_list)
+    
+    # Determine context
+    if current_entities & recent_entities:
+        instructions.append("This is a follow-up question. Reference the previous context.")
+    
+    if "nutrivize" in recent_entities and "tech_stack" in current_entities:
+        instructions.append("User is asking about Nutrivize's tech stack specifically.")
+    
+    if "echopod" in recent_entities and "tech_stack" in current_entities:
+        instructions.append("User is asking about EchoPod's tech stack specifically.")
+    
+    if "quizium" in recent_entities and "tech_stack" in current_entities:
+        instructions.append("User is asking about Quizium's tech stack specifically.")
+    
+    return " ".join(instructions) if instructions else ""
+
 @router.post("/chatbot", response_model=ChatResponse)
 async def chat_with_assistant(request: ChatRequest, req: Request):
     """
-    AI Chatbot endpoint that uses GPT-4o with comprehensive knowledge base
+    Enhanced AI Chatbot endpoint with entity tracking and context awareness
     """
     try:
         # Get client IP for rate limiting
@@ -62,23 +141,45 @@ async def chat_with_assistant(request: ChatRequest, req: Request):
                 detail={"error": "Rate limit exceeded. Please try again later.", "retryAfter": 3600}
             )
         
-        # Session management
+        # Ensure cache manager is connected
+        if not cache_manager.connected:
+            await cache_manager.connect()
+        
+        # Session management with enhanced entity tracking
         session_id = request.sessionId or str(uuid4())
         session_data = await cache_manager.get_session(session_id)
         
         if not session_data:
-            session_data = {"messages": [], "lastUpdated": time.time()}
+            session_data = {
+                "messages": [], 
+                "lastUpdated": time.time(),
+                "entities": {"projects": [], "topics": [], "skills": [], "companies": []}
+            }
+        
+        # Extract entities from current question
+        current_entities = extract_entities(request.question)
+        
+        # Update session entities
+        for entity_type, entity_list in current_entities.items():
+            if entity_type in session_data["entities"]:
+                session_data["entities"][entity_type].extend(entity_list)
+                # Remove duplicates while preserving order
+                session_data["entities"][entity_type] = list(dict.fromkeys(session_data["entities"][entity_type]))
+        
+        # Get contextual instructions
+        contextual_instructions = get_contextual_instructions(current_entities, session_data["messages"])
         
         # Check for cached response (30 minutes cache)
-        cached_response = await cache_manager.get_cached_response(request.question)
+        cache_key = f"{request.question}_{hash(str(session_data['entities']))}"
+        cached_response = await cache_manager.get_cached_response(cache_key)
         if cached_response and (time.time() - cached_response.get("timestamp", 0)) < 1800:
             # Update session with cached interaction
             session_data["messages"].extend([
-                {"role": "user", "content": request.question, "timestamp": time.time()},
+                {"role": "user", "content": request.question, "timestamp": time.time(), "entities": current_entities},
                 {"role": "assistant", "content": cached_response["response"], "timestamp": time.time(), "cached": True}
             ])
             
-            await cache_manager.cache_session(session_id, session_data["messages"])
+            await cache_manager.cache_session(session_id, session_data)
             
             return ChatResponse(
                 response=cached_response["response"],
@@ -86,7 +187,9 @@ async def chat_with_assistant(request: ChatRequest, req: Request):
                 searchMethod="cached",
                 conversationLength=len(session_data["messages"]) // 2,
                 cached=True,
-                timestamp=datetime.now().isoformat()
+                timestamp=datetime.now().isoformat(),
+                entities=current_entities,
+                contextUsed=[contextual_instructions] if contextual_instructions else []
             )
         
         # Search the knowledge base using hybrid search
@@ -98,17 +201,33 @@ async def chat_with_assistant(request: ChatRequest, req: Request):
             relevant_info = get_fallback_info(request.question)
             search_successful = False
         
-        # Build conversation context
+        # Build enhanced conversation context with entity awareness
         recent_messages = session_data["messages"][-6:]  # Last 3 exchanges
         conversation_context = ""
         if recent_messages:
             conversation_context = "\\n\\nRecent conversation context:\\n" + \
                 "\\n".join([f"{msg['role']}: {msg['content']}" for msg in recent_messages])
         
-        # Create detailed prompt for GPT-4o
+        # Add entity context
+        entity_context = ""
+        if any(session_data["entities"].values()):
+            entity_context = "\\n\\nConversation entities tracked:\\n"
+            for entity_type, entities in session_data["entities"].items():
+                if entities:
+                    entity_context += f"- {entity_type}: {', '.join(entities)}\\n"
+        
+        # Create enhanced prompt for GPT-4o with contextual awareness
+        system_prompt = f"""You are Isaac Mineo's AI assistant. Provide comprehensive, detailed responses about Isaac's projects, skills, and background using the knowledge base. 
+
+CONTEXTUAL INSTRUCTIONS: {contextual_instructions}
+
+Use markdown formatting extensively for better readability. Be thorough and informative while maintaining a conversational tone that reflects Isaac's personality and expertise. Include specific examples, technical details, and context. 
+
+For contact: isaacmineo@gmail.com"""
+
         user_prompt = f"""KNOWLEDGE BASE: {relevant_info}
 
-CONTEXT: {conversation_context}
+CONTEXT: {conversation_context}{entity_context}
 
 QUESTION: {request.question}
 
@@ -125,10 +244,7 @@ Make your response engaging and conversational while maintaining professionalism
         completion = openai_client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {
-                    "role": "system",
-                    "content": "You are Isaac Mineo's AI assistant. Provide comprehensive, detailed responses about Isaac's projects, skills, and background using the knowledge base. Use markdown formatting extensively for better readability. Be thorough and informative while maintaining a conversational tone that reflects Isaac's personality and expertise. Include specific examples, technical details, and context. For contact: isaacmineo@gmail.com"
-                },
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
             max_tokens=800,
@@ -139,9 +255,9 @@ Make your response engaging and conversational while maintaining professionalism
         
         response_text = completion.choices[0].message.content or "I'm having trouble processing your question right now."
         
-        # Update session with new interaction
+        # Update session with new interaction including entities
         session_data["messages"].extend([
-            {"role": "user", "content": request.question, "timestamp": time.time()},
+            {"role": "user", "content": request.question, "timestamp": time.time(), "entities": current_entities},
             {"role": "assistant", "content": response_text, "timestamp": time.time()}
         ])
         
@@ -150,10 +266,11 @@ Make your response engaging and conversational while maintaining professionalism
             session_data["messages"] = session_data["messages"][-20:]
         
         # Cache the session and response
-        await cache_manager.cache_session(session_id, session_data["messages"])
-        await cache_manager.cache_response(request.question, response_text, {
+        await cache_manager.cache_session(session_id, session_data)
+        await cache_manager.cache_response(cache_key, response_text, {
             "searchSuccessful": search_successful,
             "sessionId": session_id,
+            "entities": current_entities,
             "userIP": client_ip[:8] if client_ip != "unknown" else "unknown"
         })
         
@@ -163,7 +280,9 @@ Make your response engaging and conversational while maintaining professionalism
             searchMethod="vector_search" if search_successful else "fallback",
             conversationLength=len(session_data["messages"]) // 2,
             cached=False,
-            timestamp=datetime.now().isoformat()
+            timestamp=datetime.now().isoformat(),
+            entities=current_entities,
+            contextUsed=[contextual_instructions] if contextual_instructions else []
         )
         
     except HTTPException:
@@ -171,7 +290,7 @@ Make your response engaging and conversational while maintaining professionalism
     except Exception as error:
         print(f"Error in chatbot API: {error}")
         
-        # Fallback response
+        # Fallback response with entity awareness
         fallback_response = get_fallback_response(request.question)
         
         return ChatResponse(
@@ -180,7 +299,9 @@ Make your response engaging and conversational while maintaining professionalism
             searchMethod="fallback",
             conversationLength=0,
             cached=False,
-            timestamp=datetime.now().isoformat()
+            timestamp=datetime.now().isoformat(),
+            entities=extract_entities(request.question),
+            contextUsed=[]
         )
 
 def get_fallback_info(question: str) -> str:

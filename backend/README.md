@@ -1,31 +1,52 @@
-# Isaac Mineo Portfolio - FastAPI Backend
+# Isaac Mineo Portfolio - FastAPI Backend 🐍
 
-FastAPI backend with AI-powered chatbot capabilities, vector search, and comprehensive knowledge base.
+**Centralized backend** with enhanced AI chatbot capabilities, context awareness, and comprehensive API endpoints.
 
-## 🚀 Features
+## 🚀 Enhanced Features
 
-- **GPT-4o AI Chatbot** with Isaac's comprehensive knowledge base
-- **Vector Search** using Pinecone for semantic question answering
-- **Redis Caching** for improved performance and rate limiting
-- **API Documentation** with automatic OpenAPI/Swagger generation
-- **Health Monitoring** and status endpoints
+- **GPT-4o AI Chatbot** with **entity tracking** and **context awareness**
+- **Conversational Memory** - remembers topics and provides contextual responses
+- **Vector Search** using Pinecone for semantic question answering  
+- **Redis Session Management** for conversation persistence
+- **Rate Limiting** and comprehensive error handling
+- **Contact Form Processing** with email integration
+- **Health Monitoring** and metrics endpoints
 
-## 📁 Structure
+## 🧠 Enhanced AI Capabilities
+
+### Context-Aware Conversations
+```
+User: "Tell me about Nutrivize"
+Bot: [Detailed response about Nutrivize]
+
+User: "What's the tech stack?"
+Bot: [Understands you mean Nutrivize's tech stack specifically]
+```
+
+### Entity Tracking
+- **Projects**: Nutrivize, EchoPod, Quizium
+- **Topics**: Tech stack, experience, skills, education
+- **Skills**: React, FastAPI, Python, AI/ML
+- **Companies**: Automatically detected from conversation
+
+## 📁 Clean Architecture
 
 ```
 backend/
 ├── app/
-│   ├── main.py              # FastAPI application entry point
+│   ├── main.py                    # FastAPI application entry
 │   ├── routers/
-│   │   └── chatbot.py       # Chatbot API endpoints
+│   │   └── chatbot.py            # Enhanced chatbot with context
 │   ├── services/
-│   │   ├── pinecone_service.py   # Vector search functionality
-│   │   ├── cache_manager.py      # Redis caching
-│   │   └── rate_limiter.py       # API rate limiting
-│   └── knowledge_base/      # Isaac's comprehensive knowledge base
-├── requirements.txt         # Python dependencies
-├── setup.sh                # Backend setup script
-└── README.md               # This file
+│   │   ├── email_service.py      # Contact form processing
+│   │   └── error_handler.py      # Comprehensive error handling  
+│   └── utils/
+│       ├── pinecone_service.py   # Vector search functionality
+│       ├── cache_manager.py      # Redis session management
+│       └── rate_limiter.py       # API rate limiting
+├── knowledge-base/               # Isaac's knowledge base documents
+├── requirements.txt              # Python dependencies
+└── README.md                    # This file
 ```
 
 ## 🛠️ Tech Stack

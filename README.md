@@ -1,35 +1,59 @@
 # Isaac Mineo - AI-Powered Portfolio 🚀
 
-A modern, full-stack portfolio application with FastAPI backend and React frontend, featuring advanced AI chatbot capabilities and dynamic deployment scripts.
+A modern, full-stack portfolio application with **FastAPI backend** and **React frontend**, featuring advanced AI chatbot capabilities with **enhanced context awareness** and **entity tracking**.
+
+## 🏗️ Clean Architecture
+
+This project follows a **consolidated architecture** where all AI functionality, caching, and API logic resides in the FastAPI backend, while the frontend focuses purely on UI/UX.
 
 ## 📁 Project Structure
 
 ```
 isaac-mineo/
-├── backend/              # FastAPI backend with AI chatbot
-├── frontend/             # React + Vite frontend
-├── start-backend.sh      # Dynamic backend starter (auto port detection)
-├── start-frontend.sh     # Dynamic frontend starter (auto port detection) 
-├── start-dev.sh          # Start both backend & frontend with auto-config
-├── render-deploy.sh      # Production deployment to Render
-├── render.yaml          # Render deployment configuration
-└── README.md            # This file
+├── backend/                 # 🐍 FastAPI Backend (All Logic)
+│   ├── app/
+│   │   ├── main.py         # FastAPI application entry
+│   │   ├── routers/        # API endpoints
+│   │   │   └── chatbot.py  # Enhanced AI chatbot with context
+│   │   ├── services/       # Business logic
+│   │   └── utils/          # Pinecone, Redis, utilities
+│   └── knowledge-base/     # AI knowledge base documents
+├── frontend/               # ⚛️ React Frontend (UI Only)
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   └── services/       # API client (calls FastAPI)
+│   ├── public/             # Static assets
+│   └── scripts/            # Testing utilities
+├── deployment scripts...   # 🚀 Deployment automation
+└── README.md              # This file
 ```
 
-## ✨ Features
+## ✨ Enhanced Features
 
-### AI-Powered Backend (FastAPI)
-- **GPT-4o Chatbot** with comprehensive knowledge base about Isaac
+### 🤖 AI-Powered Backend (FastAPI)
+- **GPT-4o Chatbot** with **enhanced context awareness**
+- **Entity Tracking** - remembers projects, topics, and skills mentioned
+- **Conversational Memory** - understands follow-up questions in context
 - **Vector Search** using Pinecone for semantic question answering
-- **Redis Caching** for improved performance and rate limiting
-- **Dynamic Port Detection** - automatically finds available ports
+- **Redis Caching** with session management for conversations
+- **Rate Limiting** and comprehensive error handling
 - **API Documentation** at `/docs` endpoint
 
-### Modern Frontend (React + Vite)
+### 💬 Context-Aware Conversations
+```
+User: "Tell me about Nutrivize"
+Bot: [Explains Nutrivize project in detail]
+
+User: "What's the tech stack?"  
+Bot: [Understands you mean Nutrivize's tech stack specifically]
+```
+
+### 🎨 Modern Frontend (React + Vite)
+- **Clean Architecture** - No duplicate files or obsolete code
+- **FastAPI Integration** - Single source of truth for all API calls
 - **Responsive Design** with Tailwind CSS
 - **Progressive Web App** capabilities
 - **Professional Sections**: About, Projects, Resume, Contact
-- **AI Chatbot Interface** connected to FastAPI backend
 
 ## 🚀 Quick Start
 
@@ -100,31 +124,83 @@ This will deploy the FastAPI backend to Render. The frontend can be deployed to 
 
 ## 📚 API Documentation
 
+### Enhanced Chatbot Endpoint
+
+**Endpoint:** `POST /api/chatbot`
+
+**Features:**
+- **Entity Tracking** - Remembers projects, skills, companies mentioned
+- **Context Awareness** - Understands follow-up questions  
+- **Session Management** - Maintains conversation history
+- **Vector Search** - Semantic search through knowledge base
+- **Caching** - Improved response times
+
+**Request Example:**
+```json
+{
+  "question": "What's the tech stack?",
+  "sessionId": "existing-session-id-or-null"
+}
+```
+
+**Response Example:**
+```json
+{
+  "response": "Based on our previous discussion about Nutrivize...",
+  "sessionId": "uuid-session-id",
+  "searchMethod": "vector_search",
+  "conversationLength": 2,
+  "entities": {
+    "projects": ["nutrivize"],
+    "topics": ["tech_stack"],
+    "skills": ["react", "fastapi"]
+  },
+  "contextUsed": ["User is asking about Nutrivize's tech stack specifically."]
+}
+```
+
+### Other Endpoints
+
 Once the backend is running, visit:
 - **API Documentation**: http://localhost:8001/docs
-- **Health Check**: http://localhost:8001/health
-- **Chatbot Endpoint**: http://localhost:8001/api/chatbot
+- **Health Check**: http://localhost:8001/health  
+- **Contact Form**: `POST /api/contact`
 
 ## 🛠️ Technology Stack
 
-### Backend (FastAPI)
+### 🐍 Backend (FastAPI) - **All Logic & AI**
 - **FastAPI** - Modern Python web framework
-- **OpenAI GPT-4o** - AI chatbot responses
+- **OpenAI GPT-4o** - Enhanced AI chatbot with context awareness
 - **Pinecone** - Vector database for semantic search
-- **Redis** - Caching and rate limiting
+- **Redis** - Session management and caching
 - **Uvicorn** - ASGI server
+- **Comprehensive APIs** - Chatbot, Contact, Health endpoints
 
-### Frontend (React + Vite)
+### ⚛️ Frontend (React + Vite) - **Pure UI**
 - **React 18** - UI framework
-- **Vite** - Build tool and dev server
+- **Vite** - Build tool and dev server  
 - **Tailwind CSS** - Styling framework
-- **JavaScript/JSX** - Programming language
+- **Clean Architecture** - No backend logic, calls FastAPI only
 
-### DevOps & Deployment
+### 🚀 DevOps & Deployment
 - **Render** - Backend hosting
-- **Vercel** - Frontend hosting  
+- **Vercel** - Frontend hosting (SPA routing configured)
 - **Dynamic Scripts** - Automatic port detection
 - **Git** - Version control
+
+## 🧹 Recent Architecture Improvements
+
+### ✅ Consolidated Codebase
+- **Removed duplicate files** - No more `vercel_new.json`, `App_old.jsx`, etc.
+- **Single source of truth** - All AI logic in FastAPI backend
+- **No Vercel functions** - Everything goes through FastAPI endpoints
+- **Clean frontend** - Focused on UI/UX only
+
+### ✅ Enhanced AI Capabilities  
+- **Entity tracking** across conversations
+- **Context-aware responses** to follow-up questions
+- **Session management** with conversation memory
+- **Improved caching** for better performance
 
 ## 📝 Environment Variables
 
@@ -148,6 +224,45 @@ REDIS_URL=redis://localhost:6379
 
 **Required for basic functionality:**
 - `VITE_SITE_PASSWORD` - Already set to "Buddydog#41"
+- `OPENAI_API_KEY` - Required for AI chatbot functionality
+
+**Optional for enhanced features:**
+- `PINECONE_API_KEY` - For vector search capabilities
+- `REDIS_URL` - For improved caching and session management
+- Email settings - For contact form functionality
+
+## 📖 Additional Documentation
+
+- **[Architecture Guide](./ARCHITECTURE.md)** - Detailed architecture documentation
+- **[Frontend README](./frontend/README.md)** - Frontend-specific documentation  
+- **[Backend README](./backend/README.md)** - Backend-specific documentation
+
+## 🔄 Recent Updates
+
+### ✅ Architecture Consolidation (Latest)
+- **Removed 22+ duplicate/obsolete files** for cleaner codebase
+- **Consolidated all AI logic** in FastAPI backend
+- **Enhanced context awareness** with entity tracking
+- **Improved session management** with conversation memory
+- **Single source of truth** for all configurations
+
+### 🧹 Cleanup Highlights
+- No more duplicate `vercel_*.json` files
+- No more old component versions (`App_old.jsx`, etc.)
+- No more unused utilities or API functions
+- Clean, focused frontend that calls FastAPI only
+
+---
+
+## 🚀 Get Started
+
+```bash
+git clone https://github.com/GoldenRodger5/isaac-mineo.git
+cd isaac-mineo
+./start-dev.sh
+```
+
+Visit http://localhost:5173 to see the portfolio in action! 🎉
 - `OPENAI_API_KEY` - Get from https://platform.openai.com/api-keys
 
 **Optional but recommended:**

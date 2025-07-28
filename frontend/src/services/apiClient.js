@@ -126,25 +126,21 @@ class APIClient {
     }
   }
 
-  // Send contact form email with smart environment-aware fallback
+  // Send contact form email using FastAPI backend
   async sendContactEmail(contactData) {
     const startTime = Date.now();
     
-    // In development, try localhost backend first, then Vercel function
-    // In production, try Render backend first, then Vercel function
-    
     console.log(`📧 Sending contact email via ${this.environment} environment...`);
     
-    // Primary method: Try main backend
     try {
-      console.log(`🎯 Trying primary backend: ${this.baseURL}/contact`);
+      console.log(`🎯 Using FastAPI backend: ${this.baseURL}/contact`);
       const response = await this.fetchWithRetry(`${this.baseURL}/contact`, {
         method: 'POST',
         body: JSON.stringify(contactData),
       });
 
       const elapsed = Date.now() - startTime;
-      console.log(`✅ Primary backend success in ${elapsed}ms`);
+      console.log(`✅ Contact email sent successfully in ${elapsed}ms`);
       
       return {
         success: true,
@@ -152,46 +148,16 @@ class APIClient {
         method: this.environment === 'development' ? 'localhost' : 'render',
         duration: elapsed
       };
-    } catch (backendError) {
-      console.warn(`⚠️ Primary backend failed:`, backendError.message);
+    } catch (error) {
+      console.error(`❌ Contact email failed:`, error.message);
       
-      // Fallback method: Try Vercel serverless function
-      try {
-        console.log(`🚀 Trying Vercel function fallback...`);
-        const vercelResponse = await this.fetchWithRetry('/api/contact', {
-          method: 'POST',
-          body: JSON.stringify(contactData),
-        });
-
-        const elapsed = Date.now() - startTime;
-        console.log(`✅ Vercel function success in ${elapsed}ms`);
-        
-        return {
-          success: true,
-          data: vercelResponse,
-          method: 'vercel',
-          duration: elapsed,
-          fallback: true
-        };
-      } catch (vercelError) {
-        console.error(`❌ Both contact methods failed:`, { 
-          primary: backendError.message, 
-          fallback: vercelError.message 
-        });
-        
-        const elapsed = Date.now() - startTime;
-        
-        return {
-          success: false,
-          error: 'All contact methods failed',
-          duration: elapsed,
-          details: {
-            primary: backendError.message,
-            fallback: vercelError.message,
-            environment: this.environment
-          }
-        };
-      }
+      const elapsed = Date.now() - startTime;
+      return {
+        success: false,
+        error: error.message,
+        duration: elapsed,
+        environment: this.environment
+      };
     }
   }
 
