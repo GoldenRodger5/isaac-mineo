@@ -76,30 +76,30 @@ class CacheManager:
         except Exception as error:
             print(f"Error caching session: {error}")
     
-    async def get_cached_response(self, question: str) -> Optional[Dict[str, Any]]:
-        """Get cached response for a question"""
+    async def get_cached_response(self, cache_key: str) -> Optional[Dict[str, Any]]:
+        """Get cached response for a cache key"""
         try:
             if self.redis_client:
-                cache_key = f"response:{hash(question.lower())}"
-                data = self.redis_client.get(cache_key)
+                cache_redis_key = f"response:{hash(cache_key)}"
+                data = self.redis_client.get(cache_redis_key)
                 return json.loads(data) if data else None
             return None
         except Exception as error:
             print(f"Error getting cached response: {error}")
             return None
-    
-    async def cache_response(self, question: str, response: str, metadata: Dict[str, Any]):
+
+    async def cache_response(self, cache_key: str, response: str, metadata: Dict[str, Any]):
         """Cache a response"""
         try:
             if self.redis_client:
-                cache_key = f"response:{hash(question.lower())}"
+                cache_redis_key = f"response:{hash(cache_key)}"
                 cache_data = {
                     "response": response,
                     "timestamp": time.time(),
                     "metadata": metadata
                 }
                 self.redis_client.setex(
-                    cache_key,
+                    cache_redis_key,
                     1800,  # 30 minutes expiry
                     json.dumps(cache_data)
                 )
