@@ -118,23 +118,23 @@ Please provide a focused answer to the follow-up question in the context of this
 
   if (loading) {
     return (
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 h-full">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-white">AI Explanation</h2>
+      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 h-full flex flex-col">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base font-semibold text-white">AI Explanation</h2>
           <div className="animate-pulse text-blue-400">🤖</div>
         </div>
         
-        <div className="space-y-4">
+        <div className="space-y-3 flex-1">
           <div className="animate-pulse">
-            <div className="bg-white/10 rounded h-4 mb-2"></div>
-            <div className="bg-white/10 rounded h-4 mb-2 w-4/5"></div>
-            <div className="bg-white/10 rounded h-4 mb-2 w-3/4"></div>
-            <div className="bg-white/10 rounded h-4 mb-2 w-5/6"></div>
-            <div className="bg-white/10 rounded h-4 mb-2 w-2/3"></div>
+            <div className="bg-white/10 rounded h-3 mb-2"></div>
+            <div className="bg-white/10 rounded h-3 mb-2 w-4/5"></div>
+            <div className="bg-white/10 rounded h-3 mb-2 w-3/4"></div>
+            <div className="bg-white/10 rounded h-3 mb-2 w-5/6"></div>
+            <div className="bg-white/10 rounded h-3 mb-2 w-2/3"></div>
           </div>
         </div>
         
-        <div className="text-center text-blue-400 mt-6">
+        <div className="text-center text-blue-400 mt-4">
           ⏳ Claude AI is analyzing your code...
         </div>
       </div>
@@ -143,11 +143,11 @@ Please provide a focused answer to the follow-up question in the context of this
 
   if (error) {
     return (
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 h-full">
-        <h2 className="text-lg font-semibold text-white mb-6">AI Explanation</h2>
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
-          <div className="text-red-400 text-2xl mb-2">⚠️</div>
-          <p className="text-red-400">{error}</p>
+      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 h-full flex flex-col">
+        <h2 className="text-base font-semibold text-white mb-4">AI Explanation</h2>
+        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+          <div className="text-red-400 text-xl mb-2">⚠️</div>
+          <p className="text-red-400 text-sm">{error}</p>
           <button
             onClick={() => onExplainCode()}
             className="mt-3 text-sm bg-red-500/20 hover:bg-red-500/30 px-3 py-1 rounded text-red-300"
@@ -162,10 +162,10 @@ Please provide a focused answer to the follow-up question in the context of this
   return (
     <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
+      <div className="flex items-center justify-between p-3 border-b border-white/10 flex-shrink-0">
         <div className="flex items-center space-x-2">
-          <span className="text-xl">{getModeIcon(explanationMode)}</span>
-          <h2 className="text-lg font-semibold text-white">AI Explanation</h2>
+          <span className="text-lg">{getModeIcon(explanationMode)}</span>
+          <h2 className="text-base font-semibold text-white">AI Explanation</h2>
           <span className={`px-2 py-1 rounded text-xs bg-${getModeColor(explanationMode)}-500/20 text-${getModeColor(explanationMode)}-300`}>
             {explanationMode}
           </span>
@@ -175,14 +175,14 @@ Please provide a focused answer to the follow-up question in the context of this
           <div className="flex items-center space-x-2">
             <button
               onClick={copyExplanation}
-              className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-gray-300 hover:text-white"
+              className="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-gray-300 hover:text-white text-sm"
               title="Copy explanation"
             >
               📋
             </button>
             <button
               onClick={clearConversation}
-              className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-gray-300 hover:text-white"
+              className="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-gray-300 hover:text-white text-sm"
               title="Clear conversation"
             >
               🗑️
@@ -192,17 +192,17 @@ Please provide a focused answer to the follow-up question in the context of this
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-3 min-h-0">
         {!explanation && !loading && !error && (
-          <div className="text-center py-16">
-            <div className="text-6xl mb-4">🤖</div>
-            <p className="text-gray-400 text-lg mb-2">Claude AI Ready to Help</p>
-            <p className="text-gray-500 text-sm">
+          <div className="text-center py-12 flex-1 flex flex-col justify-center">
+            <div className="text-4xl mb-3">🤖</div>
+            <p className="text-gray-400 text-base mb-2">Claude AI Ready to Help</p>
+            <p className="text-gray-500 text-xs">
               Select code or click explain to get Claude-powered insights
             </p>
-            <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-              <h3 className="text-blue-300 font-medium mb-2">How it works:</h3>
-              <ul className="text-sm text-gray-400 space-y-1 text-left">
+            <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <h3 className="text-blue-300 font-medium mb-2 text-sm">How it works:</h3>
+              <ul className="text-xs text-gray-400 space-y-1 text-left">
                 <li>🔍 <strong>Explain:</strong> Technical breakdown for developers</li>
                 <li>📋 <strong>Summarize:</strong> High-level overview</li>
                 <li>🎓 <strong>Teach:</strong> Beginner-friendly explanations</li>
@@ -212,47 +212,47 @@ Please provide a focused answer to the follow-up question in the context of this
         )}
 
         {explanation && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Main Explanation */}
-            <div className="bg-white/5 rounded-lg p-4 border-l-4 border-blue-500">
-              <div className="flex items-center space-x-2 mb-3">
+            <div className="bg-white/5 rounded-lg p-3 border-l-4 border-blue-500">
+              <div className="flex items-center space-x-2 mb-2">
                 <span className={`text-${getModeColor(explanationMode)}-400`}>
                   {getModeIcon(explanationMode)}
                 </span>
-                <span className="text-sm font-medium text-gray-300">
+                <span className="text-xs font-medium text-gray-300">
                   {explanationMode.charAt(0).toUpperCase() + explanationMode.slice(1)} Mode
                 </span>
                 {selectedCode && (
-                  <span className="text-xs bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded">
+                  <span className="text-xs bg-yellow-500/20 text-yellow-300 px-1.5 py-0.5 rounded">
                     Selection
                   </span>
                 )}
               </div>
               <div 
-                className="text-gray-300 leading-relaxed"
+                className="text-gray-300 leading-relaxed text-sm"
                 dangerouslySetInnerHTML={{ 
-                  __html: `<p class="mb-3">${formatExplanation(explanation)}</p>` 
+                  __html: `<p class="mb-2">${formatExplanation(explanation)}</p>` 
                 }}
               />
             </div>
 
             {/* Conversation History */}
             {conversationHistory.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-gray-400 border-b border-white/10 pb-2">
+              <div className="space-y-2">
+                <h3 className="text-xs font-medium text-gray-400 border-b border-white/10 pb-1">
                   Follow-up Q&A
                 </h3>
                 {conversationHistory.map((item, index) => (
                   <div
                     key={index}
-                    className={`p-3 rounded-lg ${
+                    className={`p-2 rounded-lg ${
                       item.type === 'question' 
                         ? 'bg-blue-500/10 border-l-4 border-blue-500 ml-0' 
-                        : 'bg-green-500/10 border-l-4 border-green-500 ml-4'
+                        : 'bg-green-500/10 border-l-4 border-green-500 ml-3'
                     }`}
                   >
-                    <div className="flex items-center space-x-2 mb-2">
-                      <span className="text-sm">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <span className="text-xs">
                         {item.type === 'question' ? '❓' : '🤖'}
                       </span>
                       <span className="text-xs text-gray-400">
@@ -260,7 +260,7 @@ Please provide a focused answer to the follow-up question in the context of this
                       </span>
                     </div>
                     <div 
-                      className="text-sm text-gray-300"
+                      className="text-xs text-gray-300"
                       dangerouslySetInnerHTML={{ 
                         __html: formatExplanation(item.content) 
                       }}
@@ -275,7 +275,7 @@ Please provide a focused answer to the follow-up question in the context of this
 
       {/* Follow-up Question Input */}
       {explanation && (
-        <div className="p-4 border-t border-white/10 bg-white/5">
+        <div className="p-3 border-t border-white/10 bg-white/5 flex-shrink-0">
           <div className="flex space-x-2">
             <input
               type="text"
@@ -283,17 +283,17 @@ Please provide a focused answer to the follow-up question in the context of this
               value={followUpQuestion}
               onChange={(e) => setFollowUpQuestion(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleAskFollowUp()}
-              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/50 text-sm"
+              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-1.5 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/50 text-xs"
             />
             <button
               onClick={handleAskFollowUp}
               disabled={!followUpQuestion.trim()}
-              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg text-white text-sm font-medium transition-colors"
+              className="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg text-white text-xs font-medium transition-colors"
             >
               Ask
             </button>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 mt-1">
             💡 Ask questions like "Why is this approach used?" or "What could be improved?"
           </p>
         </div>

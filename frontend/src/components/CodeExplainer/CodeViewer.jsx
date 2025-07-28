@@ -99,12 +99,12 @@ const CodeViewer = ({
 
   if (!fileContent && !loading && !error) {
     return (
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 h-full">
-        <h2 className="text-lg font-semibold text-white mb-6">Code Viewer</h2>
-        <div className="text-center py-16">
-          <div className="text-6xl mb-4">👩‍💻</div>
-          <p className="text-gray-400 text-lg">Select a file to view its code</p>
-          <p className="text-gray-500 text-sm mt-2">
+      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 h-full flex flex-col">
+        <h2 className="text-base font-semibold text-white mb-4">Code Viewer</h2>
+        <div className="text-center py-12 flex-1 flex flex-col justify-center">
+          <div className="text-4xl mb-3">👩‍💻</div>
+          <p className="text-gray-400 text-base">Select a file to view its code</p>
+          <p className="text-gray-500 text-xs mt-2">
             You can then highlight code sections for AI explanations
           </p>
         </div>
@@ -114,15 +114,15 @@ const CodeViewer = ({
 
   if (loading) {
     return (
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 h-full">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-white">Code Viewer</h2>
+      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 h-full flex flex-col">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base font-semibold text-white">Code Viewer</h2>
           <div className="animate-spin text-blue-400">⏳</div>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 flex-1">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
             <div key={i} className="animate-pulse">
-              <div className="bg-white/10 rounded h-6" style={{ width: `${Math.random() * 40 + 60}%` }}></div>
+              <div className="bg-white/10 rounded h-5" style={{ width: `${Math.random() * 40 + 60}%` }}></div>
             </div>
           ))}
         </div>
@@ -132,11 +132,11 @@ const CodeViewer = ({
 
   if (error) {
     return (
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 h-full">
-        <h2 className="text-lg font-semibold text-white mb-6">Code Viewer</h2>
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-6">
-          <div className="text-red-400 text-2xl mb-2">⚠️</div>
-          <p className="text-red-400">{error}</p>
+      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 h-full flex flex-col">
+        <h2 className="text-base font-semibold text-white mb-4">Code Viewer</h2>
+        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+          <div className="text-red-400 text-xl mb-2">⚠️</div>
+          <p className="text-red-400 text-sm">{error}</p>
         </div>
       </div>
     );
@@ -145,12 +145,12 @@ const CodeViewer = ({
   return (
     <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
-        <div className="flex items-center space-x-3">
-          <span className="text-xl">📄</span>
-          <div>
-            <h2 className="text-lg font-semibold text-white">{fileContent.path}</h2>
-            <div className="flex items-center space-x-4 text-sm text-gray-400">
+      <div className="flex items-center justify-between p-3 border-b border-white/10 flex-shrink-0">
+        <div className="flex items-center space-x-2 min-w-0 flex-1">
+          <span className="text-lg">📄</span>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-sm font-semibold text-white truncate">{fileContent.path}</h2>
+            <div className="flex items-center space-x-3 text-xs text-gray-400">
               <span>{fileContent.language}</span>
               <span>{fileContent.lines} lines</span>
               <span>{Math.round(fileContent.size / 1024)} KB</span>
@@ -158,35 +158,35 @@ const CodeViewer = ({
           </div>
         </div>
         
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 flex-shrink-0">
           <button
             onClick={() => copyToClipboard(fileContent.content)}
-            className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-gray-300 hover:text-white"
+            className="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-gray-300 hover:text-white text-sm"
             title="Copy file content"
           >
             📋
           </button>
           <button
             onClick={handleExplainFile}
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            className={`px-3 py-1.5 rounded-lg font-medium transition-all text-xs ${
               explanationMode === 'explain' ? 'bg-blue-500 hover:bg-blue-600' :
               explanationMode === 'summarize' ? 'bg-green-500 hover:bg-green-600' :
               'bg-purple-500 hover:bg-purple-600'
             } text-white shadow-lg hover:shadow-xl`}
           >
-            {explanationMode === 'explain' ? '🔍 Explain File' :
-             explanationMode === 'summarize' ? '📋 Summarize File' :
-             '🎓 Teach File'}
+            {explanationMode === 'explain' ? '🔍 Explain' :
+             explanationMode === 'summarize' ? '📋 Summarize' :
+             '🎓 Teach'}
           </button>
         </div>
       </div>
 
       {/* Code Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto min-h-0">
         <div className="relative">
           <pre
             ref={codeRef}
-            className="p-4 text-sm font-mono leading-relaxed text-gray-300 whitespace-pre-wrap select-text"
+            className="p-3 text-xs font-mono leading-relaxed text-gray-300 whitespace-pre-wrap select-text"
             style={{ tabSize: 2 }}
           >
             <code
@@ -207,12 +207,12 @@ const CodeViewer = ({
               }}
             >
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-300">
+                <span className="text-xs text-gray-300">
                   {selectedCode.length} characters selected
                 </span>
                 <button
                   onClick={handleExplainSelection}
-                  className={`px-3 py-1 rounded text-sm font-medium transition-all ${
+                  className={`px-2 py-1 rounded text-xs font-medium transition-all ${
                     explanationMode === 'explain' ? 'bg-blue-500 hover:bg-blue-600' :
                     explanationMode === 'summarize' ? 'bg-green-500 hover:bg-green-600' :
                     'bg-purple-500 hover:bg-purple-600'
@@ -229,7 +229,7 @@ const CodeViewer = ({
       </div>
 
       {/* Footer */}
-      <div className="p-3 border-t border-white/10 bg-white/5">
+      <div className="p-2 border-t border-white/10 bg-white/5 flex-shrink-0">
         <div className="flex items-center justify-between text-xs text-gray-400">
           <span>💡 Tip: Highlight code to get AI explanations</span>
           <span>Mode: {explanationMode.charAt(0).toUpperCase() + explanationMode.slice(1)}</span>
