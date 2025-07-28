@@ -8,7 +8,8 @@ const ExplanationPanel = ({
   loading, 
   error, 
   explanationMode, 
-  onExplainCode 
+  onExplainCode,
+  onClearExplanation 
 }) => {
   const [conversationHistory, setConversationHistory] = useState([]);
   const [followUpQuestion, setFollowUpQuestion] = useState('');
@@ -108,6 +109,9 @@ Please provide a focused answer to the follow-up question in the context of this
 
   const clearConversation = () => {
     setConversationHistory([]);
+    if (onClearExplanation) {
+      onClearExplanation();
+    }
   };
 
   const copyExplanation = () => {

@@ -205,6 +205,10 @@ Please provide a clear, detailed explanation.`;
     setSelectedCode(selection);
   };
 
+  const handleClearExplanation = () => {
+    setExplanation('');
+  };
+
   // Main panel resizing handlers (for code viewer vs explanation panel)
   const handleMainPanelMouseDown = (e) => {
     e.preventDefault();
@@ -282,9 +286,9 @@ Please provide a clear, detailed explanation.`;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
-      {/* Header */}
-      <div className="border-b border-white/10 bg-black/20 backdrop-blur-sm">
+    <div className="h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex flex-col overflow-hidden">
+      {/* Header - Fixed Height */}
+      <div className="border-b border-white/10 bg-black/20 backdrop-blur-sm flex-shrink-0">
         <div className="max-w-full mx-auto px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -380,7 +384,13 @@ Please provide a clear, detailed explanation.`;
               {['explain', 'summarize', 'teach'].map((mode) => (
                 <button
                   key={mode}
-                  onClick={() => setExplanationMode(mode)}
+                  onClick={() => {
+                    // Clear explanation when switching modes
+                    if (explanationMode !== mode) {
+                      setExplanation('');
+                    }
+                    setExplanationMode(mode);
+                  }}
                   className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                     explanationMode === mode
                       ? mode === 'explain' ? 'bg-blue-500 text-white' :
@@ -456,10 +466,10 @@ Please provide a clear, detailed explanation.`;
           )}
 
           {/* Main Content Panels */}
-          <div className="main-content-container flex w-full px-8 py-6 gap-4">
+          <div className="main-content-container flex w-full h-full px-8 py-6 gap-4">
             {/* Code Viewer */}
             <div 
-              className="transition-all duration-200"
+              className="transition-all duration-200 h-full"
               style={{ width: `${mainPanelSplit}%` }}
             >
               <CodeViewer
@@ -475,7 +485,7 @@ Please provide a clear, detailed explanation.`;
 
             {/* Main Panel Resize Handle */}
             <div
-              className="w-2 bg-white/5 hover:bg-white/20 rounded-full cursor-col-resize transition-colors flex-shrink-0 group"
+              className="w-2 bg-white/5 hover:bg-white/20 rounded-full cursor-col-resize transition-colors flex-shrink-0 group h-full"
               onMouseDown={handleMainPanelMouseDown}
             >
               <div className="w-full h-full rounded-full group-hover:bg-blue-400/50"></div>
@@ -483,7 +493,7 @@ Please provide a clear, detailed explanation.`;
 
             {/* Explanation Panel */}
             <div 
-              className="transition-all duration-200"
+              className="transition-all duration-200 h-full"
               style={{ width: `${100 - mainPanelSplit - 1}%` }} // Subtract 1% for the handle
             >
               <ExplanationPanel
@@ -494,6 +504,7 @@ Please provide a clear, detailed explanation.`;
                 error={errors.explanation}
                 explanationMode={explanationMode}
                 onExplainCode={handleExplainCode}
+                onClearExplanation={handleClearExplanation}
               />
             </div>
           </div>
