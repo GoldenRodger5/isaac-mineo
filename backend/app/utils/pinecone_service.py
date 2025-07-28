@@ -9,7 +9,7 @@ import re
 from enum import Enum
 
 # Import knowledge service
-from backend.app.services.knowledge_service import knowledge_service
+from app.services.knowledge_service import knowledge_service
 
 # Multi-index configuration
 class IndexType(Enum):

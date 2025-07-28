@@ -13,8 +13,8 @@ import json
 import re
 from urllib.parse import urlparse
 
-from backend.app.utils.cache_manager import CacheManager
-from backend.app.services.error_handler import error_handler
+from app.utils.cache_manager import CacheManager
+from app.services.error_handler import error_handler
 
 
 class GitHubService:

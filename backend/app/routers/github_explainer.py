@@ -9,8 +9,8 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 import os
 
-from backend.app.services.github_service import github_service
-from backend.app.services.error_handler import error_handler
+from app.services.github_service import github_service
+from app.services.error_handler import error_handler
 
 
 router = APIRouter()
