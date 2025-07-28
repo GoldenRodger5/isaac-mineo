@@ -469,101 +469,49 @@ Please provide a clear, detailed explanation.`;
             </>
           )}
 
-          {/* Main Content Panels - Dynamic Layout Based on Code Selection */}
+          {/* Main Content Panels */}
           <div className="main-content-container flex w-full flex-1 px-8 py-6 gap-4 min-h-0">
-            
-            {/* Dynamic Layout: Show explanation on left when code is selected */}
-            {selectedCode ? (
-              <>
-                {/* Explanation Panel - LEFT side when code is selected */}
-                <div 
-                  className="transition-all duration-200 flex flex-col min-h-0"
-                  style={{ width: `${100 - mainPanelSplit - 1}%` }}
-                >
-                  <ExplanationPanel
-                    explanation={explanation}
-                    selectedCode={selectedCode}
-                    fileContext={fileContent}
-                    loading={loadingStates.explanation}
-                    error={errors.explanation}
-                    explanationMode={explanationMode}
-                    onExplainCode={handleExplainCode}
-                    onClearExplanation={handleClearExplanation}
-                    followUpQuestions={followUpQuestions}
-                    isCodeSelection={true}
-                  />
-                </div>
+            {/* Code Viewer - LEFT side */}
+            <div 
+              className="transition-all duration-200 flex flex-col min-h-0"
+              style={{ width: `${mainPanelSplit}%` }}
+            >
+              <CodeViewer
+                fileContent={fileContent}
+                selectedCode={selectedCode}
+                onCodeSelection={handleCodeSelection}
+                onExplainCode={handleExplainCode}
+                loading={loadingStates.fileContent}
+                error={errors.fileContent}
+                explanationMode={explanationMode}
+              />
+            </div>
 
-                {/* Main Panel Resize Handle */}
-                <div
-                  className="w-2 bg-white/5 hover:bg-white/20 rounded-full cursor-col-resize transition-colors flex-shrink-0 group self-stretch"
-                  onMouseDown={handleMainPanelMouseDown}
-                >
-                  <div className="w-full h-full rounded-full group-hover:bg-blue-400/50"></div>
-                </div>
+            {/* Main Panel Resize Handle */}
+            <div
+              className="w-2 bg-white/5 hover:bg-white/20 rounded-full cursor-col-resize transition-colors flex-shrink-0 group self-stretch"
+              onMouseDown={handleMainPanelMouseDown}
+            >
+              <div className="w-full h-full rounded-full group-hover:bg-blue-400/50"></div>
+            </div>
 
-                {/* Code Viewer - RIGHT side when code is selected */}
-                <div 
-                  className="transition-all duration-200 flex flex-col min-h-0"
-                  style={{ width: `${mainPanelSplit}%` }}
-                >
-                  <CodeViewer
-                    fileContent={fileContent}
-                    selectedCode={selectedCode}
-                    onCodeSelection={handleCodeSelection}
-                    onExplainCode={handleExplainCode}
-                    loading={loadingStates.fileContent}
-                    error={errors.fileContent}
-                    explanationMode={explanationMode}
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                {/* Code Viewer - LEFT side when no code selected (default) */}
-                <div 
-                  className="transition-all duration-200 flex flex-col min-h-0"
-                  style={{ width: `${mainPanelSplit}%` }}
-                >
-                  <CodeViewer
-                    fileContent={fileContent}
-                    selectedCode={selectedCode}
-                    onCodeSelection={handleCodeSelection}
-                    onExplainCode={handleExplainCode}
-                    loading={loadingStates.fileContent}
-                    error={errors.fileContent}
-                    explanationMode={explanationMode}
-                  />
-                </div>
-
-                {/* Main Panel Resize Handle */}
-                <div
-                  className="w-2 bg-white/5 hover:bg-white/20 rounded-full cursor-col-resize transition-colors flex-shrink-0 group self-stretch"
-                  onMouseDown={handleMainPanelMouseDown}
-                >
-                  <div className="w-full h-full rounded-full group-hover:bg-blue-400/50"></div>
-                </div>
-
-                {/* Explanation Panel - RIGHT side when no code selected (default) */}
-                <div 
-                  className="transition-all duration-200 flex flex-col min-h-0"
-                  style={{ width: `${100 - mainPanelSplit - 1}%` }} // Subtract 1% for the handle
-                >
-                  <ExplanationPanel
-                    explanation={explanation}
-                    selectedCode={selectedCode}
-                    fileContext={fileContent}
-                    loading={loadingStates.explanation}
-                    error={errors.explanation}
-                    explanationMode={explanationMode}
-                    onExplainCode={handleExplainCode}
-                    onClearExplanation={handleClearExplanation}
-                    followUpQuestions={followUpQuestions}
-                    isCodeSelection={false}
-                  />
-                </div>
-              </>
-            )}
+            {/* Explanation Panel - RIGHT side */}
+            <div 
+              className="transition-all duration-200 flex flex-col min-h-0"
+              style={{ width: `${100 - mainPanelSplit - 1}%` }} // Subtract 1% for the handle
+            >
+              <ExplanationPanel
+                explanation={explanation}
+                selectedCode={selectedCode}
+                fileContext={fileContent}
+                loading={loadingStates.explanation}
+                error={errors.explanation}
+                explanationMode={explanationMode}
+                onExplainCode={handleExplainCode}
+                onClearExplanation={handleClearExplanation}
+                followUpQuestions={followUpQuestions}
+              />
+            </div>
           </div>
         </div>
       </div>

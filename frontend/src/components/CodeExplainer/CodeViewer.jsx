@@ -51,7 +51,7 @@ const CodeViewer = ({
       const rect = range.getBoundingClientRect();
       
       setTooltipPosition({
-        x: rect.left + rect.width / 2,
+        x: rect.left - 20, // Position to the LEFT of the selection
         y: rect.top - 10
       });
       
@@ -132,7 +132,7 @@ const CodeViewer = ({
           style={{
             left: tooltipPosition.x,
             top: tooltipPosition.y,
-            transform: 'translate(-50%, -100%)'
+            transform: 'translate(0, -100%)' // Anchor from left edge, not center
           }}
         >
           <button
