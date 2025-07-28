@@ -19,7 +19,7 @@ const CodeViewer = ({
     const lines = code.split('\n');
     return lines.map((line, index) => {
       const lineNumber = (index + 1).toString().padStart(3, ' ');
-      return `<span class="line-number" style="color: #6B7280; margin-right: 16px; user-select: none; display: inline-block; width: 40px; text-align: right;">${lineNumber}</span>${line}`;
+      return '<span class="line-number" style="color: #6B7280; margin-right: 16px; user-select: none; display: inline-block; width: 40px; text-align: right;">' + lineNumber + '</span>' + line;
     }).join('\n');
   };
 
@@ -43,12 +43,12 @@ const CodeViewer = ({
 
     // Highlight keywords with word boundaries
     langKeywords.forEach(keyword => {
-      const regex = new RegExp(`\\b(${keyword})\\b`, 'g');
+      const regex = new RegExp('\\b(' + keyword + ')\\b', 'g');
       highlighted = highlighted.replace(regex, '<span style="color: #a855f7; font-weight: 600;">$1</span>');
     });
 
-    // Highlight strings (single, double quotes, and template literals)
-    highlighted = highlighted.replace(/(["'\`])((?:\\.|(?!\1)[^\\])*)\1/g, '<span style="color: #22c55e;">$1$2$1</span>');
+    // Highlight strings (single and double quotes only)
+    highlighted = highlighted.replace(/(["'])((?:\\.|(?!\1)[^\\])*)\1/g, '<span style="color: #22c55e;">$1$2$1</span>');
 
     // Highlight numbers
     highlighted = highlighted.replace(/\b(\d+\.?\d*)\b/g, '<span style="color: #3b82f6;">$1</span>');
