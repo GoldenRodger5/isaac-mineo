@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { apiClient } from '../services/apiClient';
+import MobileChatInterface from './MobileChatInterface';
 
 // Simple function to format AI responses
 const formatAIResponse = (text) => {
@@ -196,33 +197,35 @@ const AIChatbot = () => {
 
   return (
     <>
-      {/* Chat Toggle Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 z-50 group"
-        aria-label="Toggle AI Chatbot"
-      >
-        <div className="relative">
-          {backendStatus === 'connected' && (
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-          )}
-          {backendStatus === 'disconnected' && (
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full"></div>
-          )}
-          <svg
-            className={`w-6 h-6 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            {isOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.013 8.013 0 01-2.319-.345l-4.049 1.52a.5.5 0 01-.647-.647l1.52-4.049A8.013 8.013 0 016 12c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
+      {/* Desktop Floating Chat */}
+      <div className="hidden md:block">
+        {/* Chat Toggle Button */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 z-50 group"
+          aria-label="Toggle AI Chatbot"
+        >
+          <div className="relative">
+            {backendStatus === 'connected' && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
             )}
-          </svg>
-        </div>
-      </button>
+            {backendStatus === 'disconnected' && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full"></div>
+            )}
+            <svg
+              className={`w-6 h-6 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              {isOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.013 8.013 0 01-2.319-.345l-4.049 1.52a.5.5 0 01-.647-.647l1.52-4.049A8.013 8.013 0 016 12c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
+              )}
+            </svg>
+          </div>
+        </button>
 
       {/* Chat Window */}
       {isOpen && (
@@ -324,6 +327,65 @@ const AIChatbot = () => {
           </div>
         </div>
       )}
+      </div>
+
+      {/* Mobile Chat - Simpler Fixed Button */}
+      <div className="md:hidden">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="fixed bottom-20 right-4 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 z-40"
+          aria-label="Quick AI Assistant"
+        >
+          <div className="relative">
+            {backendStatus === 'connected' && (
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            )}
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.013 8.013 0 01-2.319-.345l-4.049 1.52a.5.5 0 01-.647-.647l1.52-4.049A8.013 8.013 0 016 12c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
+            </svg>
+          </div>
+        </button>
+
+        {/* Mobile Full Screen Chat Modal */}
+        {isOpen && (
+          <div className="fixed inset-0 bg-white z-50 safe-area-all">
+            <div className="h-full flex flex-col">
+              {/* Mobile Header */}
+              <div className="bg-blue-600 text-white p-4 flex items-center justify-between safe-area-top">
+                <div>
+                  <h3 className="font-semibold">Isaac's AI Assistant</h3>
+                  <p className="text-xs text-blue-100">
+                    {backendStatus === 'connected' ? 'Connected' : 'Offline Mode'}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-blue-100 hover:text-white transition-colors p-2"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Mobile Chat Interface */}
+              <div className="flex-1">
+                <MobileChatInterface
+                  messages={messages}
+                  onSendMessage={handleSendMessage}
+                  isLoading={isLoading}
+                  suggestedQuestions={[
+                    "What projects has Isaac worked on?",
+                    "Tell me about Isaac's technical skills",
+                    "What is Isaac looking for in his next role?"
+                  ]}
+                  placeholder="Ask me about Isaac's background..."
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 };

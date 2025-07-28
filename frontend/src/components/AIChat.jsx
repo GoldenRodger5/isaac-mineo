@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { apiClient } from '../services/apiClient';
+import MobileChatInterface from './MobileChatInterface';
 
 const AIChat = () => {
   const [messages, setMessages] = useState([
@@ -178,38 +179,51 @@ const AIChat = () => {
         </div>
 
         <div className="max-w-4xl mx-auto">
-          {/* Status Bar */}
-          <div className="bg-white rounded-t-xl border-x border-t border-gray-200 px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className={`w-3 h-3 rounded-full ${
-                  backendStatus === 'connected' ? 'bg-green-400 animate-pulse' : 
-                  backendStatus === 'disconnected' ? 'bg-red-400' : 'bg-yellow-400'
-                }`}></div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Isaac's AI Assistant</h3>
-                  <p className="text-sm text-gray-500">
-                    {backendStatus === 'connected' ? (
-                      `Connected • ${conversationCount} messages exchanged`
-                    ) : backendStatus === 'disconnected' ? (
-                      'Backend offline • Using fallback responses'
-                    ) : (
-                      'Checking connection...'
-                    )}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={clearChat}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-700"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                <span>Clear Chat</span>
-              </button>
-            </div>
+          {/* Mobile Chat Interface */}
+          <div className="md:hidden bg-white rounded-xl border border-gray-200 shadow-lg h-[70vh]">
+            <MobileChatInterface
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading}
+              suggestedQuestions={suggestedQuestions}
+              placeholder="Ask me anything about Isaac's background, skills, projects, or career goals..."
+            />
           </div>
+
+          {/* Desktop Chat Interface */}
+          <div className="hidden md:block">
+            {/* Status Bar */}
+            <div className="bg-white rounded-t-xl border-x border-t border-gray-200 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-3 h-3 rounded-full ${
+                    backendStatus === 'connected' ? 'bg-green-400 animate-pulse' : 
+                    backendStatus === 'disconnected' ? 'bg-red-400' : 'bg-yellow-400'
+                  }`}></div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Isaac's AI Assistant</h3>
+                    <p className="text-sm text-gray-500">
+                      {backendStatus === 'connected' ? (
+                        `Connected • ${conversationCount} messages exchanged`
+                      ) : backendStatus === 'disconnected' ? (
+                        'Backend offline • Using fallback responses'
+                      ) : (
+                        'Checking connection...'
+                      )}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={clearChat}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-700"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>Clear Chat</span>
+                </button>
+              </div>
+            </div>
 
           {/* Chat Messages */}
           <div className="bg-gray-50 h-96 overflow-y-auto p-6 border-x border-gray-200">
@@ -351,6 +365,7 @@ const AIChat = () => {
               <p>Press Enter to send, Shift+Enter for new line</p>
               <p>Powered by GPT-4o • Isaac's Knowledge Base</p>
             </div>
+          </div>
           </div>
         </div>
       </div>

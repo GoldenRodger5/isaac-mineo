@@ -19,7 +19,7 @@ const ExplanationPanel = ({
   const [isAskingFollowUp, setIsAskingFollowUp] = useState(false);
 
   const formatExplanation = (text) => {
-    if (!text) return '';
+    if (!text || typeof text !== 'string') return '';
     
     // Convert markdown-style formatting for better display
     return text

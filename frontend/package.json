@@ -17,7 +17,9 @@
     "setup": "npm install && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && npm run init-knowledge",
     "activate-python": "source venv/bin/activate",
     "python-test": "source venv/bin/activate && python -c 'import openai, pinecone_client, redis; print(\"All Python packages working!\")'",
-    "health-check": "curl -X GET http://localhost:5173/api/health || echo 'Server not running'"
+    "health-check": "curl -X GET http://localhost:5173/api/health || echo 'Server not running'",
+    "generate-sitemap": "node scripts/generateSitemap.js",
+    "seo-check": "echo '🔍 SEO Status Check:' && echo '✅ Sitemap:' && ls -la public/sitemap.xml && echo '✅ Robots:' && ls -la public/robots.txt"
   },
   "keywords": [
     "portfolio",

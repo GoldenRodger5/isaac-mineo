@@ -10,6 +10,9 @@ import AIChatbot from './components/AIChatbot';
 import CodeExplainer from './components/CodeExplainer';
 import AuthTest from './components/AuthTest';
 import { AuthProvider } from './contexts/AuthContext';
+import BottomNavigation from './components/BottomNavigation';
+import HorizontalTabNavigation from './components/HorizontalTabNavigation';
+import SwipeableTabContainer from './components/SwipeableTabContainer';
 
 const CORRECT_PASSWORD = import.meta.env.VITE_SITE_PASSWORD;
 
@@ -344,46 +347,43 @@ function App() {
         </div>
       </section>
 
-      {/* Tab Navigation */}
-      <nav className="relative z-30 bg-white/80 backdrop-blur-xl border-y border-white/20 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center">
-            <div className="flex space-x-1 p-2">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                    activeTab === tab.id
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg transform scale-105'
-                      : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-                  }`}
-                >
-                  <span className="text-lg">{tab.icon}</span>
-                  <span className="hidden sm:inline">{tab.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* Tab Navigation - Desktop */}
+      <HorizontalTabNavigation 
+        tabs={tabs}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        className="hidden md:block"
+      />
 
-      {/* Main Content */}
-      <main className="relative z-20 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
-            <div className="p-8 md:p-12">
-              {activeTab === 'about' && <About />}
-              {activeTab === 'projects' && <Projects />}
-              {activeTab === 'resume' && <Resume />}
-              {activeTab === 'ai-chat' && <AIChat />}
-              {activeTab === 'code-explainer' && <CodeExplainer />}
-              {activeTab === 'auth-test' && <AuthTest />}
-              {activeTab === 'contact' && <Contact />}
+      {/* Main Content with Swipe Support */}
+      <SwipeableTabContainer
+        tabs={tabs}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      >
+        <main className="relative z-20 py-12 pb-24 md:pb-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+              <div className="p-4 md:p-8 lg:p-12">
+                {activeTab === 'about' && <About />}
+                {activeTab === 'projects' && <Projects />}
+                {activeTab === 'resume' && <Resume />}
+                {activeTab === 'ai-chat' && <AIChat />}
+                {activeTab === 'code-explainer' && <CodeExplainer />}
+                {activeTab === 'auth-test' && <AuthTest />}
+                {activeTab === 'contact' && <Contact />}
+              </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </SwipeableTabContainer>
+
+      {/* Bottom Navigation - Mobile */}
+      <BottomNavigation 
+        tabs={tabs}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
 
       {/* Footer */}
       <footer className="relative z-20 mt-20 bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 text-white">

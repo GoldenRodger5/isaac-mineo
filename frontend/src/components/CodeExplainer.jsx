@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { apiClient } from '../services/apiClient';
+import MobileCodeExplainerFlow from './MobileCodeExplainerFlow';
 
 // Import sub-components (we'll create these next)
 import RepositoryBrowser from './CodeExplainer/RepositoryBrowser';
@@ -290,47 +291,66 @@ Please provide a clear, detailed explanation.`;
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex flex-col overflow-hidden">
-      {/* Header - Fixed Height */}
-      <div className="border-b border-white/10 bg-black/20 backdrop-blur-sm flex-shrink-0">
-        <div className="max-w-full mx-auto px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="text-3xl">🔍</div>
-              <div>
-                <h1 className="text-3xl font-bold text-white">Claude AI Code Explainer</h1>
-                <p className="text-gray-300">
-                  Explore and understand code with Claude Sonnet-powered explanations
-                </p>
+    <>
+      {/* Mobile Flow */}
+      <div className="md:hidden">
+        <MobileCodeExplainerFlow
+          repositories={repositories}
+          selectedRepo={selectedRepo}
+          repoFiles={repoFiles}
+          selectedFile={selectedFile}
+          fileContent={fileContent}
+          onRepoSelect={handleRepoSelect}
+          onFileSelect={handleFileSelect}
+          onCodeSelection={handleCodeSelection}
+          onExplainCode={handleExplainCode}
+          loadingStates={loadingStates}
+          errors={errors}
+        />
+      </div>
+
+      {/* Desktop Flow */}
+      <div className="hidden md:block h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex flex-col overflow-hidden">
+        {/* Header - Fixed Height */}
+        <div className="border-b border-white/10 bg-black/20 backdrop-blur-sm flex-shrink-0">
+          <div className="max-w-full mx-auto px-8 py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="text-3xl">🔍</div>
+                <div>
+                  <h1 className="text-3xl font-bold text-white">Claude AI Code Explainer</h1>
+                  <p className="text-gray-300">
+                    Explore and understand code with Claude Sonnet-powered explanations
+                  </p>
+                </div>
               </div>
-            </div>
-            
-            {/* Quick Actions */}
-            <div className="flex items-center space-x-3">
-              {!repositories.length && (
-                <button
-                  onClick={loadRepositories}
-                  disabled={loadingStates.repositories}
-                  className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 px-4 py-2 rounded-lg text-white font-medium transition-colors flex items-center space-x-2"
-                >
-                  <span>📁</span>
-                  <span>{loadingStates.repositories ? 'Loading...' : 'Load Repositories'}</span>
-                </button>
-              )}
               
-              {selectedRepo && !showNavigation && (
-                <button
-                  onClick={toggleNavigation}
-                  className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-white font-medium transition-colors flex items-center space-x-2"
-                >
-                  <span>🗂️</span>
-                  <span>Browse</span>
-                </button>
-              )}
+              {/* Quick Actions */}
+              <div className="flex items-center space-x-3">
+                {!repositories?.length && (
+                  <button
+                    onClick={loadRepositories}
+                    disabled={loadingStates.repositories}
+                    className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 px-4 py-2 rounded-lg text-white font-medium transition-colors flex items-center space-x-2"
+                  >
+                    <span>📁</span>
+                    <span>{loadingStates.repositories ? 'Loading...' : 'Load Repositories'}</span>
+                  </button>
+                )}
+                
+                {selectedRepo && !showNavigation && (
+                  <button
+                    onClick={toggleNavigation}
+                    className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-white font-medium transition-colors flex items-center space-x-2"
+                  >
+                    <span>🗂️</span>
+                    <span>Browse</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
       {/* Navigation Tabs & Main Content */}
       <div className="flex flex-col flex-1 min-h-0">
@@ -520,7 +540,8 @@ Please provide a clear, detailed explanation.`;
       {Object.values(loadingStates).some(Boolean) && (
         <LoadingSpinner message="Processing..." />
       )}
-    </div>
+      </div>
+    </>
   );
 };
 
