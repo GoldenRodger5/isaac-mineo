@@ -283,10 +283,10 @@ async def explain_code(request: CodeExplanationRequest):
             request.selected_code
         )
         
-        # Use Claude Sonnet 4 for code explanation
+        # Use Claude Sonnet 4 for code explanation with large token capacity for entire files
         response = anthropic_client.messages.create(
             model="claude-sonnet-4-20250514",  # Latest Claude Sonnet model available
-            max_tokens=1500,
+            max_tokens=16000,  # Increased to handle large files (400+ lines of code)
             temperature=0.3,  # Lower temperature for more focused code explanations
             system="You are an expert code reviewer and software engineer with deep knowledge across multiple programming languages and frameworks. Provide clear, detailed, and helpful code explanations that demonstrate both technical depth and practical insights.",
             messages=[

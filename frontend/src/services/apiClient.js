@@ -6,7 +6,7 @@ class APIClient {
     // Smart environment detection
     this.environment = this.detectEnvironment();
     this.baseURL = this.getApiBaseUrl();
-    this.timeout = 30000; // 30 seconds - increased for better reliability
+    this.timeout = 120000; // 2 minutes - increased for Claude Sonnet 4 large responses
     this.retryAttempts = 3;
     this.retryDelay = 1000; // 1 second
     
