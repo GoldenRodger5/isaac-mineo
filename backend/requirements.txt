@@ -3,6 +3,7 @@ uvicorn[standard]
 python-multipart
 python-dotenv
 openai
+anthropic
 pinecone
 redis
 pydantic
@@ -12,3 +13,4 @@ jinja2
 python-jose[cryptography]
 passlib[bcrypt]
 httpx
+aiohttp

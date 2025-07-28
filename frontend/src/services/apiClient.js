@@ -33,13 +33,13 @@ class APIClient {
     switch (this.environment) {
       case 'development':
         // Local development - try localhost backend
-        return 'http://localhost:8000/api';
+        return 'http://localhost:8001/api';
       case 'production':
       case 'preview':
         // Production/Preview - use Render backend
         return 'https://isaac-mineo-api.onrender.com/api';
       default:
-        return 'http://localhost:8000/api';
+        return 'http://localhost:8001/api';
     }
   }
 
@@ -203,6 +203,57 @@ class APIClient {
     }
     
     return "Isaac is a Full-Stack Developer specializing in AI-powered applications. Ask me about his tech stack, projects like Nutrivize, experience, or career goals. Contact him at isaacmineo@gmail.com for opportunities!";
+  }
+
+  // GitHub Code Explanation API
+  async explainCode(code, mode = 'explain', fileContext = null, selectedCode = null) {
+    try {
+      const response = await this.fetchWithRetry(`${this.baseURL}/github/explain-code`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code,
+          mode,
+          file_context: fileContext,
+          selected_code: selectedCode
+        })
+      });
+
+      return response;
+    } catch (error) {
+      console.error('Code explanation API error:', error);
+      
+      // Return fallback explanation
+      return {
+        success: false,
+        error: error.message,
+        fallback: true,
+        data: {
+          explanation: `I'm having trouble connecting to the Claude AI service right now. Here's what I can tell you about the code:
+
+**Code Analysis (Offline Mode)**
+This appears to be ${fileContext?.language || 'unknown'} code${fileContext?.path ? ` from ${fileContext.path}` : ''}. 
+
+${mode === 'teach' ? 
+  'For learning purposes, I recommend breaking down the code into smaller functions and adding comments to understand each part.' :
+  mode === 'summarize' ?
+  'This code appears to contain logic for data processing or application functionality.' :
+  'This code contains various programming constructs that work together to achieve specific functionality.'
+}
+
+Please try again in a moment, or contact Isaac directly for detailed code explanations powered by Claude Sonnet.`,
+          mode,
+          model: "claude-sonnet-4-20250514",
+          context: {
+            file_path: fileContext?.path || null,
+            language: fileContext?.language || null,
+            has_selection: Boolean(selectedCode)
+          }
+        }
+      };
+    }
   }
 }
 

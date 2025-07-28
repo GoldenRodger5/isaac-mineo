@@ -6,8 +6,8 @@ import uvicorn
 import asyncio
 
 # Import services
-from app.services.error_handler import error_handler
-from app.utils.pinecone_service import initialize_pinecone_indexes
+from backend.app.services.error_handler import error_handler
+from backend.app.utils.pinecone_service import initialize_pinecone_indexes
 
 # Load environment variables from root .env file
 load_dotenv(dotenv_path='../.env')  # Load from project root
@@ -39,7 +39,7 @@ async def startup_event():
         print("✅ Multi-index knowledge base system ready")
         
         # Initialize cache manager
-        from app.utils.cache_manager import CacheManager
+        from backend.app.utils.cache_manager import CacheManager
         cache_manager = CacheManager()
         await cache_manager.connect()
         print("✅ Cache manager initialized")
@@ -85,10 +85,12 @@ async def get_metrics():
         raise HTTPException(status_code=500, detail="Failed to retrieve metrics")
 
 # Import routers
-from app.routers import chatbot
+from backend.app.routers import chatbot
+from backend.app.routers import github_explainer
 
 # Include routers
 app.include_router(chatbot.router, prefix="/api", tags=["chatbot"])
+app.include_router(github_explainer.router, prefix="/api", tags=["github", "code-explainer"])
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,0 +1,355 @@
+"""
+GitHub API Router for Code Explainer Feature
+Provides REST endpoints for GitHub repository interaction
+"""
+
+from fastapi import APIRouter, HTTPException, Query, Path
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from typing import Optional, List, Dict, Any
+import os
+
+from backend.app.services.github_service import github_service
+from backend.app.services.error_handler import error_handler
+
+
+router = APIRouter()
+
+
+class RepoRequest(BaseModel):
+    repo_full_name: str
+    branch: Optional[str] = None
+
+
+class FileRequest(BaseModel):
+    repo_full_name: str
+    file_path: str
+    branch: Optional[str] = None
+
+
+class SearchRequest(BaseModel):
+    repo_full_name: str
+    query: str
+    branch: Optional[str] = None
+
+
+class CodeExplanationRequest(BaseModel):
+    code: str
+    mode: str = "explain"  # explain, summarize, teach
+    file_context: Optional[Dict[str, Any]] = None
+    selected_code: Optional[str] = None
+
+
+@router.get("/github/repos")
+async def get_user_repos(username: str = Query("GoldenRodger5", description="GitHub username")):
+    """Get all repositories for a user"""
+    try:
+        repos = await github_service.get_user_repos(username)
+        return {
+            "success": True,
+            "data": repos,
+            "count": len(repos),
+            "username": username
+        }
+    except Exception as e:
+        error_handler.log_error(e, {"endpoint": "/github/repos", "username": username})
+        raise HTTPException(status_code=500, detail=f"Failed to fetch repositories: {str(e)}")
+
+
+@router.get("/github/repo/{owner}/{repo}/tree")
+async def get_repository_tree(
+    owner: str = Path(..., description="Repository owner"),
+    repo: str = Path(..., description="Repository name"),
+    branch: Optional[str] = Query(None, description="Branch name (defaults to default branch)")
+):
+    """Get repository file tree"""
+    try:
+        repo_full_name = f"{owner}/{repo}"
+        tree_data = await github_service.get_repo_tree(repo_full_name, branch)
+        
+        if not tree_data:
+            raise HTTPException(status_code=404, detail="Repository not found or access denied")
+        
+        return {
+            "success": True,
+            "data": tree_data
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        error_handler.log_error(e, {"endpoint": "/github/repo/tree", "repo": f"{owner}/{repo}"})
+        raise HTTPException(status_code=500, detail=f"Failed to fetch repository tree: {str(e)}")
+
+
+@router.get("/github/repo/{owner}/{repo}/file")
+async def get_file_content(
+    owner: str = Path(..., description="Repository owner"),
+    repo: str = Path(..., description="Repository name"),
+    file_path: str = Query(..., description="File path in repository"),
+    branch: Optional[str] = Query(None, description="Branch name (defaults to default branch)")
+):
+    """Get file content from repository"""
+    try:
+        repo_full_name = f"{owner}/{repo}"
+        file_data = await github_service.get_file_content(repo_full_name, file_path, branch)
+        
+        if not file_data:
+            raise HTTPException(status_code=404, detail="File not found or access denied")
+        
+        return {
+            "success": True,
+            "data": file_data
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        error_handler.log_error(e, {"endpoint": "/github/file", "repo": f"{owner}/{repo}", "file": file_path})
+        raise HTTPException(status_code=500, detail=f"Failed to fetch file content: {str(e)}")
+
+
+@router.get("/github/repo/{owner}/{repo}/stats")
+async def get_repository_stats(
+    owner: str = Path(..., description="Repository owner"),
+    repo: str = Path(..., description="Repository name")
+):
+    """Get repository statistics and metadata"""
+    try:
+        repo_full_name = f"{owner}/{repo}"
+        stats = await github_service.get_repo_stats(repo_full_name)
+        
+        if not stats:
+            raise HTTPException(status_code=404, detail="Repository not found or access denied")
+        
+        return {
+            "success": True,
+            "data": stats
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        error_handler.log_error(e, {"endpoint": "/github/stats", "repo": f"{owner}/{repo}"})
+        raise HTTPException(status_code=500, detail=f"Failed to fetch repository stats: {str(e)}")
+
+
+@router.post("/github/search")
+async def search_repository_files(search_request: SearchRequest):
+    """Search for files in a repository"""
+    try:
+        results = await github_service.search_files_in_repo(
+            search_request.repo_full_name,
+            search_request.query,
+            search_request.branch
+        )
+        
+        return {
+            "success": True,
+            "data": results,
+            "count": len(results),
+            "query": search_request.query
+        }
+    except Exception as e:
+        error_handler.log_error(e, {"endpoint": "/github/search", "repo": search_request.repo_full_name})
+        raise HTTPException(status_code=500, detail=f"Failed to search repository: {str(e)}")
+
+
+@router.get("/github/rate-limit")
+async def get_rate_limit_status():
+    """Get GitHub API rate limit status"""
+    try:
+        rate_limit = await github_service.get_rate_limit_status()
+        return {
+            "success": True,
+            "data": rate_limit
+        }
+    except Exception as e:
+        error_handler.log_error(e, {"endpoint": "/github/rate-limit"})
+        raise HTTPException(status_code=500, detail=f"Failed to get rate limit status: {str(e)}")
+
+
+@router.get("/github/supported-extensions")
+async def get_supported_file_extensions():
+    """Get list of supported file extensions"""
+    return {
+        "success": True,
+        "data": {
+            "extensions": list(github_service.supported_extensions),
+            "count": len(github_service.supported_extensions),
+            "categories": {
+                "programming": ['.py', '.js', '.jsx', '.ts', '.tsx', '.java', '.cpp', '.c', '.cs', '.php', '.rb', '.go', '.rs', '.kt', '.swift', '.dart'],
+                "web": ['.html', '.css', '.scss', '.sass', '.less', '.vue', '.svelte'],
+                "config": ['.json', '.yaml', '.yml', '.toml', '.ini', '.cfg', '.conf'],
+                "documentation": ['.md', '.rst', '.txt', '.adoc'],
+                "scripts": ['.sh', '.bash', '.ps1', '.dockerfile']
+            }
+        }
+    }
+
+
+@router.get("/github/health")
+async def github_service_health():
+    """Health check for GitHub service"""
+    try:
+        # Check if GitHub token is configured
+        github_token = os.getenv("GITHUB_API_TOKEN")
+        if not github_token:
+            return {
+                "success": False,
+                "status": "unhealthy",
+                "message": "GitHub API token not configured"
+            }
+        
+        # Check rate limit to verify token works
+        rate_limit = await github_service.get_rate_limit_status()
+        
+        return {
+            "success": True,
+            "status": "healthy",
+            "data": {
+                "token_configured": True,
+                "rate_limit": rate_limit,
+                "supported_extensions": len(github_service.supported_extensions)
+            }
+        }
+    except Exception as e:
+        error_handler.log_error(e, {"endpoint": "/github/health"})
+        return {
+            "success": False,
+            "status": "unhealthy",
+            "message": str(e)
+        }
+
+
+@router.post("/github/explain-code")
+async def explain_code(request: CodeExplanationRequest):
+    """
+    Generate AI explanation for code using Claude Sonnet 4
+    """
+    try:
+        # Import Anthropic client
+        import anthropic
+        import os
+        
+        anthropic_client = anthropic.Anthropic(
+            api_key=os.getenv("ANTHROPIC_API_KEY")
+        )
+        
+        # Generate contextual prompt based on mode and file context
+        prompt = generate_explanation_prompt(
+            request.code, 
+            request.mode, 
+            request.file_context, 
+            request.selected_code
+        )
+        
+        # Use Claude Sonnet 4 for code explanation
+        response = anthropic_client.messages.create(
+            model="claude-sonnet-4-20250514",  # Latest Claude Sonnet model available
+            max_tokens=1500,
+            temperature=0.3,  # Lower temperature for more focused code explanations
+            system="You are an expert code reviewer and software engineer with deep knowledge across multiple programming languages and frameworks. Provide clear, detailed, and helpful code explanations that demonstrate both technical depth and practical insights.",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        )
+        
+        response_text = response.content[0].text if response.content else "I'm having trouble analyzing this code right now."
+        
+        return {
+            "success": True,
+            "data": {
+                "explanation": response_text,
+                "mode": request.mode,
+                "model": "claude-sonnet-4-20250514",
+                "context": {
+                    "file_path": request.file_context.get("path") if request.file_context else None,
+                    "language": request.file_context.get("language") if request.file_context else None,
+                    "has_selection": bool(request.selected_code)
+                }
+            }
+        }
+        
+    except Exception as e:
+        error_handler.log_error(e, {
+            "endpoint": "/github/explain-code",
+            "mode": request.mode,
+            "code_length": len(request.code),
+            "model": "claude-sonnet-4-20250514"
+        })
+        raise HTTPException(status_code=500, detail=f"Failed to generate explanation: {str(e)}")
+
+
+def generate_explanation_prompt(code: str, mode: str, file_context: Optional[Dict] = None, selected_code: Optional[str] = None) -> str:
+    """Generate contextual prompts for different explanation modes"""
+    
+    # Mode-specific instructions
+    mode_instructions = {
+        "explain": """Explain this code as if to a mid-level developer reviewing a pull request. 
+                     Focus on:
+                     - What the code does (purpose and functionality)
+                     - How it works (key logic and algorithms)
+                     - Why certain approaches were chosen
+                     - How it interacts with other parts of the system
+                     - Any potential issues or improvements""",
+        
+        "summarize": """Provide a concise, high-level summary of this code.
+                       Focus on:
+                       - Main purpose and functionality
+                       - Key components or modules
+                       - Overall architecture or design pattern
+                       - How it fits into the larger application""",
+        
+        "teach": """Explain this code as if teaching a beginner developer.
+                   Focus on:
+                   - Basic concepts and terminology
+                   - Step-by-step breakdown of what happens
+                   - Why each part is necessary
+                   - Common patterns and best practices shown
+                   - Learning opportunities and key takeaways"""
+    }
+    
+    # Build context information
+    context_info = ""
+    if file_context:
+        context_info = f"""
+        
+File Context:
+- File: {file_context.get('path', 'Unknown')}
+- Language: {file_context.get('language', 'Unknown')}
+- File Size: {file_context.get('size', 'Unknown')} bytes
+"""
+    
+    # Handle code selection vs full file
+    code_context = ""
+    if selected_code and selected_code != code:
+        code_context = f"""
+Selected Code (focus on this):
+```{file_context.get('language', 'text') if file_context else 'text'}
+{selected_code}
+```
+
+Full File Context:
+```{file_context.get('language', 'text') if file_context else 'text'}
+{code[:2000]}{'...' if len(code) > 2000 else ''}
+```"""
+    else:
+        code_context = f"""
+Code to Analyze:
+```{file_context.get('language', 'text') if file_context else 'text'}
+{code}
+```"""
+    
+    # Construct final prompt
+    prompt = f"""You are an expert code reviewer and teacher helping to explain code from a GitHub repository.
+
+{mode_instructions.get(mode, mode_instructions['explain'])}
+
+{context_info}
+
+{code_context}
+
+Please provide a clear, well-structured explanation in the requested style ({mode}). Use markdown formatting for better readability."""
+
+    return prompt

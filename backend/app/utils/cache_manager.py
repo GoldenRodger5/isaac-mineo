@@ -105,3 +105,21 @@ class CacheManager:
                 )
         except Exception as error:
             print(f"Error caching response: {error}")
+
+    async def get(self, key: str) -> Optional[str]:
+        """Generic get method for caching"""
+        try:
+            if self.redis_client:
+                return self.redis_client.get(key)
+            return None
+        except Exception as error:
+            print(f"Error getting cached value: {error}")
+            return None
+
+    async def set(self, key: str, value: str, expire: int = 3600):
+        """Generic set method for caching"""
+        try:
+            if self.redis_client:
+                self.redis_client.setex(key, expire, value)
+        except Exception as error:
+            print(f"Error setting cached value: {error}")
