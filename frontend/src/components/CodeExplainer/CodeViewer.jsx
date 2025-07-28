@@ -15,42 +15,54 @@ const CodeViewer = ({
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const codeRef = useRef(null);
 
+  const addLineNumbers = (code) => {
+    const lines = code.split('\n');
+    return lines.map((line, index) => {
+      const lineNumber = (index + 1).toString().padStart(3, ' ');
+      return `<span class="line-number" style="color: #6B7280; margin-right: 16px; user-select: none; display: inline-block; width: 40px; text-align: right;">${lineNumber}</span>${line}`;
+    }).join('\n');
+  };
+
   const syntaxHighlight = (code, language) => {
     if (!code) return '';
 
-    // Simple syntax highlighting with regex
-    let highlighted = code;
+    // Escape HTML first to prevent injection
+    let highlighted = code
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
 
-    // Keywords highlighting
+    // Simple syntax highlighting with regex for common languages
     const keywords = {
-      javascript: ['function', 'const', 'let', 'var', 'return', 'if', 'else', 'for', 'while', 'class', 'import', 'export', 'from', 'async', 'await'],
-      python: ['def', 'class', 'import', 'from', 'return', 'if', 'else', 'elif', 'for', 'while', 'try', 'except', 'with', 'as', 'async', 'await'],
+      javascript: ['function', 'const', 'let', 'var', 'return', 'if', 'else', 'for', 'while', 'class', 'import', 'export', 'from', 'async', 'await', 'try', 'catch'],
+      python: ['def', 'class', 'import', 'from', 'return', 'if', 'else', 'elif', 'for', 'while', 'try', 'except', 'with', 'as', 'async', 'await', 'yield'],
       typescript: ['function', 'const', 'let', 'var', 'return', 'if', 'else', 'for', 'while', 'class', 'import', 'export', 'from', 'interface', 'type', 'async', 'await']
     };
 
-    const langKeywords = keywords[language] || keywords.javascript;
+    const langKeywords = keywords[language?.toLowerCase()] || keywords.javascript;
 
-    // Highlight keywords
+    // Highlight keywords with word boundaries
     langKeywords.forEach(keyword => {
-      const regex = new RegExp(`\\b${keyword}\\b`, 'g');
-      highlighted = highlighted.replace(regex, `<span class="text-purple-400 font-medium">${keyword}</span>`);
+      const regex = new RegExp(`\\b(${keyword})\\b`, 'g');
+      highlighted = highlighted.replace(regex, '<span style="color: #a855f7; font-weight: 600;">$1</span>');
     });
 
-    // Highlight strings
-    highlighted = highlighted.replace(/(["'`])(.*?)\1/g, '<span class="text-green-400">$1$2$1</span>');
+    // Highlight strings (single, double quotes, and template literals)
+    highlighted = highlighted.replace(/(["'`])((?:\\.|(?!\1)[^\\])*)\1/g, '<span style="color: #22c55e;">$1$2$1</span>');
 
     // Highlight numbers
-    highlighted = highlighted.replace(/\b(\d+\.?\d*)\b/g, '<span class="text-blue-400">$1</span>');
+    highlighted = highlighted.replace(/\b(\d+\.?\d*)\b/g, '<span style="color: #3b82f6;">$1</span>');
 
     // Highlight comments
     if (language === 'javascript' || language === 'typescript') {
-      highlighted = highlighted.replace(/(\/\/.*$)/gm, '<span class="text-gray-500 italic">$1</span>');
-      highlighted = highlighted.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="text-gray-500 italic">$1</span>');
+      highlighted = highlighted.replace(/(\/\/.*$)/gm, '<span style="color: #6b7280; font-style: italic;">$1</span>');
+      highlighted = highlighted.replace(/(\/\*[\s\S]*?\*\/)/g, '<span style="color: #6b7280; font-style: italic;">$1</span>');
     } else if (language === 'python') {
-      highlighted = highlighted.replace(/(#.*$)/gm, '<span class="text-gray-500 italic">$1</span>');
+      highlighted = highlighted.replace(/(#.*$)/gm, '<span style="color: #6b7280; font-style: italic;">$1</span>');
     }
 
-    return highlighted;
+    // Add line numbers
+    return addLineNumbers(highlighted);
   };
 
   const handleTextSelection = () => {
@@ -182,12 +194,20 @@ const CodeViewer = ({
       </div>
 
       {/* Code Content */}
-      <div className="flex-1 overflow-auto min-h-0">
-                <div className="relative">
+      <div className="flex-1 min-h-0 bg-gray-900/50 overflow-hidden">
+        <div 
+          className="h-full overflow-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#4B5563 #1F2937'
+          }}
+        >
           <pre
             ref={codeRef}
-            className="p-4 text-sm font-mono leading-relaxed text-gray-300 whitespace-pre-wrap select-text"
+            className="p-4 text-sm font-mono leading-relaxed text-gray-300 whitespace-pre-wrap select-text block min-h-full"
             style={{ tabSize: 2 }}
+            onMouseUp={handleTextSelection}
+            onKeyUp={handleTextSelection}
           >
             <code
               dangerouslySetInnerHTML={{
@@ -195,6 +215,7 @@ const CodeViewer = ({
               }}
             />
           </pre>
+        </div>
 
           {/* Selection Tooltip */}
           {showSelectionTooltip && selectedCode && (

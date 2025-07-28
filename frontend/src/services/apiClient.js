@@ -33,13 +33,13 @@ class APIClient {
     switch (this.environment) {
       case 'development':
         // Local development - try localhost backend
-        return 'http://localhost:8001/api';
+        return 'http://localhost:8000/api';
       case 'production':
       case 'preview':
         // Production/Preview - use Render backend
         return 'https://isaac-mineo-api.onrender.com/api';
       default:
-        return 'http://localhost:8001/api';
+        return 'http://localhost:8000/api';
     }
   }
 

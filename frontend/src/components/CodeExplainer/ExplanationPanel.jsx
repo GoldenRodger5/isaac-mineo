@@ -192,7 +192,13 @@ Please provide a focused answer to the follow-up question in the context of this
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-3 min-h-0">
+      <div 
+        className="flex-1 p-3 min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
+        style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#4B5563 #1F2937'
+        }}
+      >
         {!explanation && !loading && !error && (
           <div className="text-center py-12 flex-1 flex flex-col justify-center">
             <div className="text-4xl mb-3">🤖</div>
