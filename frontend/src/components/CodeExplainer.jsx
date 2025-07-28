@@ -301,7 +301,7 @@ Please provide a clear, detailed explanation.`;
             <div className="flex items-center space-x-3">
               {!repositories.length && (
                 <button
-                  onClick={fetchGitHubRepositories}
+                  onClick={loadRepositories}
                   disabled={loadingStates.repositories}
                   className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 px-4 py-2 rounded-lg text-white font-medium transition-colors flex items-center space-x-2"
                 >
