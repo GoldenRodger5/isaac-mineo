@@ -11,7 +11,8 @@ const ExplanationPanel = ({
   explanationMode, 
   onExplainCode,
   onClearExplanation,
-  followUpQuestions 
+  followUpQuestions,
+  isCodeSelection = false
 }) => {
   const [conversationHistory, setConversationHistory] = useState([]);
   const [followUpQuestion, setFollowUpQuestion] = useState('');
@@ -178,10 +179,17 @@ Please provide a focused answer to the follow-up question in the context of this
       <div className="flex items-center justify-between p-3 border-b border-white/10 flex-shrink-0">
         <div className="flex items-center space-x-2">
           <span className="text-lg">{getModeIcon(explanationMode)}</span>
-          <h2 className="text-base font-semibold text-white">AI Explanation</h2>
+          <h2 className="text-base font-semibold text-white">
+            {isCodeSelection ? 'Code Selection Analysis' : 'AI Explanation'}
+          </h2>
           <span className={`px-2 py-1 rounded text-xs bg-${getModeColor(explanationMode)}-500/20 text-${getModeColor(explanationMode)}-300`}>
             {explanationMode}
           </span>
+          {isCodeSelection && (
+            <span className="px-2 py-1 rounded text-xs bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+              ✂️ Selection
+            </span>
+          )}
         </div>
         
         {explanation && (

@@ -288,7 +288,22 @@ async def explain_code(request: CodeExplanationRequest):
             model="claude-sonnet-4-20250514",  # Latest Claude Sonnet model available
             max_tokens=16000,  # Increased to handle large files (400+ lines of code)
             temperature=0.3,  # Lower temperature for more focused code explanations
-            system="You are an expert code reviewer and software engineer with deep knowledge across multiple programming languages and frameworks. Provide clear, detailed, and helpful code explanations that demonstrate both technical depth and practical insights.",
+            system="""You are an expert code reviewer and software engineer with deep knowledge across multiple programming languages and frameworks. 
+
+FORMATTING REQUIREMENTS:
+- NO markdown headers (#) - use **bold text** for titles instead
+- Use compact bullet points with minimal spacing: • Item (no extra lines)
+- ALWAYS reference specific line numbers when discussing code: "The FastAPI initialization (lines 18-22) shows..."
+- Use inline code formatting for short snippets: `app.add_middleware()`
+- Include file paths when relevant: "In backend/app/main.py at line 15..."
+- Structure sections clearly with **bold section titles**
+- Keep explanations concise but technically precise
+
+CONTENT REQUIREMENTS:
+- Provide clear, detailed, and helpful code explanations
+- Demonstrate both technical depth and practical insights
+- Reference exact code locations and line numbers
+- Explain the purpose and context of each code section""",
             messages=[
                 {
                     "role": "user",
@@ -353,75 +368,102 @@ async def explain_code(request: CodeExplanationRequest):
 
 
 def generate_explanation_prompt(code: str, mode: str, file_context: Optional[Dict] = None, selected_code: Optional[str] = None) -> str:
-    """Generate contextual prompts for different explanation modes"""
+    """Generate contextual prompts for different explanation modes with enhanced formatting"""
     
-    # Mode-specific instructions
+    # Mode-specific instructions with formatting requirements
     mode_instructions = {
-        "explain": """Explain this code as if to a mid-level developer reviewing a pull request. 
-                     Focus on:
-                     - What the code does (purpose and functionality)
-                     - How it works (key logic and algorithms)
-                     - Why certain approaches were chosen
-                     - How it interacts with other parts of the system
-                     - Any potential issues or improvements""",
+        "explain": """Provide a technical code analysis for a mid-level developer reviewing a pull request.
+
+FORMAT REQUIREMENTS:
+• Use **bold text** for section titles (NO # headers)
+• Reference specific line numbers: "The initialization code (lines 18-22) demonstrates..."
+• Use compact bullet points: • Item (no extra spacing)
+• Use inline code: `function_name()` for short snippets
+• Include file path references: "In backend/app/main.py at line 25..."
+
+CONTENT FOCUS:
+• Purpose and functionality with exact line references
+• Key logic and algorithms with code line citations
+• System interactions and dependencies
+• Code quality assessment and potential improvements""",
         
-        "summarize": """Provide a concise, high-level summary of this code.
-                       Focus on:
-                       - Main purpose and functionality
-                       - Key components or modules
-                       - Overall architecture or design pattern
-                       - How it fits into the larger application""",
+        "summarize": """Provide a concise, executive-level overview of this code.
+
+FORMAT REQUIREMENTS:
+• Use **bold text** for section titles (NO # headers)
+• Reference key line ranges: "The core setup (lines 1-15) handles..."
+• Use compact bullet points: • Item (no extra spacing)
+• Use inline code: `class_name` for references
+• Mention file context: "This main.py file (115 lines) serves as..."
+
+CONTENT FOCUS:
+• Main purpose and high-level functionality
+• Key architectural components with line references
+• Overall design patterns and structure
+• Integration with larger application ecosystem""",
         
-        "teach": """Explain this code as if teaching a beginner developer.
-                   Focus on:
-                   - Basic concepts and terminology
-                   - Step-by-step breakdown of what happens
-                   - Why each part is necessary
-                   - Common patterns and best practices shown
-                   - Learning opportunities and key takeaways"""
+        "teach": """Explain this code as if teaching a programming student step-by-step.
+
+FORMAT REQUIREMENTS:
+• Use **bold text** for section titles (NO # headers)
+• Reference specific lines for learning: "Look at line 38 where we see..."
+• Use compact bullet points: • Item (no extra spacing)
+• Use inline code: `variable_name` for concepts
+• Provide line-by-line guidance: "Lines 25-30 show how to..."
+
+CONTENT FOCUS:
+• Basic concepts with exact line examples
+• Step-by-step breakdown with line references
+• Why each section is necessary (with line numbers)
+• Learning opportunities and best practices shown
+• Beginner-friendly explanations with code citations"""
     }
     
     # Build context information
     context_info = ""
     if file_context:
+        total_lines = len(code.split('\n'))
         context_info = f"""
-        
-File Context:
-- File: {file_context.get('path', 'Unknown')}
-- Language: {file_context.get('language', 'Unknown')}
-- File Size: {file_context.get('size', 'Unknown')} bytes
-"""
+**File Context:**
+• Path: {file_context.get('path', 'Unknown')}
+• Language: {file_context.get('language', 'Unknown')}
+• Total Lines: {total_lines}
+• File Size: {file_context.get('size', 'Unknown')} bytes"""
     
     # Handle code selection vs full file
     code_context = ""
     if selected_code and selected_code != code:
+        selected_lines = len(selected_code.split('\n'))
+        total_lines = len(code.split('\n'))
         code_context = f"""
-Selected Code (focus on this):
+**Code Selection Analysis:**
+Focus your explanation on the selected portion ({selected_lines} lines) within the context of the full file ({total_lines} lines).
+
+**Selected Code:**
 ```{file_context.get('language', 'text') if file_context else 'text'}
 {selected_code}
 ```
 
-Full File Context:
+**Full File Context (for reference):**
 ```{file_context.get('language', 'text') if file_context else 'text'}
 {code[:2000]}{'...' if len(code) > 2000 else ''}
 ```"""
     else:
+        total_lines = len(code.split('\n'))
         code_context = f"""
-Code to Analyze:
+**Complete File Analysis ({total_lines} lines):**
 ```{file_context.get('language', 'text') if file_context else 'text'}
 {code}
 ```"""
     
-    # Construct final prompt
-    prompt = f"""You are an expert code reviewer and teacher helping to explain code from a GitHub repository.
-
-{mode_instructions.get(mode, mode_instructions['explain'])}
+    # Construct final prompt with formatting emphasis
+    prompt = f"""{mode_instructions.get(mode, mode_instructions['explain'])}
 
 {context_info}
 
 {code_context}
 
-Please provide a clear, well-structured explanation in the requested style ({mode}). Use markdown formatting for better readability."""
+REMEMBER: Always reference specific line numbers when discussing code sections. Use clean, professional formatting without markdown headers."""
 
     return prompt
 
