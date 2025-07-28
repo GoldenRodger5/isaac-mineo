@@ -161,7 +161,7 @@ const CodeViewer = ({
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden bg-gray-900 rounded-lg min-h-0">
+      <div className="flex-1 flex flex-col bg-gray-900 rounded-lg min-h-0">
         <div className="p-4 border-b border-gray-700 flex-shrink-0">
           <h3 className="text-lg font-semibold text-gray-100">
             {fileContent?.name || 'No file selected'}
@@ -173,11 +173,11 @@ const CodeViewer = ({
           )}
         </div>
         
-        <div className="flex-1 overflow-hidden min-h-0">
-          <div className="code-content h-full overflow-y-auto overflow-x-auto">
+        <div className="flex-1 min-h-0 relative">
+          <div className="absolute inset-0 overflow-auto">
             <pre 
               ref={codeRef}
-              className="p-4 text-sm leading-relaxed text-gray-100 font-mono whitespace-pre-wrap block min-h-full" 
+              className="p-4 text-sm leading-relaxed text-gray-100 font-mono whitespace-pre block" 
               dangerouslySetInnerHTML={{ __html: syntaxHighlight(fileContent?.content || '', fileContent?.language) }}
             />
           </div>
