@@ -183,10 +183,10 @@ const CodeViewer = ({
 
       {/* Code Content */}
       <div className="flex-1 overflow-auto min-h-0">
-        <div className="relative">
+                <div className="relative">
           <pre
             ref={codeRef}
-            className="p-3 text-xs font-mono leading-relaxed text-gray-300 whitespace-pre-wrap select-text"
+            className="p-4 text-sm font-mono leading-relaxed text-gray-300 whitespace-pre-wrap select-text"
             style={{ tabSize: 2 }}
           >
             <code
@@ -225,14 +225,6 @@ const CodeViewer = ({
               </div>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="p-2 border-t border-white/10 bg-white/5 flex-shrink-0">
-        <div className="flex items-center justify-between text-xs text-gray-400">
-          <span>💡 Tip: Highlight code to get AI explanations</span>
-          <span>Mode: {explanationMode.charAt(0).toUpperCase() + explanationMode.slice(1)}</span>
         </div>
       </div>
     </div>

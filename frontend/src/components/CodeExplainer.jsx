@@ -33,17 +33,15 @@ const CodeExplainer = () => {
   // GitHub service health
   const [githubHealthy, setGithubHealthy] = useState(null);
   
-  // Panel sizing state for resizable panels
-  const [panelSizes, setPanelSizes] = useState({
-    repositories: 280,  // Repository browser width
-    files: 250,         // File browser width  
-    code: 450,          // Code viewer width
-    explanation: 350    // Explanation panel width
-  });
+  // Navigation state for tab-based interface
+  const [activeNavigationTab, setActiveNavigationTab] = useState('repos'); // 'repos' or 'files'
+  const [showNavigation, setShowNavigation] = useState(false);
   
-  // Refs for drag handling
+  // Panel sizing state for main content (simplified for 2-panel layout)
+  const [mainPanelSplit, setMainPanelSplit] = useState(55); // Percentage for code viewer (55% code, 45% explanation)
+  
+  // Ref for drag handling
   const isDragging = useRef(false);
-  const dragType = useRef(null);
 
   // Check GitHub service health on mount
   useEffect(() => {
@@ -207,54 +205,53 @@ Please provide a clear, detailed explanation.`;
     setSelectedCode(selection);
   };
 
-  // Panel resizing handlers
-  const handleMouseDown = (e, panelType) => {
+  // Main panel resizing handlers (for code viewer vs explanation panel)
+  const handleMainPanelMouseDown = (e) => {
     e.preventDefault();
     isDragging.current = true;
-    dragType.current = panelType;
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousemove', handleMainPanelMouseMove);
+    document.addEventListener('mouseup', handleMainPanelMouseUp);
   };
 
-  const handleMouseMove = (e) => {
-    if (!isDragging.current || !dragType.current) return;
+  const handleMainPanelMouseMove = (e) => {
+    if (!isDragging.current) return;
     
-    const containerRect = document.querySelector('.code-explainer-container').getBoundingClientRect();
+    const container = document.querySelector('.main-content-container');
+    if (!container) return;
+    
+    const containerRect = container.getBoundingClientRect();
     const relativeX = e.clientX - containerRect.left;
+    const percentage = (relativeX / containerRect.width) * 100;
     
-    setPanelSizes(prev => {
-      const newSizes = { ...prev };
-      
-      switch (dragType.current) {
-        case 'repositories':
-          newSizes.repositories = Math.max(200, Math.min(400, relativeX - 24));
-          break;
-        case 'files':
-          newSizes.files = Math.max(180, Math.min(350, relativeX - prev.repositories - 48));
-          break;
-        case 'code':
-          const usedWidth = prev.repositories + prev.files;
-          const availableForCode = containerRect.width - usedWidth - prev.explanation - 96; // margins
-          newSizes.code = Math.max(300, Math.min(800, relativeX - usedWidth - 72));
-          break;
-      }
-      
-      return newSizes;
-    });
+    // Constrain between 30% and 70%
+    const newSplit = Math.max(30, Math.min(70, percentage));
+    setMainPanelSplit(newSplit);
   };
 
-  const handleMouseUp = () => {
+  const handleMainPanelMouseUp = () => {
     isDragging.current = false;
-    dragType.current = null;
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
+    document.removeEventListener('mousemove', handleMainPanelMouseMove);
+    document.removeEventListener('mouseup', handleMainPanelMouseUp);
+  };
+
+  // Toggle navigation panel
+  const toggleNavigation = () => {
+    setShowNavigation(!showNavigation);
+  };
+
+  // Handle navigation tab switching
+  const handleNavigationTabSwitch = (tab) => {
+    setActiveNavigationTab(tab);
+    if (!showNavigation) {
+      setShowNavigation(true);
+    }
   };
 
   // Cleanup event listeners
   useEffect(() => {
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mousemove', handleMainPanelMouseMove);
+      document.removeEventListener('mouseup', handleMainPanelMouseUp);
     };
   }, []);
 
@@ -300,108 +297,206 @@ Please provide a clear, detailed explanation.`;
               </div>
             </div>
             
-            {/* Explanation Mode Selector */}
-            <div className="flex bg-white/10 rounded-xl p-1.5">
-              {['explain', 'summarize', 'teach'].map((mode) => (
+            {/* Quick Actions */}
+            <div className="flex items-center space-x-3">
+              {!repositories.length && (
                 <button
-                  key={mode}
-                  onClick={() => setExplanationMode(mode)}
-                  className={`px-6 py-3 rounded-lg text-sm font-medium transition-all ${
-                    explanationMode === mode
-                      ? 'bg-blue-500 text-white shadow-lg'
-                      : 'text-gray-300 hover:text-white hover:bg-white/10'
-                  }`}
+                  onClick={fetchGitHubRepositories}
+                  disabled={loadingStates.repositories}
+                  className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 px-4 py-2 rounded-lg text-white font-medium transition-colors flex items-center space-x-2"
                 >
-                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                  <span>📁</span>
+                  <span>{loadingStates.repositories ? 'Loading...' : 'Load Repositories'}</span>
                 </button>
-              ))}
+              )}
+              
+              {selectedRepo && !showNavigation && (
+                <button
+                  onClick={toggleNavigation}
+                  className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-white font-medium transition-colors flex items-center space-x-2"
+                >
+                  <span>🗂️</span>
+                  <span>Browse</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content - Resizable Panels */}
-      <div className="code-explainer-container flex h-[calc(100vh-120px)] px-8 py-6 gap-6">
-        {/* Repository Browser */}
-        <div 
-          className="flex-shrink-0 transition-all duration-200"
-          style={{ width: `${panelSizes.repositories}px` }}
-        >
-          <RepositoryBrowser
-            repositories={repositories}
-            selectedRepo={selectedRepo}
-            onRepoSelect={handleRepoSelect}
-            loading={loadingStates.repositories}
-            error={errors.repositories}
-          />
+      {/* Navigation Tabs & Main Content */}
+      <div className="flex flex-col h-[calc(100vh-120px)]">
+        {/* Navigation Tabs Bar */}
+        <div className="px-8 py-3 border-b border-white/10 bg-black/10">
+          <div className="flex items-center justify-between">
+            {/* Left: Navigation Tabs */}
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={() => handleNavigationTabSwitch('repos')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeNavigationTab === 'repos' && showNavigation
+                    ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                    : 'text-gray-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span>📁</span>
+                <span>Repositories</span>
+                <span className="text-xs bg-white/20 px-1.5 py-0.5 rounded">{repositories.length}</span>
+              </button>
+              
+              <button
+                onClick={() => handleNavigationTabSwitch('files')}
+                disabled={!selectedRepo}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeNavigationTab === 'files' && showNavigation
+                    ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                    : selectedRepo 
+                      ? 'text-gray-400 hover:text-white hover:bg-white/10'
+                      : 'text-gray-600 cursor-not-allowed'
+                }`}
+              >
+                <span>📄</span>
+                <span>Files</span>
+                <span className="text-xs bg-white/20 px-1.5 py-0.5 rounded">{repoFiles.length}</span>
+              </button>
+              
+              {/* Breadcrumb */}
+              {selectedRepo && (
+                <div className="flex items-center space-x-2 ml-4 text-sm text-gray-400">
+                  <span>/</span>
+                  <span className="text-gray-300">{selectedRepo.name}</span>
+                  {selectedFile && (
+                    <>
+                      <span>/</span>
+                      <span className="text-blue-300">{selectedFile.path}</span>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            {/* Right: Mode Controls */}
+            <div className="flex bg-white/10 rounded-xl p-1">
+              {['explain', 'summarize', 'teach'].map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setExplanationMode(mode)}
+                  className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+                    explanationMode === mode
+                      ? mode === 'explain' ? 'bg-blue-500 text-white' :
+                        mode === 'summarize' ? 'bg-green-500 text-white' :
+                        'bg-purple-500 text-white'
+                      : 'text-gray-300 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  {mode === 'explain' ? '🔍' : mode === 'summarize' ? '📋' : '🎓'} {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Resize Handle 1 */}
-        <div
-          className="w-2 bg-white/5 hover:bg-white/20 rounded-full cursor-col-resize transition-colors flex-shrink-0 group"
-          onMouseDown={(e) => handleMouseDown(e, 'repositories')}
-        >
-          <div className="w-full h-full rounded-full group-hover:bg-blue-400/50"></div>
-        </div>
+        {/* Main Content Area */}
+        <div className="flex-1 flex relative">
+          {/* Navigation Sidebar (Overlay) */}
+          {showNavigation && (
+            <>
+              {/* Backdrop */}
+              <div 
+                className="fixed inset-0 bg-black/50 z-40"
+                onClick={() => setShowNavigation(false)}
+              />
+              
+              {/* Navigation Panel */}
+              <div className="fixed left-8 top-32 bottom-8 w-96 bg-gray-900/95 backdrop-blur-sm border border-white/20 rounded-xl z-50 shadow-2xl">
+                <div className="h-full flex flex-col">
+                  {/* Navigation Header */}
+                  <div className="flex items-center justify-between p-4 border-b border-white/10">
+                    <h3 className="text-lg font-semibold text-white">
+                      {activeNavigationTab === 'repos' ? '📁 Repositories' : '📄 Files'}
+                    </h3>
+                    <button
+                      onClick={() => setShowNavigation(false)}
+                      className="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  
+                  {/* Navigation Content */}
+                  <div className="flex-1 overflow-hidden">
+                    {activeNavigationTab === 'repos' ? (
+                      <RepositoryBrowser
+                        repositories={repositories}
+                        selectedRepo={selectedRepo}
+                        onRepoSelect={(repo) => {
+                          handleRepoSelect(repo);
+                          setShowNavigation(false);
+                        }}
+                        loading={loadingStates.repositories}
+                        error={errors.repositories}
+                      />
+                    ) : (
+                      <FileBrowser
+                        files={repoFiles}
+                        selectedFile={selectedFile}
+                        onFileSelect={(file) => {
+                          handleFileSelect(file);
+                          setShowNavigation(false);
+                        }}
+                        loading={loadingStates.files}
+                        error={errors.files}
+                        selectedRepo={selectedRepo}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
 
-        {/* File Browser */}
-        <div 
-          className="flex-shrink-0 transition-all duration-200"
-          style={{ width: `${panelSizes.files}px` }}
-        >
-          <FileBrowser
-            files={repoFiles}
-            selectedFile={selectedFile}
-            onFileSelect={handleFileSelect}
-            loading={loadingStates.files}
-            error={errors.files}
-            selectedRepo={selectedRepo}
-          />
-        </div>
+          {/* Main Content Panels */}
+          <div className="main-content-container flex w-full px-8 py-6 gap-4">
+            {/* Code Viewer */}
+            <div 
+              className="transition-all duration-200"
+              style={{ width: `${mainPanelSplit}%` }}
+            >
+              <CodeViewer
+                fileContent={fileContent}
+                selectedCode={selectedCode}
+                onCodeSelection={handleCodeSelection}
+                onExplainCode={handleExplainCode}
+                loading={loadingStates.fileContent}
+                error={errors.fileContent}
+                explanationMode={explanationMode}
+              />
+            </div>
 
-        {/* Resize Handle 2 */}
-        <div
-          className="w-2 bg-white/5 hover:bg-white/20 rounded-full cursor-col-resize transition-colors flex-shrink-0 group"
-          onMouseDown={(e) => handleMouseDown(e, 'files')}
-        >
-          <div className="w-full h-full rounded-full group-hover:bg-blue-400/50"></div>
-        </div>
+            {/* Main Panel Resize Handle */}
+            <div
+              className="w-2 bg-white/5 hover:bg-white/20 rounded-full cursor-col-resize transition-colors flex-shrink-0 group"
+              onMouseDown={handleMainPanelMouseDown}
+            >
+              <div className="w-full h-full rounded-full group-hover:bg-blue-400/50"></div>
+            </div>
 
-        {/* Code Viewer */}
-        <div 
-          className="flex-shrink-0 transition-all duration-200"
-          style={{ width: `${panelSizes.code}px` }}
-        >
-          <CodeViewer
-            fileContent={fileContent}
-            selectedCode={selectedCode}
-            onCodeSelection={handleCodeSelection}
-            onExplainCode={handleExplainCode}
-            loading={loadingStates.fileContent}
-            error={errors.fileContent}
-            explanationMode={explanationMode}
-          />
-        </div>
-
-        {/* Resize Handle 3 */}
-        <div
-          className="w-2 bg-white/5 hover:bg-white/20 rounded-full cursor-col-resize transition-colors flex-shrink-0 group"
-          onMouseDown={(e) => handleMouseDown(e, 'code')}
-        >
-          <div className="w-full h-full rounded-full group-hover:bg-blue-400/50"></div>
-        </div>
-
-        {/* Explanation Panel - Takes remaining space */}
-        <div className="flex-1 min-w-0">
-          <ExplanationPanel
-            explanation={explanation}
-            selectedCode={selectedCode}
-            fileContext={fileContent}
-            loading={loadingStates.explanation}
-            error={errors.explanation}
-            explanationMode={explanationMode}
-            onExplainCode={handleExplainCode}
-          />
+            {/* Explanation Panel */}
+            <div 
+              className="transition-all duration-200"
+              style={{ width: `${100 - mainPanelSplit - 1}%` }} // Subtract 1% for the handle
+            >
+              <ExplanationPanel
+                explanation={explanation}
+                selectedCode={selectedCode}
+                fileContext={fileContent}
+                loading={loadingStates.explanation}
+                error={errors.explanation}
+                explanationMode={explanationMode}
+                onExplainCode={handleExplainCode}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
