@@ -9,8 +9,7 @@ const CodeViewer = ({
   error, 
   explanationMode 
 }) => {
-  const [selectionStart, setSelectionStart] = useState(null);
-  const [selectionEnd, setSelectionEnd] = useState(null);
+  const [localSelectedCode, setLocalSelectedCode] = useState('');
   const [showSelectionTooltip, setShowSelectionTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const codeRef = useRef(null);
@@ -43,7 +42,10 @@ const CodeViewer = ({
     const text = selection.toString().trim();
     
     if (text && text.length > 0) {
-      setSelectedCode(text);
+      setLocalSelectedCode(text);
+      if (onCodeSelection) {
+        onCodeSelection(text);
+      }
       
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
@@ -56,13 +58,16 @@ const CodeViewer = ({
       setShowSelectionTooltip(true);
     } else {
       setShowSelectionTooltip(false);
-      setSelectedCode('');
+      setLocalSelectedCode('');
+      if (onCodeSelection) {
+        onCodeSelection('');
+      }
     }
   };
 
   const handleExplainSelection = () => {
-    if (selectedCode) {
-      onExplainCode(selectedCode);
+    if (localSelectedCode) {
+      onExplainCode(localSelectedCode);
       setShowSelectionTooltip(false);
     }
   };
@@ -121,7 +126,7 @@ const CodeViewer = ({
 
   return (
     <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 h-full flex flex-col">
-      {showSelectionTooltip && selectedCode && (
+      {showSelectionTooltip && localSelectedCode && (
         <div 
           className="fixed z-50 bg-gray-800 text-white text-xs px-2 py-1 rounded shadow-lg border border-gray-600"
           style={{
@@ -159,11 +164,11 @@ const CodeViewer = ({
       <div className="flex-1 overflow-hidden bg-gray-900 rounded-lg">
         <div className="p-4 border-b border-gray-700">
           <h3 className="text-lg font-semibold text-gray-100">
-            {selectedFile?.name || 'No file selected'}
+            {fileContent?.name || 'No file selected'}
           </h3>
-          {selectedFile?.language && (
+          {fileContent?.language && (
             <p className="text-sm text-gray-400 mt-1">
-              Language: {selectedFile.language}
+              Language: {fileContent.language}
             </p>
           )}
         </div>
@@ -173,7 +178,7 @@ const CodeViewer = ({
             <pre 
               ref={codeRef}
               className="p-4 text-sm leading-relaxed text-gray-100 font-mono whitespace-pre-wrap" 
-              dangerouslySetInnerHTML={{ __html: syntaxHighlight(selectedFile?.content || '', selectedFile?.language) }}
+              dangerouslySetInnerHTML={{ __html: syntaxHighlight(fileContent?.content || '', fileContent?.language) }}
             />
           </div>
         </div>
