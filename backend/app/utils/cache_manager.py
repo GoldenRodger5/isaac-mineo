@@ -10,23 +10,45 @@ class CacheManager:
         self.connected = False
     
     async def connect(self):
-        """Connect to Redis"""
+        """Connect to Redis with enhanced error handling"""
         if self.connected:
             return
         
         try:
             redis_url = os.getenv("REDIS_URL")
+            print(f"Attempting Redis connection with URL: {redis_url[:50]}..." if redis_url else "No REDIS_URL found")
+            
             if redis_url:
-                self.redis_client = redis.from_url(redis_url, decode_responses=True)
+                # Enhanced Redis connection with timeout and retry settings
+                self.redis_client = redis.from_url(
+                    redis_url, 
+                    decode_responses=True,
+                    socket_timeout=10,
+                    socket_connect_timeout=10,
+                    retry_on_timeout=True,
+                    health_check_interval=30
+                )
                 # Test connection
-                self.redis_client.ping()
+                ping_result = self.redis_client.ping()
                 self.connected = True
-                print("Connected to Redis")
+                print(f"✅ Connected to Redis successfully - Ping: {ping_result}")
+                
+                # Test basic operations
+                self.redis_client.set("test:connection", "success", ex=60)
+                test_result = self.redis_client.get("test:connection")
+                print(f"✅ Redis operations test: {test_result}")
+                
             else:
-                print("No Redis URL provided, using in-memory cache")
+                print("❌ No Redis URL provided in environment variables")
                 self.redis_client = None
+        except redis.AuthenticationError as error:
+            print(f"❌ Redis authentication error: {error}")
+            self.redis_client = None
+        except redis.ConnectionError as error:
+            print(f"❌ Redis connection error: {error}")
+            self.redis_client = None
         except Exception as error:
-            print(f"Redis connection failed: {error}")
+            print(f"❌ Redis connection failed: {error}")
             self.redis_client = None
     
     async def get_session(self, session_id: str) -> Optional[Dict[str, Any]]:
