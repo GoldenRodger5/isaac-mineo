@@ -16,6 +16,8 @@ services:
         sync: false
       - key: ANTHROPIC_API_KEY
         sync: false
+      - key: GITHUB_API_TOKEN
+        sync: false
       - key: PINECONE_API_KEY
         sync: false
       - key: PINECONE_INDEX_NAME

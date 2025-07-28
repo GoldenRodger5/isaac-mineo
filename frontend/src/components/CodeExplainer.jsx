@@ -45,10 +45,14 @@ const CodeExplainer = () => {
       
       if (response.success) {
         loadRepositories();
+      } else {
+        console.error('GitHub service unhealthy:', response.message);
+        setErrors(prev => ({ ...prev, github: response.message || 'GitHub service is not available' }));
       }
     } catch (error) {
       console.error('GitHub health check failed:', error);
       setGithubHealthy(false);
+      setErrors(prev => ({ ...prev, github: 'Failed to connect to GitHub service' }));
     }
   };
 
@@ -199,8 +203,11 @@ Please provide a clear, detailed explanation.`;
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-8 text-center">
             <div className="text-red-400 text-4xl mb-4">⚠️</div>
             <h2 className="text-2xl font-bold text-red-400 mb-4">GitHub Service Unavailable</h2>
-            <p className="text-gray-300 mb-6">
-              The GitHub integration service is currently unavailable. Please check your configuration and try again.
+            <p className="text-gray-300 mb-2">
+              {errors.github || 'The GitHub integration service is currently unavailable.'}
+            </p>
+            <p className="text-gray-400 text-sm mb-6">
+              Please check your configuration and try again.
             </p>
             <button
               onClick={checkGitHubHealth}
