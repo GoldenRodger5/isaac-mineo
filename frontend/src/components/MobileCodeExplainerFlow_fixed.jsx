@@ -60,8 +60,7 @@ const MobileCodeExplainerFlow = ({
   onRepoSelect, 
   onFileSelect, 
   onCodeSelection, 
-  onExplainCode,
-  onLoadRepositories, 
+  onExplainCode, 
   loadingStates = {}, 
   errors = {} 
 }) => {
@@ -134,13 +133,7 @@ const MobileCodeExplainerFlow = ({
           <div className="text-4xl mb-4">📁</div>
           <p className="text-gray-600">No repositories found</p>
           <button 
-            onClick={() => {
-              if (onLoadRepositories) {
-                onLoadRepositories();
-              } else {
-                window.location.reload();
-              }
-            }}
+            onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg"
           >
             Refresh
@@ -324,37 +317,13 @@ const MobileCodeExplainerFlow = ({
       </MobileCodeExplainerModal>
 
       {/* Entry Point Button for Mobile */}
-      <div className="w-full">
+      <div className="md:hidden">
         <button
-          onClick={() => {
-            console.log('Mobile code explainer button clicked');
-            if (!repositories?.length && onLoadRepositories) {
-              console.log('Loading repositories...');
-              onLoadRepositories();
-            }
-            setCurrentModal('repos');
-          }}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-xl font-medium text-center shadow-lg"
+          onClick={() => setCurrentModal('repos')}
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-xl font-medium text-center"
         >
           🔍 Browse Code Repositories
         </button>
-        
-        {/* Status indicator */}
-        <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600">
-            {repositories?.length ? `${repositories.length} repositories available` : 'Tap above to load repositories'}
-          </p>
-        </div>
-        
-        {/* Quick Info */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-medium text-blue-900 mb-2">How it works:</h3>
-          <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Select a repository from your GitHub</li>
-            <li>• Browse files in the repository</li>
-            <li>• View code and get AI explanations</li>
-          </ul>
-        </div>
       </div>
     </>
   );

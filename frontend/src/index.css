@@ -41,12 +41,53 @@ body {
   }
 }
 
+@keyframes floatProfessional {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  33% { 
+    transform: translateY(-8px) rotate(1deg); 
+  }
+  66% { 
+    transform: translateY(-4px) rotate(-1deg); 
+  }
+}
+
+@keyframes morphGradient {
+  0%, 100% { 
+    background-position: 0% 50%; 
+  }
+  50% { 
+    background-position: 100% 50%; 
+  }
+}
+
+@keyframes neuralPulse {
+  0%, 100% { 
+    opacity: 0.4;
+    transform: scale(1); 
+  }
+  50% { 
+    opacity: 0.8;
+    transform: scale(1.1); 
+  }
+}
+
+@keyframes magneticHover {
+  0% { 
+    transform: scale(1) translateZ(0); 
+  }
+  100% { 
+    transform: scale(1.05) translateZ(0); 
+  }
+}
+
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
   }
   50% {
-    box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 30px rgba(59, 130, 246, 0.4);
   }
 }
 
@@ -106,6 +147,27 @@ body {
   animation: float 3s ease-in-out infinite;
 }
 
+.animate-float-professional {
+  animation: floatProfessional 4s ease-in-out infinite;
+}
+
+.animate-morph {
+  animation: morphGradient 12s ease-in-out infinite;
+  background-size: 400% 400%;
+}
+
+.animate-neural-pulse {
+  animation: neuralPulse 3s ease-in-out infinite;
+}
+
+.animate-magnetic {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.animate-magnetic:hover {
+  animation: magneticHover 0.3s ease-out forwards;
+}
+
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
@@ -118,19 +180,45 @@ body {
   animation: gradientShift 8s ease-in-out infinite;
 }
 
-/* Gradient text */
+/* Enhanced gradient text with better contrast */
 .gradient-text {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1d4ed8 0%, #0891b2 50%, #7c3aed 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  background-size: 200% 200%;
+  animation: morphGradient 8s ease-in-out infinite;
 }
 
-/* Glass morphism effect */
+/* Enhanced glass morphism */
 .glass {
   background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.glass-heavy {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Neomorphism effect */
+.neomorphic {
+  background: #f8fafc;
+  box-shadow: 
+    20px 20px 60px #e2e8f0,
+    -20px -20px 60px #ffffff;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.neomorphic-inset {
+  background: #f8fafc;
+  box-shadow: 
+    inset 8px 8px 16px #e2e8f0,
+    inset -8px -8px 16px #ffffff;
 }
 
 /* Safe area utilities */

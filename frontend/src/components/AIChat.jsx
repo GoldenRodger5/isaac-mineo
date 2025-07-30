@@ -171,8 +171,10 @@ const AIChat = () => {
     <section id="ai-chat" className="py-20">
       <div className="animate-fadeInUp">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold gradient-text mb-4">AI Assistant</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-primary-600 via-accent-600 to-neural-600 bg-clip-text text-transparent mb-4">
+            AI Assistant
+          </h2>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Chat with Isaac's AI assistant powered by his comprehensive knowledge base. 
             Ask about his technical skills, projects, experience, or career goals.
           </p>
@@ -180,7 +182,7 @@ const AIChat = () => {
 
         <div className="max-w-4xl mx-auto">
           {/* Mobile Chat Interface */}
-          <div className="md:hidden bg-white rounded-xl border border-gray-200 shadow-lg h-[70vh]">
+          <div className="md:hidden glass-heavy rounded-2xl border border-white/20 shadow-2xl h-[70vh]">
             <MobileChatInterface
               messages={messages}
               onSendMessage={handleSendMessage}
@@ -193,16 +195,16 @@ const AIChat = () => {
           {/* Desktop Chat Interface */}
           <div className="hidden md:block">
             {/* Status Bar */}
-            <div className="bg-white rounded-t-xl border-x border-t border-gray-200 px-6 py-4">
+            <div className="glass-light rounded-t-2xl border-x border-t border-white/20 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className={`w-3 h-3 rounded-full ${
-                    backendStatus === 'connected' ? 'bg-green-400 animate-pulse' : 
+                    backendStatus === 'connected' ? 'bg-accent-400 animate-neural-pulse' : 
                     backendStatus === 'disconnected' ? 'bg-red-400' : 'bg-yellow-400'
                   }`}></div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">Isaac's AI Assistant</h3>
-                    <p className="text-sm text-gray-500">
+                    <h3 className="font-semibold text-white">Isaac's AI Assistant</h3>
+                    <p className="text-sm text-gray-300">
                       {backendStatus === 'connected' ? (
                         `Connected • ${conversationCount} messages exchanged`
                       ) : backendStatus === 'disconnected' ? (
@@ -215,7 +217,7 @@ const AIChat = () => {
                 </div>
                 <button
                   onClick={clearChat}
-                  className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-700"
+                  className="flex items-center space-x-2 px-4 py-2 glass-light hover:bg-white/20 rounded-xl transition-all duration-300 text-sm font-medium text-gray-300 animate-magnetic"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -226,22 +228,22 @@ const AIChat = () => {
             </div>
 
           {/* Chat Messages */}
-          <div className="bg-gray-50 h-96 overflow-y-auto p-6 border-x border-gray-200">
+          <div className="bg-gradient-to-br from-gray-900/30 to-gray-800/40 backdrop-blur-xl h-96 overflow-y-auto p-6 border-x border-white/20">
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}
+                  className={`flex ${message.isBot ? 'justify-start' : 'justify-end'} animate-float-professional`}
                 >
                   <div className={`max-w-xs lg:max-w-md xl:max-w-lg ${
                     message.isBot
-                      ? 'bg-white border border-gray-200 text-gray-800'
-                      : 'bg-primary-600 text-white'
-                  } rounded-lg px-4 py-3 shadow-sm`}>
+                      ? 'glass-light border border-white/20 text-gray-200'
+                      : 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg'
+                  } rounded-xl px-4 py-3 shadow-lg animate-magnetic`}>
                     <div className="flex items-start space-x-2">
                       {message.isBot && (
-                        <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <svg className="w-3 h-3 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="w-6 h-6 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                           </svg>
                         </div>
@@ -249,21 +251,21 @@ const AIChat = () => {
                       <div className="flex-1">
                         {message.isBot ? (
                           <ReactMarkdown 
-                            className="text-sm prose prose-sm max-w-none prose-gray"
+                            className="text-sm prose prose-sm max-w-none prose-invert"
                             components={{
-                              p: ({children}) => <p className="mb-2 last:mb-0">{children}</p>,
-                              strong: ({children}) => <strong className="font-semibold text-gray-900">{children}</strong>,
-                              em: ({children}) => <em className="italic text-gray-700">{children}</em>,
+                              p: ({children}) => <p className="mb-2 last:mb-0 text-gray-200">{children}</p>,
+                              strong: ({children}) => <strong className="font-semibold text-white">{children}</strong>,
+                              em: ({children}) => <em className="italic text-gray-300">{children}</em>,
                               ul: ({children}) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
                               ol: ({children}) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
-                              li: ({children}) => <li className="text-sm">{children}</li>,
-                              code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
-                              blockquote: ({children}) => <blockquote className="border-l-4 border-primary-200 pl-4 italic my-2">{children}</blockquote>,
-                              h1: ({children}) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
-                              h2: ({children}) => <h2 className="text-base font-semibold mb-2">{children}</h2>,
-                              h3: ({children}) => <h3 className="text-sm font-medium mb-1">{children}</h3>,
-                              hr: () => <hr className="my-3 border-gray-300" />,
-                              a: ({href, children}) => <a href={href} className="text-primary-600 hover:text-primary-800 underline" target="_blank" rel="noopener noreferrer">{children}</a>
+                              li: ({children}) => <li className="text-sm text-gray-200">{children}</li>,
+                              code: ({children}) => <code className="bg-gray-800/50 px-1 py-0.5 rounded text-xs font-mono text-accent-300">{children}</code>,
+                              blockquote: ({children}) => <blockquote className="border-l-4 border-primary-400 pl-4 italic my-2 text-gray-300">{children}</blockquote>,
+                              h1: ({children}) => <h1 className="text-lg font-bold mb-2 text-white">{children}</h1>,
+                              h2: ({children}) => <h2 className="text-base font-semibold mb-2 text-white">{children}</h2>,
+                              h3: ({children}) => <h3 className="text-sm font-medium mb-1 text-white">{children}</h3>,
+                              hr: () => <hr className="my-3 border-gray-600" />,
+                              a: ({href, children}) => <a href={href} className="text-accent-400 hover:text-accent-300 underline" target="_blank" rel="noopener noreferrer">{children}</a>
                             }}
                           >
                             {message.text}
@@ -272,16 +274,16 @@ const AIChat = () => {
                           <p className="text-sm whitespace-pre-wrap">{message.text}</p>
                         )}
                         <div className="flex items-center mt-2 space-x-2">
-                          <p className={`text-xs ${message.isBot ? 'text-gray-500' : 'text-primary-100'}`}>
+                          <p className={`text-xs ${message.isBot ? 'text-gray-400' : 'text-white/70'}`}>
                             {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </p>
                           {message.metadata?.cached && (
-                            <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded">
+                            <span className="text-xs bg-accent-500/20 text-accent-300 px-2 py-0.5 rounded-full border border-accent-500/30">
                               Cached
                             </span>
                           )}
                           {message.metadata?.error && (
-                            <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded">
+                            <span className="text-xs bg-red-500/20 text-red-300 px-2 py-0.5 rounded-full border border-red-500/30">
                               Fallback
                             </span>
                           )}
@@ -294,17 +296,17 @@ const AIChat = () => {
 
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm">
+                  <div className="glass-light border border-white/20 rounded-xl px-4 py-3 shadow-lg animate-magnetic">
                     <div className="flex items-center space-x-2">
-                      <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center">
-                        <svg className="w-3 h-3 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
+                      <div className="w-6 h-6 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full flex items-center justify-center">
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                       </div>
                       <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                        <div className="w-2 h-2 bg-accent-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                        <div className="w-2 h-2 bg-accent-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                        <div className="w-2 h-2 bg-accent-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
                       </div>
                     </div>
                   </div>
@@ -316,15 +318,15 @@ const AIChat = () => {
 
           {/* Suggested Questions */}
           {showSuggestions && (
-            <div className="bg-white border-x border-gray-200 px-6 py-4">
-              <p className="text-sm font-medium text-gray-700 mb-3">Suggested questions:</p>
+            <div className="glass-light border-x border-white/20 px-6 py-4">
+              <p className="text-sm font-medium text-gray-300 mb-3">Suggested questions:</p>
               <div className="flex flex-wrap gap-2">
                 {suggestedQuestions.map((question, index) => (
                   <button
                     key={index}
                     onClick={() => handleSendMessage(question)}
                     disabled={isLoading}
-                    className="text-sm bg-gray-100 hover:bg-gray-200 disabled:hover:bg-gray-100 text-gray-700 px-3 py-2 rounded-lg transition-colors disabled:opacity-50"
+                    className="text-sm glass-light hover:bg-white/20 disabled:hover:bg-white/10 text-gray-300 px-3 py-2 rounded-xl transition-all duration-300 disabled:opacity-50 animate-magnetic border border-white/10"
                   >
                     {question}
                   </button>
@@ -334,21 +336,21 @@ const AIChat = () => {
           )}
 
           {/* Input Area */}
-          <div className="bg-white rounded-b-xl border border-gray-200 p-6">
+          <div className="glass-heavy rounded-b-2xl border border-white/20 p-6">
             <div className="flex space-x-4">
               <textarea
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask me anything about Isaac's background, skills, projects, or career goals..."
-                className="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                className="flex-1 glass-light border border-white/20 rounded-xl px-4 py-3 focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500/50 resize-none text-gray-200 placeholder-gray-400 backdrop-blur-sm"
                 rows={3}
                 disabled={isLoading}
               />
               <button
                 onClick={() => handleSendMessage()}
                 disabled={!inputValue.trim() || isLoading}
-                className="bg-primary-600 hover:bg-primary-700 disabled:bg-gray-300 text-white px-6 py-3 rounded-lg font-medium transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+                className="bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 disabled:from-gray-600 disabled:to-gray-600 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 disabled:cursor-not-allowed flex items-center justify-center shadow-lg animate-magnetic"
               >
                 {isLoading ? (
                   <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -361,9 +363,11 @@ const AIChat = () => {
                 )}
               </button>
             </div>
-            <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+            <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
               <p>Press Enter to send, Shift+Enter for new line</p>
-              <p>Powered by GPT-4o • Isaac's Knowledge Base</p>
+              <p className="bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent font-medium">
+                Powered by GPT-4o • Isaac's Knowledge Base
+              </p>
             </div>
           </div>
           </div>

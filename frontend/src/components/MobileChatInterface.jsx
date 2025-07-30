@@ -53,25 +53,25 @@ const MobileChatInterface = ({
   };
 
   return (
-    <div className={`flex flex-col h-full ${isKeyboardVisible ? 'keyboard-open' : ''}`}>
+    <div className={`flex flex-col h-full glass-heavy ${isKeyboardVisible ? 'keyboard-open' : ''}`}>
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message, index) => (
           <div
             key={message.id || index}
-            className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}
+            className={`flex ${message.isBot ? 'justify-start' : 'justify-end'} animate-float-professional`}
           >
-            <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+            <div className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-lg animate-magnetic ${
               message.isBot
-                ? 'bg-gray-100 text-gray-900 rounded-bl-sm'
-                : 'bg-blue-600 text-white rounded-br-sm'
+                ? 'glass-light text-gray-200 rounded-bl-sm border border-white/20'
+                : 'bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-br-sm'
             }`}>
               {message.isBot && (
                 <div className="flex items-center space-x-2 mb-2">
-                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                  <div className="w-6 h-6 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-xs">🤖</span>
                   </div>
-                  <span className="text-xs text-gray-500 font-medium">AI Assistant</span>
+                  <span className="text-xs text-gray-400 font-medium">AI Assistant</span>
                 </div>
               )}
               <div className="text-sm leading-relaxed">
@@ -85,7 +85,7 @@ const MobileChatInterface = ({
               </div>
               {message.timestamp && (
                 <div className={`text-xs mt-2 ${
-                  message.isBot ? 'text-gray-500' : 'text-blue-100'
+                  message.isBot ? 'text-gray-400' : 'text-white/70'
                 }`}>
                   {new Date(message.timestamp).toLocaleTimeString([], { 
                     hour: '2-digit', 
@@ -100,14 +100,14 @@ const MobileChatInterface = ({
         {/* Loading Indicator */}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 rounded-2xl rounded-bl-sm px-4 py-3 max-w-[85%]">
+            <div className="glass-light rounded-2xl rounded-bl-sm px-4 py-3 max-w-[85%] border border-white/20 shadow-lg animate-magnetic">
               <div className="flex items-center space-x-2">
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  <div className="w-2 h-2 bg-accent-400 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-accent-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="w-2 h-2 bg-accent-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                 </div>
-                <span className="text-sm text-gray-600">Thinking...</span>
+                <span className="text-sm text-gray-300">Thinking...</span>
               </div>
             </div>
           </div>
@@ -118,13 +118,13 @@ const MobileChatInterface = ({
 
       {/* Suggested Questions */}
       {suggestedQuestions.length > 0 && messages.length <= 1 && (
-        <div className="px-4 py-2 border-t border-gray-200">
+        <div className="px-4 py-2 border-t border-white/20">
           <div className="flex flex-wrap gap-2">
             {suggestedQuestions.slice(0, 3).map((question, index) => (
               <button
                 key={index}
                 onClick={() => handleSend(question)}
-                className="bg-blue-50 text-blue-700 px-3 py-2 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors border border-blue-200"
+                className="glass-light text-primary-300 px-3 py-2 rounded-full text-sm font-medium hover:bg-white/20 transition-all duration-300 border border-primary-500/30 animate-magnetic"
                 disabled={isLoading}
               >
                 {question}
@@ -135,7 +135,7 @@ const MobileChatInterface = ({
       )}
 
       {/* Input Area */}
-      <div className="border-t border-gray-200 p-4 bg-white">
+      <div className="border-t border-white/20 p-4 glass-light">
         <div className="flex items-end space-x-3">
           <div className="flex-1 relative">
             <textarea
@@ -144,14 +144,14 @@ const MobileChatInterface = ({
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={placeholder}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              className="w-full px-4 py-3 glass-light border border-white/20 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500/50 text-sm text-gray-200 placeholder-gray-400 backdrop-blur-sm"
               rows={1}
               style={{ minHeight: '44px', maxHeight: '120px' }}
               disabled={isLoading}
             />
             {/* Character count for long messages */}
             {inputValue.length > 200 && (
-              <div className="absolute -top-6 right-2 text-xs text-gray-500">
+              <div className="absolute -top-6 right-2 text-xs text-gray-400">
                 {inputValue.length}/500
               </div>
             )}
@@ -160,7 +160,7 @@ const MobileChatInterface = ({
           <button
             onClick={() => handleSend()}
             disabled={!inputValue.trim() || isLoading}
-            className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+            className="bg-gradient-to-r from-primary-500 to-accent-500 text-white p-3 rounded-full hover:from-primary-600 hover:to-accent-600 focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:ring-offset-2 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed transition-all duration-300 flex-shrink-0 shadow-lg animate-magnetic"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

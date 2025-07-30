@@ -8,7 +8,6 @@ import Contact from './components/Contact';
 import AIChat from './components/AIChat';
 import AIChatbot from './components/AIChatbot';
 import CodeExplainer from './components/CodeExplainer';
-import AuthTest from './components/AuthTest';
 import { AuthProvider } from './contexts/AuthContext';
 import BottomNavigation from './components/BottomNavigation';
 import HorizontalTabNavigation from './components/HorizontalTabNavigation';
@@ -25,6 +24,8 @@ function App() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [installPrompt, setInstallPrompt] = useState(null);
   const [activeTab, setActiveTab] = useState('about');
+  const [isAppReady, setIsAppReady] = useState(false);
+  const [appError, setAppError] = useState(null);
 
   const tabs = [
     { id: 'about', label: 'About', icon: '👨‍💻' },
@@ -32,15 +33,34 @@ function App() {
     { id: 'resume', label: 'Resume', icon: '📄' },
     { id: 'ai-chat', label: 'AI Assistant', icon: '🤖' },
     { id: 'code-explainer', label: 'Claude Code Explorer', icon: '🔍' },
-    { id: 'auth-test', label: 'Auth Test', icon: '🔐' },
     { id: 'contact', label: 'Contact', icon: '📬' }
   ];
 
+  // Initialize app with error handling
+  useEffect(() => {
+    try {
+      console.log('App initializing...');
+      // Simulate app initialization
+      setTimeout(() => {
+        setIsAppReady(true);
+        console.log('App ready');
+      }, 100);
+    } catch (error) {
+      console.error('App initialization error:', error);
+      setAppError(error.message);
+    }
+  }, []);
+
   // Check if user has valid session
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('isaac-portfolio-auth');
-    if (isAuthenticated === 'true') {
-      setUnlocked(true);
+    try {
+      const isAuthenticated = localStorage.getItem('isaac-portfolio-auth');
+      if (isAuthenticated === 'true') {
+        setUnlocked(true);
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+      // Don't fail completely, just log the error
     }
   }, []);
 
@@ -94,6 +114,47 @@ function App() {
       });
     }
   };
+
+  // Show loading screen while app initializes
+  if (!isAppReady) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-500 flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-6 mx-auto animate-pulse">
+            <span className="text-white text-3xl font-bold">IM</span>
+          </div>
+          <div className="text-white text-2xl md:text-3xl font-bold mb-2 tracking-wide">Isaac Mineo</div>
+          <div className="text-white/80 text-lg font-medium mb-6">AI & Full-Stack Developer Portfolio</div>
+          <div className="flex justify-center space-x-1">
+            <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+            <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error screen if app failed to initialize
+  if (appError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center px-4">
+        <div className="text-center bg-white rounded-xl p-8 max-w-md mx-auto shadow-2xl">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">App Error</h1>
+          <p className="text-gray-600 mb-6">
+            Something went wrong while loading the app.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors"
+          >
+            Reload Page
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!unlocked) {
     return (
@@ -177,11 +238,23 @@ function App() {
   return (
     <AuthProvider>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* AI-themed background pattern */}
-      <div className="fixed inset-0 opacity-20 pointer-events-none">
-        <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full filter blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full filter blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full filter blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
+      {/* Enhanced AI-themed background pattern */}
+      <div className="fixed inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-primary-400 to-accent-400 rounded-full filter blur-3xl animate-morph"></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-neural-400 to-primary-400 rounded-full filter blur-3xl animate-morph" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-r from-accent-400 to-neural-400 rounded-full filter blur-3xl animate-morph" style={{animationDelay: '4s'}}></div>
+        
+        {/* Neural network grid */}
+        <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="neural-dots" width="50" height="50" patternUnits="userSpaceOnUse">
+              <circle cx="25" cy="25" r="1" fill="currentColor" className="text-primary-300" opacity="0.4">
+                <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3s" repeatCount="indefinite" />
+              </circle>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#neural-dots)" />
+        </svg>
       </div>
 
       {/* Offline Indicator */}
@@ -192,22 +265,22 @@ function App() {
       )}
 
       {/* Header */}
-      <header className="relative z-40 bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-sm">
+      <header className="relative z-40 glass-heavy border-b border-white/20 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-white text-lg font-bold">IM</span>
+                <div className="w-12 h-12 bg-gradient-to-br from-primary-600 via-accent-600 to-neural-600 rounded-xl flex items-center justify-center shadow-xl animate-pulse-glow">
+                  <span className="text-white text-xl font-bold">IM</span>
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-400 rounded-full animate-neural-pulse shadow-lg"></div>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl md:text-3xl font-display font-bold gradient-text tracking-tight">
                   Isaac Mineo
                 </h1>
-                <p className="text-xs text-gray-500 font-medium">Gen AI Backend Developer</p>
+                <p className="text-sm md:text-base text-gray-600 font-semibold tracking-wide">AI & Full-Stack Developer</p>
               </div>
             </div>
 
@@ -216,7 +289,7 @@ function App() {
               {installPrompt && (
                 <button
                   onClick={handleInstallPWA}
-                  className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-lg"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 shadow-lg animate-magnetic"
                 >
                   Install App
                 </button>
@@ -227,7 +300,7 @@ function App() {
                   localStorage.removeItem('isaac-portfolio-auth');
                   setUnlocked(false);
                 }}
-                className="text-gray-500 hover:text-gray-700 transition-colors text-sm font-medium"
+                className="text-gray-500 hover:text-gray-700 transition-colors text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-100"
               >
                 Logout
               </button>
@@ -296,52 +369,68 @@ function App() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-8 pb-12 px-4 sm:px-6 lg:px-8">
+      <section className="relative pt-12 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-8">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+          <div className="mb-12">
+            <h1 className="text-5xl md:text-7xl font-display font-bold mb-6">
+              <span className="gradient-text block">
                 Building the Future
               </span>
-              <br />
-              <span className="text-gray-800">with AI</span>
+              <span className="text-gray-800 block">with AI</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-6 max-w-3xl mx-auto leading-relaxed">
-              Full-Stack Developer specializing in <strong>AI-powered applications</strong>, 
+            <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Full-Stack Developer specializing in <strong className="text-primary-700">AI-powered applications</strong>, 
               scalable backend architecture, and intelligent user experiences.
             </p>
-            <div className="flex flex-wrap justify-center gap-3 mb-8">
-              <span className="px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 rounded-full text-sm font-semibold border border-blue-200">
+            
+            {/* Professional badges */}
+            <div className="flex flex-wrap justify-center gap-4 mb-12">
+              <span className="px-6 py-3 bg-gradient-to-r from-primary-100 to-accent-100 text-primary-800 rounded-full text-sm font-semibold border border-primary-200 animate-magnetic">
                 🧠 AI Integration Expert
               </span>
-              <span className="px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 rounded-full text-sm font-semibold border border-purple-200">
+              <span className="px-6 py-3 bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 rounded-full text-sm font-semibold border border-emerald-200 animate-magnetic">
                 ⚡ FastAPI Specialist
               </span>
-              <span className="px-4 py-2 bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-800 rounded-full text-sm font-semibold border border-indigo-200">
+              <span className="px-6 py-3 bg-gradient-to-r from-neural-100 to-primary-100 text-neural-800 rounded-full text-sm font-semibold border border-neural-200 animate-magnetic">
                 🚀 React Developer
               </span>
             </div>
           </div>
 
-          {/* Quick Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          {/* Enhanced Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <button
               onClick={() => setActiveTab('projects')}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+              className="group bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-700 hover:to-accent-700 text-white px-10 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 animate-magnetic"
             >
-              🚀 Explore Projects
+              <span className="flex items-center justify-center">
+                🚀 Explore Projects
+                <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </span>
             </button>
             <button
               onClick={() => setActiveTab('ai-chat')}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+              className="group bg-gradient-to-r from-neural-600 to-purple-600 hover:from-neural-700 hover:to-purple-700 text-white px-10 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 animate-magnetic"
             >
-              🤖 Chat with AI
+              <span className="flex items-center justify-center">
+                🤖 Chat with AI
+                <svg className="w-5 h-5 ml-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </span>
             </button>
             <button
               onClick={() => setActiveTab('resume')}
-              className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 rounded-xl font-semibold transition-all duration-200"
+              className="group border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-10 py-4 rounded-2xl font-semibold transition-all duration-300 animate-magnetic"
             >
-              📄 View Resume
+              <span className="flex items-center justify-center">
+                📄 View Resume
+                <svg className="w-5 h-5 ml-2 group-hover:translate-y-[-2px] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </span>
             </button>
           </div>
         </div>
@@ -365,13 +454,43 @@ function App() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
               <div className="p-4 md:p-8 lg:p-12">
-                {activeTab === 'about' && <About />}
-                {activeTab === 'projects' && <Projects />}
-                {activeTab === 'resume' && <Resume />}
-                {activeTab === 'ai-chat' && <AIChat />}
-                {activeTab === 'code-explainer' && <CodeExplainer />}
-                {activeTab === 'auth-test' && <AuthTest />}
-                {activeTab === 'contact' && <Contact />}
+                {(() => {
+                  try {
+                    switch (activeTab) {
+                      case 'about':
+                        return <About />;
+                      case 'projects':
+                        return <Projects />;
+                      case 'resume':
+                        return <Resume />;
+                      case 'ai-chat':
+                        return <AIChat />;
+                      case 'code-explainer':
+                        return <CodeExplainer />;
+                      case 'contact':
+                        return <Contact />;
+                      default:
+                        return <About />;
+                    }
+                  } catch (error) {
+                    console.error('Component render error:', error);
+                    return (
+                      <div className="text-center py-12">
+                        <div className="text-red-500 text-4xl mb-4">⚠️</div>
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">Component Error</h3>
+                        <p className="text-gray-600 mb-4">
+                          There was an error loading this section.
+                        </p>
+                        <button
+                          onClick={() => setActiveTab('about')}
+                          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                        >
+                          Go to About
+                        </button>
+                      </div>
+                    );
+                  }
+                })()}
               </div>
             </div>
           </div>

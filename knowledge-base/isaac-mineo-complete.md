@@ -171,6 +171,38 @@ When not coding, Isaac enjoys gaming, lifting weights, exploring music, and spon
 
 **GitHub:** https://github.com/GoldenRodger5/EchoPodCastGenerator
 
+### SignalFlow (Live - Advanced AI Trading System)
+**Description:** A comprehensive AI-powered trading ecosystem combining sophisticated machine learning, multi-agent architecture, and professional-grade dashboards for intelligent trading decisions.
+
+**Technologies:** Python 3.11+, FastAPI, Streamlit, MongoDB Atlas, OpenAI API, Claude AI, Polygon.io, Alpaca API, Railway, Telegram Bot, ElevenLabs
+
+**Key Features:**
+- Multi-agent AI architecture with specialized trading agents (Market Watcher, Trade Recommender, Sentiment Analysis, Risk Manager)
+- Supervised learning with 70/30 train/validation split for continuous improvement
+- Kelly Criterion mathematical position sizing optimization for risk management
+- Advanced technical analysis including Williams %R, MACD, and momentum multipliers
+- Real-time market scanning and pattern detection with confidence scoring
+- AI-powered sentiment analysis from financial news and social media feeds
+- Interactive Telegram bot for trade notifications and manual controls
+- Professional dashboards with mobile-responsive design and real-time data
+- Dynamic risk management with volatility scaling and position adjustments
+- Cloud deployment on Railway with auto-scaling infrastructure
+- Expected 60-65% win rate with adaptive learning improvements
+
+**Architecture Highlights:**
+- Multi-agent system with specialized AI agents for different trading functions
+- Dual AI integration: GPT-4o for complex market analysis, Claude for sentiment analysis
+- Railway cloud deployment with MongoDB Atlas for trade data and learning storage
+- Streamlit dashboards providing comprehensive trading interfaces and monitoring
+- Telegram API integration for real-time notifications and interactive trade controls
+- Polygon.io and Alpaca APIs for live market data and trade execution
+- Background task processing with WebSocket real-time updates
+
+**Impact:** Democratizing algorithmic trading through AI-powered decision making with mathematical risk management and continuous learning capabilities. Targets $6,500-$8,000 annual returns on $100/week investment with sophisticated risk controls.
+
+**GitHub:** https://github.com/GoldenRodger5/singal-flow  
+**Live Demo:** https://web-production-3e19d.up.railway.app
+
 ### Full-Stack Development Expertise (Ongoing)
 **Description:** Comprehensive experience building scalable web applications with modern technologies, AI integration, and performance optimization.
 

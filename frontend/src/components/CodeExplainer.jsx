@@ -293,7 +293,13 @@ Please provide a clear, detailed explanation.`;
   return (
     <>
       {/* Mobile Flow */}
-      <div className="md:hidden">
+      <div className="md:hidden min-h-screen bg-gray-50 p-4">
+        {/* Mobile Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">🔍 Code Explainer</h1>
+          <p className="text-gray-600">Explore and understand code with Claude AI</p>
+        </div>
+        
         <MobileCodeExplainerFlow
           repositories={repositories}
           selectedRepo={selectedRepo}
@@ -304,6 +310,7 @@ Please provide a clear, detailed explanation.`;
           onFileSelect={handleFileSelect}
           onCodeSelection={handleCodeSelection}
           onExplainCode={handleExplainCode}
+          onLoadRepositories={loadRepositories}
           loadingStates={loadingStates}
           errors={errors}
         />
