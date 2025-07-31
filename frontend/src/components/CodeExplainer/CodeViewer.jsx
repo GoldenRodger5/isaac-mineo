@@ -83,12 +83,12 @@ const CodeViewer = ({
 
   if (!fileContent && !loading && !error) {
     return (
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 h-full flex flex-col">
-        <h2 className="text-base font-semibold text-white mb-4">Code Viewer</h2>
-        <div className="text-center py-12 flex-1 flex flex-col justify-center">
-          <div className="text-4xl mb-3">👩‍💻</div>
-          <p className="text-gray-400 text-base">Select a file to view its code</p>
-          <p className="text-gray-500 text-xs mt-2">
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border-2 border-white/20 p-8 h-full flex flex-col shadow-2xl">
+        <h2 className="text-xl font-bold text-white mb-6">📝 Code Viewer</h2>
+        <div className="text-center py-16 flex-1 flex flex-col justify-center">
+          <div className="text-6xl mb-6">👩‍💻</div>
+          <p className="text-gray-300 text-xl font-semibold mb-3">Select a file to view its code</p>
+          <p className="text-gray-400 text-base font-medium">
             You can then highlight code sections for AI explanations
           </p>
         </div>
@@ -98,13 +98,15 @@ const CodeViewer = ({
 
   if (loading) {
     return (
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 h-full flex flex-col">
-        <h2 className="text-base font-semibold text-white mb-4">Code Viewer</h2>
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border-2 border-white/20 p-8 h-full flex flex-col shadow-2xl">
+        <h2 className="text-xl font-bold text-white mb-6">📝 Code Viewer</h2>
         <div className="flex-1 flex flex-col">
           <div className="animate-pulse">
-            <div className="h-4 bg-white/10 rounded mb-2"></div>
-            <div className="h-4 bg-white/10 rounded mb-2 w-3/4"></div>
-            <div className="h-4 bg-white/10 rounded mb-2 w-1/2"></div>
+            <div className="h-6 bg-white/10 rounded mb-4"></div>
+            <div className="h-6 bg-white/10 rounded mb-4 w-3/4"></div>
+            <div className="h-6 bg-white/10 rounded mb-4 w-1/2"></div>
+            <div className="h-6 bg-white/10 rounded mb-4 w-5/6"></div>
+            <div className="h-6 bg-white/10 rounded mb-4 w-2/3"></div>
           </div>
         </div>
       </div>
@@ -113,11 +115,11 @@ const CodeViewer = ({
 
   if (error) {
     return (
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 h-full flex flex-col">
-        <h2 className="text-base font-semibold text-white mb-4">Code Viewer</h2>
-        <div className="text-center py-12 flex-1 flex flex-col justify-center">
-          <div className="text-4xl mb-3">⚠️</div>
-          <p className="text-red-400 text-base">Error loading file</p>
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border-2 border-white/20 p-8 h-full flex flex-col shadow-2xl">
+        <h2 className="text-xl font-bold text-white mb-6">📝 Code Viewer</h2>
+        <div className="text-center py-16 flex-1 flex flex-col justify-center">
+          <div className="text-6xl mb-6">⚠️</div>
+          <p className="text-red-400 text-xl font-semibold mb-3">Error loading file</p>
           <p className="text-gray-500 text-xs mt-2">{error}</p>
         </div>
       </div>
@@ -125,10 +127,10 @@ const CodeViewer = ({
   }
 
   return (
-    <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 flex flex-col h-full min-h-0">
+    <div className="bg-white/5 backdrop-blur-sm rounded-2xl border-2 border-white/20 flex flex-col h-full min-h-0 shadow-2xl">
       {showSelectionTooltip && localSelectedCode && (
         <div 
-          className="fixed z-50 bg-gray-800 text-white text-xs px-2 py-1 rounded shadow-lg border border-gray-600"
+          className="fixed z-50 bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-xl border border-gray-600"
           style={{
             left: tooltipPosition.x,
             top: tooltipPosition.y,
@@ -137,38 +139,41 @@ const CodeViewer = ({
         >
           <button
             onClick={handleExplainSelection}
-            className="hover:text-blue-300 transition-colors"
+            className="hover:text-blue-300 transition-colors font-bold"
           >
-            Explain Selected Code
+            🚀 Explain Selected Code
           </button>
         </div>
       )}
 
-      <div className="p-4 border-b border-white/10 flex justify-between items-center">
+      <div className="p-6 border-b border-white/20 flex justify-between items-center bg-white/5">
         <div>
-          <h2 className="text-base font-semibold text-white">Code Viewer</h2>
-          <p className="text-xs text-gray-400 mt-1">
-            Highlight code to explain specific sections
+          <h2 className="text-xl font-bold text-white flex items-center space-x-2">
+            <span>📝</span>
+            <span>Code Viewer</span>
+          </h2>
+          <p className="text-sm text-gray-300 mt-1 font-medium">
+            💡 Highlight code to explain specific sections
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <button
             onClick={handleExplainFile}
-            className="px-3 py-1.5 rounded-lg font-medium transition-all text-xs bg-blue-500 hover:bg-blue-600 text-white shadow-lg hover:shadow-xl"
+            className="px-6 py-3 rounded-xl font-bold transition-all text-sm bg-blue-500 hover:bg-blue-600 text-white shadow-lg hover:shadow-xl hover:scale-105"
           >
-            Explain Code
+            🚀 Explain Code
           </button>
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col bg-gray-900 rounded-lg min-h-0">
-        <div className="p-4 border-b border-gray-700 flex-shrink-0">
-          <h3 className="text-lg font-semibold text-gray-100">
-            {fileContent?.name || 'No file selected'}
+      <div className="flex-1 flex flex-col bg-gray-900/90 rounded-b-2xl min-h-0 backdrop-blur-sm">
+        <div className="p-6 border-b border-gray-700/50 flex-shrink-0 bg-gray-800/50">
+          <h3 className="text-lg font-bold text-gray-100">
+            📄 {fileContent?.name || 'No file selected'}
           </h3>
           {fileContent?.language && (
-            <p className="text-sm text-gray-400 mt-1">
-              Language: {fileContent.language}
+            <p className="text-sm text-blue-300 mt-2 font-semibold">
+              🔧 Language: {fileContent.language}
             </p>
           )}
         </div>
@@ -177,7 +182,7 @@ const CodeViewer = ({
           <div className="absolute inset-0 overflow-auto">
             <pre 
               ref={codeRef}
-              className="p-4 text-sm leading-relaxed text-gray-100 font-mono whitespace-pre block" 
+              className="p-6 text-sm leading-relaxed text-gray-100 font-mono whitespace-pre block selection:bg-blue-500/30" 
               dangerouslySetInnerHTML={{ __html: syntaxHighlight(fileContent?.content || '', fileContent?.language) }}
             />
           </div>

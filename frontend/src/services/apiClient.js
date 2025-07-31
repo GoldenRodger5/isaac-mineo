@@ -80,13 +80,18 @@ class APIClient {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  // Health check endpoint
+  // Health check endpoint with better error handling for development
   async healthCheck() {
     try {
       const response = await this.fetchWithRetry(`${this.baseURL.replace('/api', '')}/health`);
       return true;
     } catch (error) {
-      console.error('Health check failed:', error);
+      // In development, don't spam console with connection errors
+      if (this.environment === 'development') {
+        console.warn('Development: Backend connection failed (this is expected if backend is not running)');
+      } else {
+        console.error('Health check failed:', error);
+      }
       return false;
     }
   }

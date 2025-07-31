@@ -22,7 +22,7 @@ const HorizontalTabNavigation = ({ tabs, activeTab, setActiveTab, className = ""
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div 
           ref={scrollContainerRef}
-          className="flex overflow-x-auto scrollbar-hide py-2 space-x-1"
+          className="flex justify-center overflow-x-auto scrollbar-hide py-2 space-x-1"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {tabs.map((tab) => (
@@ -33,7 +33,7 @@ const HorizontalTabNavigation = ({ tabs, activeTab, setActiveTab, className = ""
               className={`flex items-center space-x-2 px-6 py-3 rounded-2xl font-medium transition-all duration-500 whitespace-nowrap flex-shrink-0 animate-magnetic ${
                 activeTab === tab.id
                   ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-xl transform scale-105'
-                  : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50/80'
+                  : 'text-gray-700 hover:text-primary-600 hover:bg-primary-50 border border-gray-300 hover:border-primary-300'
               }`}
             >
               <span className="text-lg">{tab.icon}</span>

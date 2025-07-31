@@ -159,7 +159,7 @@ export default function Projects() {
   const regularProjects = projects.filter(p => !p.featured);
 
   return (
-    <section id="projects" className="py-20 relative overflow-hidden">
+    <section id="projects" className="py-4 relative overflow-hidden">
       {/* Enhanced background with neural network pattern */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-r from-primary-400 to-accent-400 rounded-full filter blur-3xl animate-float-professional"></div>
@@ -179,17 +179,17 @@ export default function Projects() {
       </div>
 
       <div className="relative z-10 animate-fadeInUp">
-        <div className="text-center mb-20">
-          <h2 className="text-5xl md:text-6xl font-display font-bold mb-6 gradient-text">
+        <div className="text-center mb-2">
+          <h2 className="text-5xl md:text-6xl font-display font-bold mb-2 gradient-text">
             Featured Projects
           </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-600 mb-2 max-w-4xl mx-auto leading-relaxed">
             Innovative solutions that showcase my expertise in AI integration, full-stack development, 
             and scalable system architecture. Each project demonstrates end-to-end technical execution.
           </p>
           
           {/* Professional metrics bar */}
-          <div className="flex flex-wrap justify-center gap-8 mb-12">
+          <div className="flex flex-wrap justify-center gap-8 mb-8">
             <div className="text-center">
               <div className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">5+</div>
               <div className="text-sm text-gray-600 font-medium">Production Apps</div>
@@ -207,7 +207,7 @@ export default function Projects() {
 
         {/* Featured Projects - Bento Grid Layout */}
         {featuredProjects.length > 0 && (
-          <div className="mb-20">
+          <div className="mb-12">
             <h3 className="text-2xl font-display font-semibold text-gray-900 mb-8 text-center">🌟 Flagship Projects</h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {featuredProjects.map((project, index) => (

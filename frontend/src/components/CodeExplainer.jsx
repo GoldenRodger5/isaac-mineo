@@ -62,7 +62,12 @@ const CodeExplainer = () => {
         setErrors(prev => ({ ...prev, github: response.message || 'GitHub service is not available' }));
       }
     } catch (error) {
-      console.error('GitHub health check failed:', error);
+      // In development, don't spam console with connection errors
+      if (apiClient.environment === 'development') {
+        console.warn('Development: GitHub service connection failed (this is expected if backend is not running)');
+      } else {
+        console.error('GitHub health check failed:', error);
+      }
       setGithubHealthy(false);
       setErrors(prev => ({ ...prev, github: 'Failed to connect to GitHub service' }));
     }
@@ -316,29 +321,40 @@ Please provide a clear, detailed explanation.`;
         />
       </div>
 
-      {/* Desktop Flow */}
-      <div className="hidden md:block h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex flex-col overflow-hidden">
-        {/* Header - Fixed Height */}
-        <div className="border-b border-white/10 bg-black/20 backdrop-blur-sm flex-shrink-0">
-          <div className="max-w-full mx-auto px-8 py-6">
+      {/* Desktop Flow - Enhanced with Larger Height */}
+      <div className="hidden md:block min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex flex-col overflow-hidden">
+        {/* Header - Enhanced and More Professional */}
+        <div className="border-b border-white/20 bg-black/30 backdrop-blur-sm flex-shrink-0 shadow-xl">
+          <div className="max-w-full mx-auto px-8 py-8">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="text-3xl">🔍</div>
+              <div className="flex items-center space-x-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
+                  <span className="text-4xl">🔍</span>
+                </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-white">Claude AI Code Explainer</h1>
-                  <p className="text-gray-300">
-                    Explore and understand code with Claude Sonnet-powered explanations
+                  <h1 className="text-4xl font-bold text-white mb-2">Claude AI Code Explainer</h1>
+                  <p className="text-gray-200 text-lg font-medium">
+                    🚀 Explore and understand code with Claude Sonnet-powered explanations
                   </p>
                 </div>
               </div>
               
-              {/* Quick Actions */}
-              <div className="flex items-center space-x-3">
+              {/* Enhanced Quick Actions */}
+              <div className="flex items-center space-x-4">
+                <div className={`flex items-center space-x-3 px-4 py-3 rounded-xl border text-sm font-bold ${
+                  githubHealthy 
+                    ? 'bg-green-500/20 border-green-500/30 text-green-300' 
+                    : 'bg-red-500/20 border-red-500/30 text-red-300'
+                }`}>
+                  <span className={`w-3 h-3 rounded-full ${githubHealthy ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></span>
+                  <span>{githubHealthy ? 'GitHub Connected' : 'GitHub Offline'}</span>
+                </div>
+                
                 {!repositories?.length && (
                   <button
                     onClick={loadRepositories}
                     disabled={loadingStates.repositories}
-                    className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 px-4 py-2 rounded-lg text-white font-medium transition-colors flex items-center space-x-2"
+                    className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 px-6 py-3 rounded-xl text-white font-bold transition-colors flex items-center space-x-2 shadow-lg hover:shadow-xl"
                   >
                     <span>📁</span>
                     <span>{loadingStates.repositories ? 'Loading...' : 'Load Repositories'}</span>
@@ -348,7 +364,7 @@ Please provide a clear, detailed explanation.`;
                 {selectedRepo && !showNavigation && (
                   <button
                     onClick={toggleNavigation}
-                    className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-white font-medium transition-colors flex items-center space-x-2"
+                    className="bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl text-white font-bold transition-colors flex items-center space-x-2 border border-white/20 shadow-lg hover:shadow-xl"
                   >
                     <span>🗂️</span>
                     <span>Browse</span>
@@ -361,57 +377,57 @@ Please provide a clear, detailed explanation.`;
 
       {/* Navigation Tabs & Main Content */}
       <div className="flex flex-col flex-1 min-h-0">
-        {/* Navigation Tabs Bar */}
-        <div className="px-8 py-3 border-b border-white/10 bg-black/10 flex-shrink-0">
+        {/* Enhanced Navigation Tabs Bar */}
+        <div className="px-8 py-4 border-b border-white/20 bg-black/20 flex-shrink-0 shadow-lg">
           <div className="flex items-center justify-between">
-            {/* Left: Navigation Tabs */}
-            <div className="flex items-center space-x-1">
+            {/* Left: Enhanced Navigation Tabs */}
+            <div className="flex items-center space-x-2">
               <button
                 onClick={() => handleNavigationTabSwitch('repos')}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`flex items-center space-x-3 px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-lg ${
                   activeNavigationTab === 'repos' && showNavigation
-                    ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                    : 'text-gray-400 hover:text-white hover:bg-white/10'
+                    ? 'bg-blue-500/30 text-blue-200 border-2 border-blue-500/50 shadow-blue-500/20'
+                    : 'text-gray-300 hover:text-white hover:bg-white/10 border-2 border-transparent'
                 }`}
               >
                 <span>📁</span>
                 <span>Repositories</span>
-                <span className="text-xs bg-white/20 px-1.5 py-0.5 rounded">{repositories.length}</span>
+                <span className="text-xs bg-white/30 px-2 py-1 rounded-full font-bold">{repositories.length}</span>
               </button>
               
               <button
                 onClick={() => handleNavigationTabSwitch('files')}
                 disabled={!selectedRepo}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`flex items-center space-x-3 px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-lg ${
                   activeNavigationTab === 'files' && showNavigation
-                    ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                    ? 'bg-green-500/30 text-green-200 border-2 border-green-500/50 shadow-green-500/20'
                     : selectedRepo 
-                      ? 'text-gray-400 hover:text-white hover:bg-white/10'
-                      : 'text-gray-600 cursor-not-allowed'
+                      ? 'text-gray-300 hover:text-white hover:bg-white/10 border-2 border-transparent'
+                      : 'text-gray-500 cursor-not-allowed border-2 border-transparent'
                 }`}
               >
                 <span>📄</span>
                 <span>Files</span>
-                <span className="text-xs bg-white/20 px-1.5 py-0.5 rounded">{repoFiles.length}</span>
+                <span className="text-xs bg-white/30 px-2 py-1 rounded-full font-bold">{repoFiles.length}</span>
               </button>
               
-              {/* Breadcrumb */}
+              {/* Enhanced Breadcrumb */}
               {selectedRepo && (
-                <div className="flex items-center space-x-2 ml-4 text-sm text-gray-400">
-                  <span>/</span>
-                  <span className="text-gray-300">{selectedRepo.name}</span>
+                <div className="flex items-center space-x-3 ml-6 text-sm font-medium">
+                  <span className="text-gray-400">/</span>
+                  <span className="text-blue-300 font-bold">{selectedRepo.name}</span>
                   {selectedFile && (
                     <>
-                      <span>/</span>
-                      <span className="text-blue-300">{selectedFile.path}</span>
+                      <span className="text-gray-400">/</span>
+                      <span className="text-green-300 font-bold">{selectedFile.path}</span>
                     </>
                   )}
                 </div>
               )}
             </div>
             
-            {/* Right: Mode Controls */}
-            <div className="flex bg-white/10 rounded-xl p-1">
+            {/* Right: Enhanced Mode Controls */}
+            <div className="flex bg-white/10 rounded-2xl p-2 shadow-lg border border-white/20">
               {['explain', 'summarize', 'teach'].map((mode) => (
                 <button
                   key={mode}
@@ -496,11 +512,11 @@ Please provide a clear, detailed explanation.`;
             </>
           )}
 
-          {/* Main Content Panels */}
-          <div className="main-content-container flex w-full flex-1 px-8 py-6 gap-4 min-h-0">
+          {/* Main Content Panels - Much Larger Height */}
+          <div className="main-content-container flex w-full flex-1 px-8 py-8 gap-6 max-h-[calc(100vh-16rem)]">
             {/* Code Viewer - LEFT side */}
             <div 
-              className="transition-all duration-200 flex flex-col min-h-0"
+              className="transition-all duration-200 flex flex-col min-h-0 shadow-2xl"
               style={{ width: `${mainPanelSplit}%` }}
             >
               <CodeViewer
@@ -514,17 +530,17 @@ Please provide a clear, detailed explanation.`;
               />
             </div>
 
-            {/* Main Panel Resize Handle */}
+            {/* Main Panel Resize Handle - Enhanced */}
             <div
-              className="w-2 bg-white/5 hover:bg-white/20 rounded-full cursor-col-resize transition-colors flex-shrink-0 group self-stretch"
+              className="w-3 bg-white/10 hover:bg-white/30 rounded-full cursor-col-resize transition-colors flex-shrink-0 group self-stretch shadow-lg"
               onMouseDown={handleMainPanelMouseDown}
             >
-              <div className="w-full h-full rounded-full group-hover:bg-blue-400/50"></div>
+              <div className="w-full h-full rounded-full group-hover:bg-blue-400/60 transition-colors"></div>
             </div>
 
             {/* Explanation Panel - RIGHT side */}
             <div 
-              className="transition-all duration-200 flex flex-col min-h-0"
+              className="transition-all duration-200 flex flex-col min-h-0 shadow-2xl"
               style={{ width: `${100 - mainPanelSplit - 1}%` }} // Subtract 1% for the handle
             >
               <ExplanationPanel

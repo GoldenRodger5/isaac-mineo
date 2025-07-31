@@ -27,11 +27,16 @@ export default function Resume() {
   }, [activeDocument]);
 
   return (
-    <section id="resume" className="py-20">
+    <section id="resume" className="py-4">
       <div className="animate-fadeInUp">
-        <h2 className="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-primary-600 via-accent-600 to-neural-600 bg-clip-text text-transparent">
-          Resume & Credentials
-        </h2>
+        <div className="text-center mb-2">
+          <h2 className="text-5xl md:text-6xl font-display font-bold mb-2 gradient-text">
+            Resume & Credentials
+          </h2>
+          <p className="text-xl text-gray-600 mb-2 max-w-4xl mx-auto leading-relaxed">
+            Comprehensive overview of experience, skills, and achievements in full-stack development and AI integration.
+          </p>
+        </div>
         
         <div className="glass-heavy rounded-3xl overflow-hidden border border-white/20">
           {/* Document Selector */}

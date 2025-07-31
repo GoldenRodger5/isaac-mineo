@@ -35,7 +35,7 @@ export default function About() {
   ];
 
   return (
-    <section id="about" className="py-20 relative overflow-hidden">
+    <section id="about" className="py-4 relative overflow-hidden">
       {/* Enhanced background */}
       <div className="absolute inset-0 opacity-30 pointer-events-none">
         <div className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-r from-primary-300 to-accent-300 rounded-full filter blur-3xl animate-float-professional"></div>
@@ -43,43 +43,49 @@ export default function About() {
       </div>
 
       <div className="relative z-10 animate-fadeInUp">
-        <h2 className="text-5xl md:text-6xl font-display font-bold text-center mb-16 gradient-text">About Me</h2>
+        <div className="text-center mb-2">
+          <h2 className="text-5xl md:text-6xl font-display font-bold mb-2 gradient-text">About Me</h2>
+          <p className="text-xl text-gray-600 mb-2 max-w-4xl mx-auto leading-relaxed">
+            Building intelligent applications that bridge cutting-edge technology with human needs. 
+            Specialized in AI integration, system architecture, and scalable web solutions.
+          </p>
+        </div>
         
-        <div className="grid lg:grid-cols-2 gap-16 items-start">
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Personal Story */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="prose prose-lg text-gray-600">
-              <div className="mb-8">
+              <div className="mb-6">
                 <h3 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
                   Building with Intention: My Journey as a Developer, Thinker, and Creator in the AI Era
                 </h3>
-                <p className="text-xl font-semibold text-gray-700 mb-6">
-                  I’m Isaac Mineo — a full-stack application developer with a backend foundation, a neuroscience background, and a deep curiosity for how intelligent systems can improve daily life. I build tools that think, but more importantly, tools that help people think better.
+                <p className="text-xl font-semibold text-gray-700 mb-4">
+                  I'm Isaac Mineo — a full-stack application developer with a backend foundation, a neuroscience background, and a deep curiosity for how intelligent systems can improve daily life. I build tools that think, but more importantly, tools that help people think better.
                 </p>
               </div>
 
-              <p className="text-xl leading-relaxed mb-6">
-                My journey into tech didn’t begin with a CS degree. It began with a fascination for how humans learn, adapt, and interact — a curiosity I explored through neuroscience before teaching myself to code. That mindset still drives me: I don’t just build for functionality; I build to understand systems, teach others through what I build, and create experiences that are intuitive, helpful, and human-centered.
+              <p className="text-xl leading-relaxed mb-4">
+                My journey into tech didn't begin with a CS degree. It began with a fascination for how humans learn, adapt, and interact — a curiosity I explored through neuroscience before teaching myself to code. That mindset still drives me: I don't just build for functionality; I build to understand systems, teach others through what I build, and create experiences that are intuitive, helpful, and human-centered.
               </p>
 
-              <p className="leading-relaxed mb-6">
-                Over time, I’ve taught myself to architect applications from scratch using technologies like Python, React, Flask, FastAPI, Firebase Auth, MongoDB, and Redis. I’ve integrated large language models like Claude and GPT-4 into production-ready apps, building intelligent assistants that track goals, process context, and adapt to user needs. One of my proudest projects, Nutrivize, began as a personal nutrition tracker and grew into a full-stack health companion — offering AI-driven food logging, macro analysis, and personalized insights through real-time data and conversation memory.
+              <p className="leading-relaxed mb-4">
+                Over time, I've taught myself to architect applications from scratch using technologies like Python, React, Flask, FastAPI, Firebase Auth, MongoDB, and Redis. I've integrated large language models like Claude and GPT-4 into production-ready apps, building intelligent assistants that track goals, process context, and adapt to user needs. One of my proudest projects, Nutrivize, began as a personal nutrition tracker and grew into a full-stack health companion — offering AI-driven food logging, macro analysis, and personalized insights through real-time data and conversation memory.
               </p>
 
-              <p className="leading-relaxed mb-6">
-                But what sets my work apart isn’t just the stack — it’s the intention behind every decision. I’m methodical in how I structure my codebase, thoughtful about scalability, and always focused on user experience. Whether syncing HealthKit data securely with JWT and Firebase, implementing AI-powered features that feel conversational, or designing vector-based search to personalize results, I bring a balance of engineering discipline and human insight to everything I build.
+              <p className="leading-relaxed mb-4">
+                But what sets my work apart isn't just the stack — it's the intention behind every decision. I'm methodical in how I structure my codebase, thoughtful about scalability, and always focused on user experience. Whether syncing HealthKit data securely with JWT and Firebase, implementing AI-powered features that feel conversational, or designing vector-based search to personalize results, I bring a balance of engineering discipline and human insight to everything I build.
               </p>
 
-              <p className="leading-relaxed mb-6">
-                I’ve developed entire systems independently, from backend APIs to mobile-first UI to AI-powered assistants — but I also know when to slow down, document decisions, and ask “why” before “how.” I learn fast by doing, and I enjoy breaking complex concepts into pieces others can learn from too.
+              <p className="leading-relaxed mb-4">
+                I've developed entire systems independently, from backend APIs to mobile-first UI to AI-powered assistants — but I also know when to slow down, document decisions, and ask "why" before "how." I learn fast by doing, and I enjoy breaking complex concepts into pieces others can learn from too.
               </p>
 
-              <p className="leading-relaxed mb-6">
-                Right now, I’m deepening my knowledge of AI systems — from prompt engineering to vector databases — and working toward my AWS Solutions Architect certification. I’m especially drawn to problems that sit at the intersection of intelligence, usability, and education — the kinds of challenges where thoughtful system design can unlock real human value.
+              <p className="leading-relaxed mb-4">
+                Right now, I'm deepening my knowledge of AI systems — from prompt engineering to vector databases — and working toward my AWS Solutions Architect certification. I'm especially drawn to problems that sit at the intersection of intelligence, usability, and education — the kinds of challenges where thoughtful system design can unlock real human value.
               </p>
 
               <p className="leading-relaxed">
-                Ultimately, I’m looking to join a team that values curiosity, creativity, and clarity — a place where I can contribute not just as a developer, but as a systems thinker and builder with purpose. If the work is meaningful and the bar is high, I’m all in.
+                Ultimately, I'm looking to join a team that values curiosity, creativity, and clarity — a place where I can contribute not just as a developer, but as a systems thinker and builder with purpose. If the work is meaningful and the bar is high, I'm all in.
               </p>
             </div>
 
@@ -95,8 +101,8 @@ export default function About() {
           </div>
           
           {/* Skills Grid */}
-          <div className="space-y-8">
-            <h3 className="text-3xl font-display font-semibold text-gray-900 mb-8 flex items-center">
+          <div className="space-y-6">
+            <h3 className="text-3xl font-display font-semibold text-gray-900 mb-6 flex items-center">
               <span className="w-3 h-3 bg-primary-500 rounded-full mr-3 animate-pulse"></span>
               Tech Stack & Expertise
             </h3>
@@ -138,7 +144,7 @@ export default function About() {
         </div>
         
         {/* Philosophy & Approach */}
-        <div className="mt-16 glass-heavy rounded-3xl shadow-2xl p-8 border border-white/20">
+        <div className="mt-12 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-gray-200">
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-accent-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-float-professional">
@@ -146,8 +152,8 @@ export default function About() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold text-white mb-2">Move Fast</h4>
-              <p className="text-gray-300">
+              <h4 className="text-xl font-semibold text-gray-900 mb-2">Move Fast</h4>
+              <p className="text-gray-600">
                 I ship quickly without sacrificing quality, iterating based on real user feedback and data.
               </p>
             </div>
@@ -158,8 +164,8 @@ export default function About() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold text-white mb-2">Solve Hard Problems</h4>
-              <p className="text-gray-300">
+              <h4 className="text-xl font-semibold text-gray-900 mb-2">Solve Hard Problems</h4>
+              <p className="text-gray-600">
                 I thrive on complex challenges that require creative solutions and innovative thinking.
               </p>
             </div>

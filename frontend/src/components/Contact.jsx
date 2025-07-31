@@ -87,7 +87,7 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-20 relative overflow-hidden">
+    <section id="contact" className="py-4 relative overflow-hidden">
       {/* Enhanced background */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         <div className="absolute top-20 right-20 w-72 h-72 bg-gradient-to-r from-accent-400 to-primary-400 rounded-full filter blur-3xl animate-float-professional"></div>
@@ -95,20 +95,20 @@ export default function Contact() {
       </div>
 
       <div className="relative z-10 animate-fadeInUp">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-display font-bold mb-6 gradient-text">Get In Touch</h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+        <div className="text-center mb-8">
+          <h2 className="text-5xl md:text-6xl font-display font-bold mb-2 gradient-text">Get In Touch</h2>
+          <p className="text-xl text-gray-600 mb-4 max-w-3xl mx-auto leading-relaxed">
             Ready to discuss opportunities, collaborate on projects, or just say hello? 
             I'd love to hear from you!
           </p>
         </div>
         
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8">
           {/* Contact Info */}
-          <div className="space-y-8">
+          <div className="space-y-4">
             <div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-6">Let's Connect</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
+              <h3 className="text-2xl font-semibold text-gray-900 mb-2">Let's Connect</h3>
+              <p className="text-gray-600 mb-2 leading-relaxed">
                 I'm always open to discussing new opportunities, interesting projects, 
                 or just chatting about technology and innovation. Whether you're looking 
                 for a developer who can design, build, and ship full-stack features with 

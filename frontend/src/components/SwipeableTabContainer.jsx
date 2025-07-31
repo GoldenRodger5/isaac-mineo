@@ -15,11 +15,12 @@ const SwipeableTabContainer = ({ children, tabs, activeTab, setActiveTab, classN
   };
 
   const swipeHandlers = useSwipeGestures(handleSwipeLeft, handleSwipeRight);
+  const { isSwiping, ...touchHandlers } = swipeHandlers;
 
   return (
     <div 
       className={`relative ${className}`}
-      {...swipeHandlers}
+      {...touchHandlers}
     >
       {/* Swipe Indicator */}
       <div className="md:hidden absolute top-2 left-1/2 transform -translate-x-1/2 z-10">

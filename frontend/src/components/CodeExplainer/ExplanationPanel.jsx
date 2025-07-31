@@ -132,23 +132,26 @@ Please provide a focused answer to the follow-up question in the context of this
 
   if (loading) {
     return (
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 h-full flex flex-col">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-white">AI Explanation</h2>
-          <div className="animate-pulse text-blue-400">🤖</div>
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border-2 border-white/20 p-8 h-full flex flex-col shadow-2xl">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-white flex items-center space-x-2">
+            <span>🤖</span>
+            <span>AI Explanation</span>
+          </h2>
+          <div className="animate-pulse text-blue-400 text-2xl">🤖</div>
         </div>
         
-        <div className="space-y-3 flex-1">
+        <div className="space-y-4 flex-1">
           <div className="animate-pulse">
-            <div className="bg-white/10 rounded h-3 mb-2"></div>
-            <div className="bg-white/10 rounded h-3 mb-2 w-4/5"></div>
-            <div className="bg-white/10 rounded h-3 mb-2 w-3/4"></div>
-            <div className="bg-white/10 rounded h-3 mb-2 w-5/6"></div>
-            <div className="bg-white/10 rounded h-3 mb-2 w-2/3"></div>
+            <div className="h-4 bg-white/10 rounded mb-3"></div>
+            <div className="h-4 bg-white/10 rounded mb-3 w-4/5"></div>
+            <div className="h-4 bg-white/10 rounded mb-3 w-3/4"></div>
+            <div className="h-4 bg-white/10 rounded mb-3 w-5/6"></div>
+            <div className="h-4 bg-white/10 rounded mb-3 w-2/3"></div>
           </div>
         </div>
         
-        <div className="text-center text-blue-400 mt-4">
+        <div className="text-center text-blue-400 mt-6 font-bold text-lg">
           ⏳ Claude AI is analyzing your code...
         </div>
       </div>
@@ -157,16 +160,19 @@ Please provide a focused answer to the follow-up question in the context of this
 
   if (error) {
     return (
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 h-full flex flex-col">
-        <h2 className="text-base font-semibold text-white mb-4">AI Explanation</h2>
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-          <div className="text-red-400 text-xl mb-2">⚠️</div>
-          <p className="text-red-400 text-sm">{error}</p>
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border-2 border-white/20 p-8 h-full flex flex-col shadow-2xl">
+        <h2 className="text-xl font-bold text-white mb-6 flex items-center space-x-2">
+          <span>🤖</span>
+          <span>AI Explanation</span>
+        </h2>
+        <div className="bg-red-500/10 border-2 border-red-500/20 rounded-xl p-6">
+          <div className="text-red-400 text-3xl mb-4">⚠️</div>
+          <p className="text-red-400 text-base font-medium mb-4">{error}</p>
           <button
             onClick={() => onExplainCode()}
-            className="mt-3 text-sm bg-red-500/20 hover:bg-red-500/30 px-3 py-1 rounded text-red-300"
+            className="text-sm bg-red-500/20 hover:bg-red-500/30 px-4 py-2 rounded-lg text-red-300 font-bold transition-colors"
           >
-            Try Again
+            🔄 Try Again
           </button>
         </div>
       </div>
@@ -174,36 +180,36 @@ Please provide a focused answer to the follow-up question in the context of this
   }
 
   return (
-    <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 flex flex-col h-full min-h-0">
-      {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-white/10 flex-shrink-0">
-        <div className="flex items-center space-x-2">
-          <span className="text-lg">{getModeIcon(explanationMode)}</span>
-          <h2 className="text-base font-semibold text-white">
-            {isCodeSelection ? 'Code Selection Analysis' : 'AI Explanation'}
+    <div className="bg-white/5 backdrop-blur-sm rounded-2xl border-2 border-white/20 flex flex-col h-full min-h-0 shadow-2xl">
+      {/* Enhanced Header */}
+      <div className="flex items-center justify-between p-6 border-b border-white/20 flex-shrink-0 bg-white/5">
+        <div className="flex items-center space-x-3">
+          <span className="text-2xl">{getModeIcon(explanationMode)}</span>
+          <h2 className="text-xl font-bold text-white">
+            {isCodeSelection ? '🎯 Code Selection Analysis' : '🤖 AI Explanation'}
           </h2>
-          <span className={`px-2 py-1 rounded text-xs bg-${getModeColor(explanationMode)}-500/20 text-${getModeColor(explanationMode)}-300`}>
+          <span className={`px-3 py-1 rounded-xl text-sm font-bold bg-${getModeColor(explanationMode)}-500/20 text-${getModeColor(explanationMode)}-300 border border-${getModeColor(explanationMode)}-500/30`}>
             {explanationMode}
           </span>
           {isCodeSelection && (
-            <span className="px-2 py-1 rounded text-xs bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+            <span className="px-3 py-1 rounded-xl text-sm bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 font-bold">
               ✂️ Selection
             </span>
           )}
         </div>
         
         {explanation && (
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
             <button
               onClick={copyExplanation}
-              className="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-gray-300 hover:text-white text-sm"
+              className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-gray-300 hover:text-white text-sm font-bold border border-white/20"
               title="Copy explanation"
             >
               📋
             </button>
             <button
               onClick={clearConversation}
-              className="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-gray-300 hover:text-white text-sm"
+              className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-gray-300 hover:text-white text-sm font-bold border border-white/20"
               title="Clear conversation"
             >
               🗑️
@@ -212,65 +218,74 @@ Please provide a focused answer to the follow-up question in the context of this
         )}
       </div>
 
-      {/* Content */}
+      {/* Enhanced Content */}
       <div 
-        className="flex-1 p-3 min-h-0 overflow-y-auto code-content"
+        className="flex-1 p-6 min-h-0 overflow-y-auto code-content"
       >
         {!explanation && !loading && !error && (
-          <div className="text-center py-12 flex-1 flex flex-col justify-center">
-            <div className="text-4xl mb-3">🤖</div>
-            <p className="text-gray-400 text-base mb-2">Claude AI Ready to Help</p>
-            <p className="text-gray-500 text-xs">
+          <div className="text-center py-16 flex-1 flex flex-col justify-center">
+            <div className="text-6xl mb-6">🤖</div>
+            <p className="text-gray-300 text-xl font-semibold mb-3">Claude AI Ready to Help</p>
+            <p className="text-gray-400 text-base font-medium">
               Select code or click explain to get Claude-powered insights
             </p>
-            <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-              <h3 className="text-blue-300 font-medium mb-2 text-sm">How it works:</h3>
-              <ul className="text-xs text-gray-400 space-y-1 text-left">
-                <li>🔍 <strong>Explain:</strong> Technical breakdown for developers</li>
-                <li>📋 <strong>Summarize:</strong> High-level overview</li>
-                <li>🎓 <strong>Teach:</strong> Beginner-friendly explanations</li>
+            <div className="mt-8 p-6 bg-blue-500/10 border-2 border-blue-500/20 rounded-2xl">
+              <h3 className="text-blue-300 font-bold mb-4 text-lg">🚀 How it works:</h3>
+              <ul className="text-sm text-gray-300 space-y-3 text-left font-medium">
+                <li className="flex items-center space-x-3">
+                  <span className="text-lg">🔍</span>
+                  <span><strong className="text-blue-300">Explain:</strong> Technical breakdown for developers</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <span className="text-lg">📋</span>
+                  <span><strong className="text-green-300">Summarize:</strong> High-level overview</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <span className="text-lg">🎓</span>
+                  <span><strong className="text-purple-300">Teach:</strong> Beginner-friendly explanations</span>
+                </li>
               </ul>
             </div>
           </div>
         )}
 
         {explanation && (
-          <div className="space-y-4">
-            {/* Main Explanation */}
-            <div className="bg-white/5 rounded-lg p-3 border-l-4 border-blue-500">
-              <div className="flex items-center space-x-2 mb-2">
-                <span className={`text-${getModeColor(explanationMode)}-400`}>
+          <div className="space-y-6">
+            {/* Enhanced Main Explanation */}
+            <div className="bg-white/5 rounded-2xl p-6 border-l-4 border-blue-500 shadow-lg backdrop-blur-sm">
+              <div className="flex items-center space-x-3 mb-4">
+                <span className={`text-${getModeColor(explanationMode)}-400 text-2xl`}>
                   {getModeIcon(explanationMode)}
                 </span>
-                <span className="text-xs font-medium text-gray-300">
+                <span className="text-base font-bold text-gray-200">
                   {explanationMode.charAt(0).toUpperCase() + explanationMode.slice(1)} Mode
                 </span>
                 {selectedCode && (
-                  <span className="text-xs bg-yellow-500/20 text-yellow-300 px-1.5 py-0.5 rounded">
+                  <span className="text-sm bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-xl font-bold border border-yellow-500/30">
                     Selection
                   </span>
                 )}
               </div>
               <div 
-                className="text-gray-300 leading-relaxed text-sm"
+                className="text-gray-200 leading-relaxed text-base font-medium"
                 dangerouslySetInnerHTML={{ 
-                  __html: `<p class="mb-2">${formatExplanation(explanation)}</p>` 
+                  __html: `<p class="mb-3">${formatExplanation(explanation)}</p>` 
                 }}
               />
             </div>
 
-            {/* Follow-up Questions */}
+            {/* Enhanced Follow-up Questions */}
             <FollowUpQuestions
               questions={followUpQuestions}
               onQuestionClick={handleAskFollowUp}
               isLoading={isAskingFollowUp}
             />
 
-            {/* Conversation History */}
+            {/* Enhanced Conversation History */}
             {conversationHistory.length > 0 && (
-              <div className="space-y-2">
-                <h3 className="text-xs font-medium text-gray-400 border-b border-white/10 pb-1">
-                  Follow-up Q&A
+              <div className="space-y-4">
+                <h3 className="text-base font-bold text-gray-300 border-b border-white/20 pb-2">
+                  💬 Follow-up Q&A
                 </h3>
                 {conversationHistory.map((item, index) => (
                   <div

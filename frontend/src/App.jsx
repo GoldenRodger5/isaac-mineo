@@ -280,7 +280,10 @@ function App() {
                 <h1 className="text-2xl md:text-3xl font-display font-bold gradient-text tracking-tight">
                   Isaac Mineo
                 </h1>
-                <p className="text-sm md:text-base text-gray-600 font-semibold tracking-wide">AI & Full-Stack Developer</p>
+                <p className="text-sm md:text-base text-gray-600 font-semibold tracking-wide">
+                  AI & Full-Stack Developer
+                  <span className="text-xs text-gray-400 ml-2 font-normal">• Portfolio</span>
+                </p>
               </div>
             </div>
 
@@ -369,11 +372,11 @@ function App() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-12 pb-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative pt-8 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-12">
-            <h1 className="text-5xl md:text-7xl font-display font-bold mb-6">
-              <span className="gradient-text block">
+          <div className="mb-8">
+            <h1 className="text-5xl md:text-7xl font-display font-bold mb-12 leading-relaxed">
+              <span className="gradient-text block mb-2">
                 Building the Future
               </span>
               <span className="text-gray-800 block">with AI</span>
@@ -384,7 +387,7 @@ function App() {
             </p>
             
             {/* Professional badges */}
-            <div className="flex flex-wrap justify-center gap-4 mb-12">
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
               <span className="px-6 py-3 bg-gradient-to-r from-primary-100 to-accent-100 text-primary-800 rounded-full text-sm font-semibold border border-primary-200 animate-magnetic">
                 🧠 AI Integration Expert
               </span>
@@ -398,7 +401,7 @@ function App() {
           </div>
 
           {/* Enhanced Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-8">
             <button
               onClick={() => setActiveTab('projects')}
               className="group bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-700 hover:to-accent-700 text-white px-10 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 animate-magnetic"
@@ -450,10 +453,10 @@ function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       >
-        <main className="relative z-20 py-12 pb-24 md:pb-12">
+        <main className="relative z-20 py-4 pb-24 md:pb-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
-              <div className="p-4 md:p-8 lg:p-12">
+              <div className="p-4 md:p-6 lg:p-8">
                 {(() => {
                   try {
                     switch (activeTab) {
@@ -561,9 +564,13 @@ function App() {
       {/* Floating AI Assistant */}
       <AIChatbot />
       
-      {/* Vercel Analytics & Speed Insights */}
-      <Analytics />
-      <SpeedInsights />
+      {/* Vercel Analytics & Speed Insights - Only in production */}
+      {import.meta.env.PROD && (
+        <>
+          <Analytics />
+          <SpeedInsights />
+        </>
+      )}
       </div>
     </AuthProvider>
   );
