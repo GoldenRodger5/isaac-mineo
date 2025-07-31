@@ -35,7 +35,7 @@ export default function About() {
   ];
 
   return (
-    <section id="about" className="py-4 relative overflow-hidden">
+    <section id="about" className="py-2 md:py-4 relative overflow-hidden">
       {/* Enhanced background */}
       <div className="absolute inset-0 opacity-30 pointer-events-none">
         <div className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-r from-primary-300 to-accent-300 rounded-full filter blur-3xl animate-float-professional"></div>
@@ -43,56 +43,60 @@ export default function About() {
       </div>
 
       <div className="relative z-10 animate-fadeInUp">
-        <div className="text-center mb-2">
-          <h2 className="text-5xl md:text-6xl font-display font-bold mb-2 gradient-text">About Me</h2>
-          <p className="text-xl text-gray-600 mb-2 max-w-4xl mx-auto leading-relaxed">
-            Building intelligent applications that bridge cutting-edge technology with human needs. 
-            Specialized in AI integration, system architecture, and scalable web solutions.
+        <div className="text-center mb-1 md:mb-2">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-1 md:mb-2 gradient-text">
+            <span className="hidden md:inline">About Me</span>
+            <span className="md:hidden">Building the Future with AI</span>
+          </h2>
+          <p className="text-lg md:text-xl text-gray-600 mb-1 md:mb-2 max-w-4xl mx-auto leading-relaxed px-4 md:px-0">
+            <span className="md:hidden">Full-Stack Developer specializing in AI-powered applications, scalable backend architecture, and intelligent user experiences.</span>
+            <span className="hidden md:inline">Building intelligent applications that bridge cutting-edge technology with human needs. Specialized in AI integration, system architecture, and scalable web solutions.</span>
           </p>
         </div>
         
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
+        <div className="grid lg:grid-cols-2 gap-6 md:gap-12 items-start">
           {/* Personal Story */}
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             <div className="prose prose-lg text-gray-600">
-              <div className="mb-6">
-                <h3 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-                  Building with Intention: My Journey as a Developer, Thinker, and Creator in the AI Era
+              <div className="mb-4 md:mb-6">
+                <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2 md:mb-4">
+                  <span className="hidden md:inline">Building with Intention: My Journey as a Developer, Thinker, and Creator in the AI Era</span>
+                  <span className="md:hidden">My Journey as a Developer</span>
                 </h3>
-                <p className="text-xl font-semibold text-gray-700 mb-4">
+                <p className="text-lg md:text-xl font-semibold text-gray-700 mb-2 md:mb-4">
                   I'm Isaac Mineo — a full-stack application developer with a backend foundation, a neuroscience background, and a deep curiosity for how intelligent systems can improve daily life. I build tools that think, but more importantly, tools that help people think better.
                 </p>
               </div>
 
-              <p className="text-xl leading-relaxed mb-4">
-                My journey into tech didn't begin with a CS degree. It began with a fascination for how humans learn, adapt, and interact — a curiosity I explored through neuroscience before teaching myself to code. That mindset still drives me: I don't just build for functionality; I build to understand systems, teach others through what I build, and create experiences that are intuitive, helpful, and human-centered.
-              </p>
+              <div className="space-y-2 md:space-y-4 text-base md:text-lg">
+                <p className="leading-relaxed">
+                  My journey into tech didn't begin with a CS degree. It began with a fascination for how humans learn, adapt, and interact — a curiosity I explored through neuroscience before teaching myself to code. That mindset still drives me: I don't just build for functionality; I build to understand systems, teach others through what I build, and create experiences that are intuitive, helpful, and human-centered.
+                </p>
 
-              <p className="leading-relaxed mb-4">
-                Over time, I've taught myself to architect applications from scratch using technologies like Python, React, Flask, FastAPI, Firebase Auth, MongoDB, and Redis. I've integrated large language models like Claude and GPT-4 into production-ready apps, building intelligent assistants that track goals, process context, and adapt to user needs. One of my proudest projects, Nutrivize, began as a personal nutrition tracker and grew into a full-stack health companion — offering AI-driven food logging, macro analysis, and personalized insights through real-time data and conversation memory.
-              </p>
+                <p className="leading-relaxed">
+                  Over time, I've taught myself to architect applications from scratch using technologies like Python, React, Flask, FastAPI, Firebase Auth, MongoDB, and Redis. I've integrated large language models like Claude and GPT-4 into production-ready apps, building intelligent assistants that track goals, process context, and adapt to user needs.
+                </p>
 
-              <p className="leading-relaxed mb-4">
-                But what sets my work apart isn't just the stack — it's the intention behind every decision. I'm methodical in how I structure my codebase, thoughtful about scalability, and always focused on user experience. Whether syncing HealthKit data securely with JWT and Firebase, implementing AI-powered features that feel conversational, or designing vector-based search to personalize results, I bring a balance of engineering discipline and human insight to everything I build.
-              </p>
+                <p className="leading-relaxed">
+                  <span className="hidden md:inline">But what sets my work apart isn't just the stack — it's the intention behind every decision. I'm methodical in how I structure my codebase, thoughtful about scalability, and always focused on user experience. Whether syncing HealthKit data securely with JWT and Firebase, implementing AI-powered features that feel conversational, or designing vector-based search to personalize results, I bring a balance of engineering discipline and human insight to everything I build.</span>
+                  <span className="md:hidden">I'm methodical in structuring codebases, thoughtful about scalability, and focused on user experience. I bring engineering discipline and human insight to everything I build.</span>
+                </p>
 
-              <p className="leading-relaxed mb-4">
-                I've developed entire systems independently, from backend APIs to mobile-first UI to AI-powered assistants — but I also know when to slow down, document decisions, and ask "why" before "how." I learn fast by doing, and I enjoy breaking complex concepts into pieces others can learn from too.
-              </p>
+                <p className="leading-relaxed">
+                  <span className="hidden md:inline">Right now, I'm deepening my knowledge of AI systems — from prompt engineering to vector databases — and working toward my AWS Solutions Architect certification. I'm especially drawn to problems that sit at the intersection of intelligence, usability, and education — the kinds of challenges where thoughtful system design can unlock real human value.</span>
+                  <span className="md:hidden">Currently deepening my AI systems knowledge and working toward AWS Solutions Architect certification. I'm drawn to challenges where thoughtful system design unlocks real human value.</span>
+                </p>
 
-              <p className="leading-relaxed mb-4">
-                Right now, I'm deepening my knowledge of AI systems — from prompt engineering to vector databases — and working toward my AWS Solutions Architect certification. I'm especially drawn to problems that sit at the intersection of intelligence, usability, and education — the kinds of challenges where thoughtful system design can unlock real human value.
-              </p>
-
-              <p className="leading-relaxed">
-                Ultimately, I'm looking to join a team that values curiosity, creativity, and clarity — a place where I can contribute not just as a developer, but as a systems thinker and builder with purpose. If the work is meaningful and the bar is high, I'm all in.
-              </p>
+                <p className="leading-relaxed">
+                  Ultimately, I'm looking to join a team that values curiosity, creativity, and clarity — a place where I can contribute not just as a developer, but as a systems thinker and builder with purpose. If the work is meaningful and the bar is high, I'm all in.
+                </p>
+              </div>
             </div>
 
             {/* Personal Interests */}
-            <div className="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-xl p-6 border border-primary-100">
-              <h4 className="font-semibold text-gray-900 mb-3">🎧 Outside of Code</h4>
-              <p className="text-gray-700 leading-relaxed">
+            <div className="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-xl p-4 md:p-6 border border-primary-100">
+              <h4 className="font-semibold text-gray-900 mb-2 md:mb-3">🎧 Outside of Code</h4>
+              <p className="text-gray-700 leading-relaxed text-sm md:text-base">
                 Outside of dev work, I'm into gaming, lifting, exploring music, and spontaneous adventures 
                 with friends. I've got a big appreciation for well-designed digital and physical spaces, 
                 clever storytelling, and any project that blends creativity with impact.
@@ -101,17 +105,17 @@ export default function About() {
           </div>
           
           {/* Skills Grid */}
-          <div className="space-y-6">
-            <h3 className="text-3xl font-display font-semibold text-gray-900 mb-6 flex items-center">
+          <div className="space-y-4 md:space-y-6">
+            <h3 className="text-2xl md:text-3xl font-display font-semibold text-gray-900 mb-3 md:mb-6 flex items-center">
               <span className="w-3 h-3 bg-primary-500 rounded-full mr-3 animate-pulse"></span>
               Tech Stack & Expertise
             </h3>
             
-            <div className="grid gap-6">
+            <div className="grid gap-4 md:gap-6">
               {skills.map((skillGroup, index) => (
                 <div 
                   key={skillGroup.category} 
-                  className="group bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 border border-white/30 animate-magnetic overflow-hidden relative"
+                  className="group bg-white/80 backdrop-blur-xl rounded-2xl p-4 md:p-6 shadow-xl hover:shadow-2xl transition-all duration-500 border border-white/30 animate-magnetic overflow-hidden relative"
                   style={{animationDelay: `${index * 0.1}s`}}
                 >
                   {/* Gradient overlay on hover */}
@@ -144,8 +148,8 @@ export default function About() {
         </div>
         
         {/* Philosophy & Approach */}
-        <div className="mt-12 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-gray-200">
-          <div className="grid md:grid-cols-3 gap-8">
+        <div className="mt-6 md:mt-12 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-4 md:p-8 border border-gray-200">
+          <div className="grid md:grid-cols-3 gap-4 md:gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-accent-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-float-professional">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

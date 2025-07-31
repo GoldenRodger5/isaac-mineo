@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 const MobileChatInterface = ({ 
   messages, 
@@ -76,9 +77,11 @@ const MobileChatInterface = ({
               )}
               <div className="text-sm leading-relaxed">
                 {typeof message.text === 'string' ? (
-                  <div dangerouslySetInnerHTML={{ 
-                    __html: message.text.replace(/\n/g, '<br/>') 
-                  }} />
+                  <ReactMarkdown 
+                    className="prose prose-sm max-w-none prose-p:my-2 prose-strong:font-bold prose-em:italic prose-ul:my-2 prose-li:my-0"
+                  >
+                    {message.text}
+                  </ReactMarkdown>
                 ) : (
                   message.text
                 )}
@@ -148,8 +151,8 @@ const MobileChatInterface = ({
               onKeyPress={handleKeyPress}
               placeholder={placeholder}
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900 placeholder-gray-500"
-              rows={1}
-              style={{ minHeight: '44px', maxHeight: '120px' }}
+              rows={3}
+              style={{ minHeight: '90px', maxHeight: '225px' }}
               disabled={isLoading}
             />
             {/* Character count for long messages */}

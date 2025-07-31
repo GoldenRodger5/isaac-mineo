@@ -311,9 +311,11 @@ Please provide a clear, detailed explanation.`;
           repoFiles={repoFiles}
           selectedFile={selectedFile}
           fileContent={fileContent}
+          explanation={explanation}
+          explanationMode={explanationMode}
           onRepoSelect={handleRepoSelect}
           onFileSelect={handleFileSelect}
-          onCodeSelection={handleCodeSelection}
+          onCodeSelection={setSelectedCode}
           onExplainCode={handleExplainCode}
           onLoadRepositories={loadRepositories}
           loadingStates={loadingStates}

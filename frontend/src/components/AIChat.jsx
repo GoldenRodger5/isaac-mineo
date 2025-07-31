@@ -18,6 +18,7 @@ const AIChat = () => {
   const [conversationCount, setConversationCount] = useState(0);
   const [backendStatus, setBackendStatus] = useState('checking');
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const messagesEndRef = useRef(null);
 
   const suggestedQuestions = [
@@ -30,15 +31,15 @@ const AIChat = () => {
   ];
 
   const scrollToBottom = () => {
-    // Only scroll if there are user messages (not just the initial welcome message)
-    if (messages.length > 1) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Only scroll if user has interacted with the chat
+    if (hasUserInteracted && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, hasUserInteracted]);
 
   // Initialize session and check backend status
   useEffect(() => {
@@ -103,6 +104,9 @@ const AIChat = () => {
   const handleSendMessage = async (messageText = null) => {
     const textToSend = messageText || inputValue.trim();
     if (!textToSend || isLoading) return;
+
+    // Mark that user has interacted with the chat
+    setHasUserInteracted(true);
 
     const userMessage = {
       id: messages.length + 1,
@@ -191,7 +195,7 @@ const AIChat = () => {
 
         <div className="max-w-6xl mx-auto">
           {/* Mobile Chat Interface */}
-          <div className="md:hidden glass-heavy rounded-2xl border border-white/20 shadow-2xl h-[80vh]">
+          <div className="md:hidden glass-heavy rounded-2xl border border-white/20 shadow-2xl h-[85vh]">
             <MobileChatInterface
               messages={messages}
               onSendMessage={handleSendMessage}

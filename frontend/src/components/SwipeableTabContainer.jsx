@@ -39,7 +39,7 @@ const SwipeableTabContainer = ({ children, tabs, activeTab, setActiveTab, classN
       {children}
       
       {/* Swipe Instructions */}
-      <div className="md:hidden text-center py-2">
+      <div className="md:hidden text-center py-1">
         <p className="text-xs text-gray-500">
           Swipe left or right to navigate between sections
         </p>

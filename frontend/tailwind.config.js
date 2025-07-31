@@ -164,6 +164,7 @@ module.exports = {
     },
   },
   plugins: [
+    require('@tailwindcss/typography'),
     function({ addUtilities }) {
       const newUtilities = {
         '.safe-area-top': {
