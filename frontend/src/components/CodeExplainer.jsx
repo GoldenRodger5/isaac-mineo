@@ -277,10 +277,10 @@ Please provide a clear, detailed explanation.`;
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-12 text-center">
             <div className="text-red-400 text-5xl mb-6">⚠️</div>
             <h2 className="text-3xl font-bold text-red-400 mb-6">GitHub Service Unavailable</h2>
-            <p className="text-gray-300 mb-3 text-lg">
+            <p className="text-gray-700 mb-3 text-lg md:text-gray-300">
               {errors.github || 'The GitHub integration service is currently unavailable.'}
             </p>
-            <p className="text-gray-400 mb-8">
+            <p className="text-gray-600 mb-8 md:text-gray-400">
               Please check your configuration and try again.
             </p>
             <button

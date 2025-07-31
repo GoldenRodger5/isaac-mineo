@@ -183,10 +183,9 @@ export default function Projects() {
           <h2 className="text-5xl md:text-6xl font-display font-bold mb-2 gradient-text">
             Featured Projects
           </h2>
-          <p className="text-xl text-gray-600 mb-2 max-w-4xl mx-auto leading-relaxed">
-            Innovative solutions that showcase my expertise in AI integration, full-stack development, 
-            and scalable system architecture. Each project demonstrates end-to-end technical execution.
-          </p>
+                        <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto md:text-gray-300">
+                Showcasing full-stack applications that blend functionality with intelligence, from AI-powered health companions to automated workflow solutions.
+              </p>
           
           {/* Professional metrics bar */}
           <div className="flex flex-wrap justify-center gap-8 mb-8">

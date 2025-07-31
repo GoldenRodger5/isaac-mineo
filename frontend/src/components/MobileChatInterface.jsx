@@ -53,28 +53,28 @@ const MobileChatInterface = ({
   };
 
   return (
-    <div className={`flex flex-col h-full glass-heavy ${isKeyboardVisible ? 'keyboard-open' : ''}`}>
-      {/* Messages Container - Enhanced */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+    <div className={`flex flex-col h-full bg-white ${isKeyboardVisible ? 'keyboard-open' : ''}`}>
+      {/* Messages Container - Optimized */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-3">
         {messages.map((message, index) => (
           <div
             key={message.id || index}
-            className={`flex ${message.isBot ? 'justify-start' : 'justify-end'} animate-float-professional`}
+            className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}
           >
-            <div className={`max-w-[85%] rounded-2xl px-6 py-4 shadow-xl animate-magnetic backdrop-blur-sm ${
+            <div className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-sm ${
               message.isBot
-                ? 'bg-white text-gray-900 rounded-bl-sm border-2 border-gray-300'
-                : 'bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-br-sm shadow-xl'
+                ? 'bg-gray-50 text-gray-900 rounded-bl-sm border border-gray-200'
+                : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-br-sm shadow-md'
             }`}>
               {message.isBot && (
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl flex items-center justify-center shadow-lg">
-                    <span className="text-white text-sm font-bold">🤖</span>
+                <div className="flex items-center space-x-2 mb-2">
+                  <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">🤖</span>
                   </div>
-                  <span className="text-sm text-gray-700 font-bold">AI Assistant</span>
+                  <span className="text-xs text-gray-600 font-medium">AI Assistant</span>
                 </div>
               )}
-              <div className="text-sm leading-relaxed font-medium">
+              <div className="text-sm leading-relaxed">
                 {typeof message.text === 'string' ? (
                   <div dangerouslySetInnerHTML={{ 
                     __html: message.text.replace(/\n/g, '<br/>') 
@@ -84,8 +84,8 @@ const MobileChatInterface = ({
                 )}
               </div>
               {message.timestamp && (
-                <div className={`text-xs mt-3 font-medium ${
-                  message.isBot ? 'text-gray-700' : 'text-white/70'
+                <div className={`text-xs mt-2 ${
+                  message.isBot ? 'text-gray-500' : 'text-white/70'
                 }`}>
                   {new Date(message.timestamp).toLocaleTimeString([], { 
                     hour: '2-digit', 
@@ -97,20 +97,20 @@ const MobileChatInterface = ({
           </div>
         ))}
         
-        {/* Enhanced Loading Indicator */}
+        {/* Loading Indicator - Optimized */}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="glass-light rounded-2xl rounded-bl-sm px-6 py-4 max-w-[85%] border-2 border-white/20 shadow-xl animate-magnetic backdrop-blur-sm">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-white text-sm font-bold">🤖</span>
+            <div className="bg-gray-50 rounded-2xl rounded-bl-sm px-4 py-3 max-w-[85%] border border-gray-200 shadow-sm">
+              <div className="flex items-center space-x-2">
+                <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">🤖</span>
                 </div>
                 <div className="flex space-x-1">
-                  <div className="w-3 h-3 bg-accent-400 rounded-full animate-bounce"></div>
-                  <div className="w-3 h-3 bg-accent-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-3 h-3 bg-accent-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.1s'}}></div>
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
                 </div>
-                <span className="text-sm text-gray-300 font-bold">AI is thinking...</span>
+                <span className="text-xs text-gray-600">AI is thinking...</span>
               </div>
             </div>
           </div>
@@ -119,15 +119,15 @@ const MobileChatInterface = ({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Enhanced Suggested Questions */}
+      {/* Suggested Questions - Optimized */}
       {suggestedQuestions.length > 0 && messages.length <= 1 && (
-        <div className="px-6 py-4 border-t border-white/20">
-          <div className="flex flex-wrap gap-3">
+        <div className="px-3 py-3 border-t border-gray-200">
+          <div className="flex flex-wrap gap-2">
             {suggestedQuestions.slice(0, 3).map((question, index) => (
               <button
                 key={index}
                 onClick={() => handleSend(question)}
-                className="glass-light text-primary-300 px-4 py-3 rounded-xl text-sm font-bold hover:bg-white/20 transition-all duration-300 border-2 border-primary-500/30 animate-magnetic shadow-lg"
+                className="bg-gray-50 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-100 transition-colors duration-200 border border-gray-200"
                 disabled={isLoading}
               >
                 {question}
@@ -137,9 +137,9 @@ const MobileChatInterface = ({
         </div>
       )}
 
-      {/* Enhanced Input Area */}
-      <div className="border-t border-white/30 p-6 glass-heavy">
-        <div className="flex items-end space-x-4">
+      {/* Input Area - Optimized */}
+      <div className="border-t border-gray-200 p-3 bg-white">
+        <div className="flex items-end space-x-3">
           <div className="flex-1 relative">
             <textarea
               ref={inputRef}
@@ -147,14 +147,14 @@ const MobileChatInterface = ({
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={placeholder}
-              className="w-full px-6 py-4 glass-light border-2 border-white/30 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500/50 text-base font-medium text-gray-200 placeholder-gray-500 backdrop-blur-sm shadow-inner"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900 placeholder-gray-500"
               rows={1}
-              style={{ minHeight: '48px', maxHeight: '120px' }}
+              style={{ minHeight: '44px', maxHeight: '120px' }}
               disabled={isLoading}
             />
             {/* Character count for long messages */}
             {inputValue.length > 200 && (
-              <div className="absolute -top-6 right-2 text-xs text-gray-600 font-bold">
+              <div className="absolute -top-5 right-2 text-xs text-gray-500">
                 {inputValue.length}/500
               </div>
             )}
@@ -163,9 +163,9 @@ const MobileChatInterface = ({
           <button
             onClick={() => handleSend()}
             disabled={!inputValue.trim() || isLoading}
-            className="bg-gradient-to-r from-primary-500 to-accent-500 text-white p-4 rounded-2xl hover:from-primary-600 hover:to-accent-600 focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:ring-offset-2 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed transition-all duration-300 flex-shrink-0 shadow-xl animate-magnetic hover:scale-105"
+            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-3 rounded-xl hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex-shrink-0 shadow-sm"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
             </svg>
           </button>

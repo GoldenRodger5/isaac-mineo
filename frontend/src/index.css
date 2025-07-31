@@ -338,6 +338,54 @@ html {
   input, select, textarea {
     font-size: 16px;
   }
+  
+  /* Disable animations on mobile for better performance and consistency */
+  .animate-float-professional,
+  .animate-magnetic,
+  .animate-bounce,
+  .animate-neural-pulse,
+  .animate-swing {
+    animation: none !important;
+    transform: none !important;
+  }
+  
+  /* Disable hover effects that don't work well on touch */
+  .hover\\:scale-105:hover {
+    transform: none !important;
+  }
+  
+  /* Fix glass effects on mobile - replace with solid backgrounds */
+  .glass-heavy,
+  .glass-light {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: none !important;
+    border: 1px solid #e5e7eb !important;
+  }
+  
+  /* Ensure high contrast text on mobile */
+  .bg-white\/80 {
+    background: rgba(255, 255, 255, 0.98) !important;
+  }
+  
+  /* Override backdrop blur effects on mobile */
+  .backdrop-blur-xl,
+  .backdrop-blur-sm {
+    backdrop-filter: none !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+  }
+  
+  /* Fix any remaining light text issues */
+  .text-gray-300 {
+    color: #374151 !important; /* text-gray-700 equivalent */
+  }
+  
+  .text-gray-400 {
+    color: #4b5563 !important; /* text-gray-600 equivalent */
+  }
+  
+  .text-gray-500 {
+    color: #6b7280 !important; /* Keep as is, it's readable */
+  }
 }
 
 /* Horizontal scroll hide scrollbar */

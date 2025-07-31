@@ -84,7 +84,7 @@ export default function Resume() {
               </div>
             </div>
             
-            <p className="text-gray-300 mt-3 font-medium">{currentDoc.description}</p>
+            <p className="text-gray-700 mt-3 font-medium md:text-gray-300">{currentDoc.description}</p>
           </div>
 
           {/* PDF Viewer */}
@@ -106,7 +106,7 @@ export default function Resume() {
                     </svg>
                   </div>
                   <h3 className="text-lg font-semibold text-white mb-2">{currentDoc.title}</h3>
-                  <p className="text-gray-300 mb-6">PDF preview not available. Click below to view or download.</p>
+                  <p className="text-gray-700 mb-6 md:text-gray-300">PDF preview not available. Click below to view or download.</p>
                   
                   <div className="flex space-x-3">
                     <a
@@ -167,7 +167,7 @@ export default function Resume() {
         <div className="mt-12 grid md:grid-cols-2 gap-8">
           <div className="glass-heavy rounded-2xl p-6 shadow-xl border border-white/20">
             <h3 className="text-xl font-semibold text-white mb-4 bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">Professional Highlights</h3>
-            <ul className="space-y-3 text-gray-300">
+            <ul className="space-y-3 text-gray-700 md:text-gray-300">
               <li className="flex items-start animate-float-professional">
                 <div className="w-5 h-5 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 mr-3 mt-0.5 flex-shrink-0 flex items-center justify-center">
                   <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -205,7 +205,7 @@ export default function Resume() {
           
           <div className="glass-heavy rounded-2xl p-6 shadow-xl border border-white/20">
             <h3 className="text-xl font-semibold text-white mb-4 bg-gradient-to-r from-accent-400 to-neural-400 bg-clip-text text-transparent">What I'm Looking For</h3>
-            <p className="text-gray-300 mb-4">
+            <p className="text-gray-700 mb-4 md:text-gray-300">
               I'm open to backend, AI engineering, or full-stack roles where I can build meaningful tools 
               alongside smart, creative teams.
             </p>
