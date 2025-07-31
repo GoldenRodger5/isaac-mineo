@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 const MobileCodeExplainerFlow = ({ 
   repositories = [], 
@@ -83,7 +84,7 @@ const MobileCodeExplainerFlow = ({
   return (
     <div className="w-full space-y-4">
       {/* Compact Selection Header */}
-      <div className="bg-white rounded-lg border border-gray-200 p-3 space-y-3 sticky top-0 z-10 shadow-sm">
+      <div className="bg-white rounded-lg border border-gray-200 p-3 space-y-3 sticky top-0 z-40 shadow-sm">
         {/* Repository Selection */}
         <div className="relative">
           <label className="block text-xs font-medium text-gray-700 mb-1">Repository</label>
@@ -105,7 +106,7 @@ const MobileCodeExplainerFlow = ({
           </button>
           
           {showRepoDropdown && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto z-20">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto z-50">
               {loadingStates.repositories ? (
                 <div className="p-3 text-center text-sm text-gray-500">Loading...</div>
               ) : repositories?.length ? (
@@ -115,7 +116,7 @@ const MobileCodeExplainerFlow = ({
                     onClick={() => handleRepoSelect(repo)}
                     className="w-full text-left p-2 hover:bg-gray-50 text-sm border-b border-gray-100 last:border-b-0"
                   >
-                    <div className="font-medium truncate">{repo.name}</div>
+                    <div className="font-medium truncate text-gray-900">{repo.name}</div>
                     {repo.description && (
                       <div className="text-xs text-gray-500 truncate">{repo.description}</div>
                     )}
@@ -145,7 +146,7 @@ const MobileCodeExplainerFlow = ({
             </button>
             
             {showFileDropdown && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto z-20">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto z-50">
                 {loadingStates.files ? (
                   <div className="p-3 text-center text-sm text-gray-500">Loading...</div>
                 ) : repoFiles?.length ? (
@@ -153,12 +154,10 @@ const MobileCodeExplainerFlow = ({
                     <button
                       key={file.path}
                       onClick={() => handleFileSelect(file)}
-                      className="w-full text-left p-2 hover:bg-gray-50 text-sm border-b border-gray-100 last:border-b-0"
+                      className="w-full text-left p-2 hover:bg-gray-50 text-sm border-b border-gray-100 last:border-b-0 flex items-center space-x-2"
                     >
-                      <div className="flex items-center space-x-2">
-                        <span>{file.type === 'file' ? '📄' : '📁'}</span>
-                        <span className="truncate">{file.name}</span>
-                      </div>
+                      <span>{file.type === 'file' ? '📄' : '📁'}</span>
+                      <span className="truncate text-gray-900 font-medium">{file.name}</span>
                     </button>
                   ))
                 ) : (
@@ -292,12 +291,20 @@ const MobileCodeExplainerFlow = ({
           {/* Explanation Content */}
           <div className="p-4">
             <div className="prose prose-sm max-w-none">
-              <div 
-                className="bg-gray-50 rounded-lg p-4 text-sm leading-relaxed whitespace-pre-wrap"
-                style={{ minHeight: '200px' }}
-              >
-                {explanation || 'Claude AI is analyzing your code and preparing a detailed explanation...'}
-              </div>
+              {explanation ? (
+                <ReactMarkdown 
+                  className="prose prose-sm max-w-none prose-p:my-2 prose-strong:font-bold prose-em:italic prose-ul:my-2 prose-li:my-0 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded"
+                >
+                  {explanation}
+                </ReactMarkdown>
+              ) : (
+                <div 
+                  className="bg-gray-50 rounded-lg p-4 text-sm leading-relaxed text-gray-600 italic"
+                  style={{ minHeight: '200px' }}
+                >
+                  Claude AI is analyzing your code and preparing a detailed explanation...
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -328,7 +335,7 @@ const MobileCodeExplainerFlow = ({
       {/* Click outside to close dropdowns */}
       {(showRepoDropdown || showFileDropdown) && (
         <div 
-          className="fixed inset-0 z-5" 
+          className="fixed inset-0 z-30" 
           onClick={() => {
             setShowRepoDropdown(false);
             setShowFileDropdown(false);
