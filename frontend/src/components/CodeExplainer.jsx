@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { apiClient } from '../services/apiClient';
-import MobileCodeExplainerFlow from './MobileCodeExplainerFlow';
+import MobileCodeExplainerFlow from './MobileCodeExplainerFlow_fixed';
 
 // Import sub-components (we'll create these next)
 import RepositoryBrowser from './CodeExplainer/RepositoryBrowser';
