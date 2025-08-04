@@ -107,6 +107,13 @@ function App() {
   useEffect(() => {
     if (unlocked && isAppReady) {
       analyticsService.trackPageView('portfolio', 'unlocked');
+      
+      // Auto-enable admin access if user has JWT token
+      const existingToken = localStorage.getItem('access_token');
+      if (existingToken) {
+        setAuthToken(existingToken);
+        console.log('🔐 Admin access enabled via existing JWT token');
+      }
     }
   }, [unlocked, isAppReady]);
 
@@ -316,6 +323,30 @@ function App() {
                   className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 shadow-lg animate-magnetic"
                 >
                   Install App
+                </button>
+              )}
+              
+              {/* Analytics Access for Desktop */}
+              <button
+                onClick={() => setShowAnalytics(!showAnalytics)}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 shadow-sm ${
+                  showAnalytics 
+                    ? 'bg-blue-100 text-blue-700' 
+                    : 'text-gray-500 hover:text-blue-600 hover:bg-blue-50'
+                }`}
+                title="Toggle Analytics"
+              >
+                📊 Analytics
+              </button>
+              
+              {/* Admin Dashboard Access (if authenticated) */}
+              {authToken && (
+                <button
+                  onClick={() => setShowAdminDashboard(true)}
+                  className="px-4 py-2 rounded-xl text-sm font-medium bg-purple-100 text-purple-700 hover:bg-purple-200 transition-all duration-200 shadow-sm"
+                  title="Admin Dashboard"
+                >
+                  ⚙️ Admin
                 </button>
               )}
               
@@ -627,10 +658,17 @@ function App() {
         <button
           onClick={(e) => {
             if (e.detail === 3) { // Triple click
-              const token = prompt('Enter admin token:');
-              if (token) {
-                setAuthToken(token);
+              // Check if user is already authenticated with JWT
+              const existingToken = localStorage.getItem('access_token');
+              if (existingToken) {
+                setAuthToken(existingToken);
                 setShowAdminDashboard(true);
+              } else {
+                const token = prompt('Enter admin token (or use existing JWT from Code Explainer):');
+                if (token) {
+                  setAuthToken(token);
+                  setShowAdminDashboard(true);
+                }
               }
             }
           }}

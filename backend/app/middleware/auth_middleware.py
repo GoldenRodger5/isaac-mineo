@@ -27,6 +27,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
             "/api/github/explain-code",  # Make public for now
             "/api/github/health",
             "/api/github/supported-extensions",
+            "/api/analytics/track",  # Analytics tracking
+            "/api/analytics/public/metrics",  # Public analytics (corrected path)
+            "/api/analytics/admin/dashboard",  # Admin analytics (uses internal auth)
+            "/api/analytics/admin/test",  # Admin test endpoint
             "/health",
             "/docs",
             "/openapi.json"
