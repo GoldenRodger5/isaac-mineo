@@ -8,10 +8,13 @@ import Contact from './components/Contact';
 import AIChat from './components/AIChat';
 import AIChatbot from './components/AIChatbot';
 import CodeExplainer from './components/CodeExplainer';
+import PublicAnalytics from './components/PublicAnalytics';
+import AdminAnalytics from './components/AdminAnalytics';
 import { AuthProvider } from './contexts/AuthContext';
 import BottomNavigation from './components/BottomNavigation';
 import HorizontalTabNavigation from './components/HorizontalTabNavigation';
 import SwipeableTabContainer from './components/SwipeableTabContainer';
+import analyticsService from './services/analyticsService';
 
 const CORRECT_PASSWORD = import.meta.env.VITE_SITE_PASSWORD;
 
@@ -26,6 +29,9 @@ function App() {
   const [activeTab, setActiveTab] = useState('about');
   const [isAppReady, setIsAppReady] = useState(false);
   const [appError, setAppError] = useState(null);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showAdminDashboard, setShowAdminDashboard] = useState(false);
+  const [authToken, setAuthToken] = useState(null);
 
   const tabs = [
     { id: 'about', label: 'About', icon: '👨‍💻' },
@@ -89,6 +95,20 @@ function App() {
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
+
+  // Analytics tracking for tab changes
+  useEffect(() => {
+    if (unlocked && isAppReady) {
+      analyticsService.trackPageView('portfolio', activeTab);
+    }
+  }, [activeTab, unlocked, isAppReady]);
+
+  // Track app unlock
+  useEffect(() => {
+    if (unlocked && isAppReady) {
+      analyticsService.trackPageView('portfolio', 'unlocked');
+    }
+  }, [unlocked, isAppReady]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -477,7 +497,12 @@ function App() {
                   try {
                     switch (activeTab) {
                       case 'about':
-                        return <About />;
+                        return (
+                          <>
+                            <About />
+                            {showAnalytics && <PublicAnalytics />}
+                          </>
+                        );
                       case 'projects':
                         return <Projects />;
                       case 'resume':
@@ -579,6 +604,42 @@ function App() {
 
       {/* Floating AI Assistant */}
       <AIChatbot />
+
+      {/* Analytics Components */}
+      {showAdminDashboard && authToken && (
+        <AdminAnalytics 
+          authToken={authToken}
+          onClose={() => setShowAdminDashboard(false)}
+        />
+      )}
+
+      {/* Floating Analytics Toggle */}
+      <div className="fixed bottom-20 right-4 z-40 flex flex-col space-y-2">
+        <button
+          onClick={() => setShowAnalytics(!showAnalytics)}
+          className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+          title={showAnalytics ? "Hide Analytics" : "Show Analytics"}
+        >
+          <span className="text-lg">📊</span>
+        </button>
+        
+        {/* Admin Dashboard Access (triple-click to reveal) */}
+        <button
+          onClick={(e) => {
+            if (e.detail === 3) { // Triple click
+              const token = prompt('Enter admin token:');
+              if (token) {
+                setAuthToken(token);
+                setShowAdminDashboard(true);
+              }
+            }
+          }}
+          className="w-12 h-12 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center opacity-30 hover:opacity-70"
+          title="Admin Access (triple-click)"
+        >
+          <span className="text-lg">⚙️</span>
+        </button>
+      </div>
       
       {/* Vercel Analytics & Speed Insights - Only in production */}
       {import.meta.env.PROD && (

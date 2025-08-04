@@ -230,3 +230,25 @@ class AuthService:
 
 # Global auth service instance
 auth_service = AuthService()
+
+
+async def get_current_user_optional(authorization: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    """
+    Optional authentication dependency - returns user if valid token provided, None otherwise
+    """
+    if not authorization:
+        return None
+    
+    try:
+        # Handle Bearer token format
+        if authorization.startswith("Bearer "):
+            token = authorization.replace("Bearer ", "")
+        else:
+            token = authorization
+        
+        # Verify token
+        user = await auth_service.verify_token(token)
+        return user
+    except Exception:
+        # Return None if token is invalid instead of raising exception
+        return None

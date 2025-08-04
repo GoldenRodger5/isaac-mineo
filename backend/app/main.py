@@ -77,6 +77,11 @@ async def startup_event():
         await performance_service.cache_manager.connect()
         print("✅ Performance monitoring initialized")
         
+        # Initialize analytics service
+        from app.services.analytics_service import analytics_service
+        await analytics_service.cache_manager.connect()
+        print("✅ Analytics service initialized")
+        
     except Exception as e:
         print(f"❌ Error initializing services: {e}")
         error_handler.log_error(e, {"startup": True})
@@ -142,11 +147,13 @@ async def get_metrics():
 from app.routers import chatbot
 from app.routers import github_explainer
 from app.routers import auth
+from app.routers import analytics
 
 # Include routers
 app.include_router(auth.router, prefix="/api", tags=["authentication"])
 app.include_router(chatbot.router, prefix="/api", tags=["chatbot"])
 app.include_router(github_explainer.router, prefix="/api", tags=["github", "code-explainer"])
+app.include_router(analytics.router, prefix="/api", tags=["analytics"])
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

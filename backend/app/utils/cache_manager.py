@@ -123,3 +123,11 @@ class CacheManager:
                 self.redis_client.setex(key, expire, value)
         except Exception as error:
             print(f"Error setting cached value: {error}")
+
+    async def delete(self, key: str):
+        """Generic delete method for caching"""
+        try:
+            if self.redis_client:
+                self.redis_client.delete(key)
+        except Exception as error:
+            print(f"Error deleting cached value: {error}")
