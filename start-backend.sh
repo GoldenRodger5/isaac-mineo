@@ -87,4 +87,6 @@ echo ""
 echo -e "${YELLOW}Press Ctrl+C to stop the server${NC}"
 echo ""
 
-uvicorn backend.app.main:app --reload --host 0.0.0.0 --port $BACKEND_PORT
+# Change to backend directory and start server
+cd backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port $BACKEND_PORT
