@@ -3,9 +3,11 @@
  * Handles visitor tracking, metrics display, and admin analytics
  */
 
+import { apiClient } from './apiClient.js';
+
 class AnalyticsService {
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+    this.baseURL = apiClient.getApiBaseUrl();
     this.visitorId = null;
     this.sessionStartTime = Date.now();
     this.currentPage = 'about';

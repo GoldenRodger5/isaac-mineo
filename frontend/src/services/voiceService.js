@@ -1,3 +1,5 @@
+import { apiClient } from './apiClient.js';
+
 class VoiceService {
   constructor() {
     this.isRecording = false;
@@ -30,7 +32,8 @@ class VoiceService {
       }
       
       // Check backend voice status
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/voice/status`);
+      const baseUrl = apiClient.getApiBaseUrl();
+      const response = await fetch(`${baseUrl}/voice/status`);
       const data = await response.json();
       
       this.isEnabled = data.voice_enabled;
@@ -97,7 +100,8 @@ class VoiceService {
       if (!hasPermission) return false;
       
       // Connect to voice WebSocket
-      const wsUrl = `${import.meta.env.VITE_API_URL.replace('http', 'ws')}/api/voice/chat`;
+      const baseUrl = apiClient.getApiBaseUrl();
+      const wsUrl = `${baseUrl.replace('http', 'ws')}/voice/chat`;
       this.websocket = new WebSocket(wsUrl);
       
       this.websocket.onopen = () => {
@@ -290,7 +294,8 @@ class VoiceService {
     }
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/voice/synthesize`, {
+      const baseUrl = apiClient.getApiBaseUrl();
+      const response = await fetch(`${baseUrl}/voice/synthesize`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
