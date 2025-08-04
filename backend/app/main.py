@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
@@ -96,9 +97,23 @@ async def root():
     }
 
 @app.options("/{path:path}")
-async def options_handler(path: str):
-    """Handle CORS preflight requests"""
-    return {"message": "OK"}
+async def options_handler(path: str, request: Request):
+    """Handle CORS preflight requests explicitly"""
+    origin = request.headers.get("origin")
+    print(f"🌐 OPTIONS request from origin: {origin} for path: {path}")
+    
+    response_headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Max-Age": "600"
+    }
+    
+    return JSONResponse(
+        content={"message": "CORS preflight OK"},
+        headers=response_headers
+    )
 
 @app.get("/health")
 async def health_check():

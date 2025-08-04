@@ -252,13 +252,33 @@ const MobileCodeExplainerFlow = ({
               fontFamily: 'JetBrains Mono, Consolas, Monaco, "Courier New", monospace',
               minHeight: '200px',
               lineHeight: '1.5',
-              fontSize: '14px'
+              fontSize: '14px',
+              color: '#f8f9fa',
+              backgroundColor: '#212529'
             }}
           >
-            <code className="text-gray-100 whitespace-pre-wrap break-words">
-              {contentToShow}
+            <code 
+              className="text-gray-100 whitespace-pre-wrap break-words"
+              style={{ 
+                color: '#f8f9fa',
+                display: 'block',
+                width: '100%'
+              }}
+            >
+              {contentToShow || 'No content available'}
             </code>
           </pre>
+          
+          {/* Debug Information */}
+          <div className="mt-2 p-2 bg-yellow-100 border border-yellow-300 rounded text-xs">
+            <strong>Debug:</strong> Content length: {contentToShow?.length || 0} characters
+            {contentToShow && (
+              <div className="mt-1">
+                Preview: "{contentToShow.substring(0, 50)}..."
+              </div>
+            )}
+          </div>
+          
           {selectedCode && (
             <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-800">
