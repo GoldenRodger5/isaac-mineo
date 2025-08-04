@@ -311,18 +311,22 @@ function App() {
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden flex items-center space-x-2">
+            <div className="md:hidden flex items-center space-x-3">
               {installPrompt && (
                 <button
                   onClick={handleInstallPWA}
-                  className="bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-green-600 transition-colors"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 shadow-md active:scale-95"
                 >
                   Install
                 </button>
               )}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
+                className={`p-3 rounded-xl transition-all duration-200 shadow-sm active:scale-95 ${
+                  isMenuOpen 
+                    ? 'text-primary-600 bg-primary-50 shadow-md' 
+                    : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
+                }`}
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {isMenuOpen ? (
@@ -335,36 +339,47 @@ function App() {
             </div>
           </div>
 
-          {/* Mobile Menu */}
+          {/* Enhanced Mobile Menu */}
           {isMenuOpen && (
-            <div className="md:hidden bg-white/95 backdrop-blur-xl border-t border-white/20 rounded-b-2xl shadow-xl mx-4 mb-4">
-              <div className="px-4 py-4 space-y-2">
-                {tabs.map((tab) => (
+            <div className="md:hidden bg-white/95 backdrop-blur-xl border-t border-gray-200/50 rounded-b-3xl shadow-2xl mx-4 mb-4 overflow-hidden">
+              <div className="px-6 py-6 space-y-3">
+                {tabs.map((tab, index) => (
                   <button
                     key={tab.id}
                     onClick={() => {
                       setActiveTab(tab.id);
                       setIsMenuOpen(false);
                     }}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                    className={`w-full flex items-center space-x-4 px-5 py-4 rounded-2xl transition-all duration-300 group active:scale-95 ${
                       activeTab === tab.id
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                        : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                        ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg transform scale-105'
+                        : 'text-gray-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50 hover:to-accent-50 hover:shadow-md'
                     }`}
+                    style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <span className="text-lg">{tab.icon}</span>
-                    <span className="font-medium">{tab.label}</span>
+                    <span className={`text-xl transition-transform duration-300 ${
+                      activeTab === tab.id ? 'scale-110' : 'group-hover:scale-105'
+                    }`}>
+                      {tab.icon}
+                    </span>
+                    <span className="font-semibold text-base">{tab.label}</span>
+                    {activeTab === tab.id && (
+                      <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    )}
                   </button>
                 ))}
-                <hr className="my-4 border-gray-200" />
+                
+                <hr className="my-6 border-gray-200/60" />
+                
                 <button
                   onClick={() => {
                     localStorage.removeItem('isaac-portfolio-auth');
                     setUnlocked(false);
                   }}
-                  className="w-full text-left px-4 py-3 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200"
+                  className="w-full flex items-center space-x-4 px-5 py-4 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all duration-300 group active:scale-95"
                 >
-                  Logout
+                  <span className="text-xl group-hover:scale-105 transition-transform">🚪</span>
+                  <span className="font-semibold text-base">Logout</span>
                 </button>
               </div>
             </div>
@@ -373,65 +388,65 @@ function App() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-4 pb-6 md:pt-8 md:pb-12 px-4 sm:px-6 lg:px-8">
+      <section className="relative pt-6 pb-8 md:pt-8 md:pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-4 md:mb-8">
-            <h1 className="text-4xl md:text-7xl font-display font-bold mb-4 md:mb-12 leading-tight md:leading-relaxed">
-              <span className="gradient-text block mb-1 md:mb-2">
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-4xl md:text-7xl font-display font-bold mb-6 md:mb-12 leading-tight md:leading-relaxed">
+              <span className="gradient-text block mb-2 md:mb-2">
                 Building the Future
               </span>
               <span className="text-gray-800 block">with AI</span>
             </h1>
-            <p className="text-lg md:text-2xl text-gray-600 mb-4 md:mb-8 max-w-3xl mx-auto leading-normal md:leading-relaxed">
+            <p className="text-lg md:text-2xl text-gray-600 mb-6 md:mb-8 max-w-3xl mx-auto leading-relaxed md:leading-relaxed px-2">
               Full-Stack Developer specializing in <strong className="text-primary-700">AI-powered applications</strong>, 
               scalable backend architecture, and intelligent user experiences.
             </p>
             
             {/* Professional badges */}
-            <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-4 md:mb-8">
-              <span className="px-3 py-2 md:px-6 md:py-3 bg-gradient-to-r from-primary-100 to-accent-100 text-primary-800 rounded-full text-xs md:text-sm font-semibold border border-primary-200 animate-magnetic">
+            <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-8 md:mb-8 px-2">
+              <span className="px-4 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-primary-100 to-accent-100 text-primary-800 rounded-full text-sm md:text-sm font-semibold border border-primary-200 animate-magnetic shadow-sm">
                 🧠 AI Integration Expert
               </span>
-              <span className="px-3 py-2 md:px-6 md:py-3 bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 rounded-full text-xs md:text-sm font-semibold border border-emerald-200 animate-magnetic">
+              <span className="px-4 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 rounded-full text-sm md:text-sm font-semibold border border-emerald-200 animate-magnetic shadow-sm">
                 ⚡ FastAPI Specialist
               </span>
-              <span className="px-3 py-2 md:px-6 md:py-3 bg-gradient-to-r from-neural-100 to-primary-100 text-neural-800 rounded-full text-xs md:text-sm font-semibold border border-neural-200 animate-magnetic">
+              <span className="px-4 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-neural-100 to-primary-100 text-neural-800 rounded-full text-sm md:text-sm font-semibold border border-neural-200 animate-magnetic shadow-sm">
                 🚀 React Developer
               </span>
             </div>
           </div>
 
           {/* Enhanced Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-6 justify-center mb-4 md:mb-8">
+          <div className="flex flex-col gap-4 md:flex-row md:gap-6 justify-center mb-6 md:mb-8 px-2">
             <button
               onClick={() => setActiveTab('projects')}
-              className="group bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-700 hover:to-accent-700 text-white px-6 py-3 md:px-10 md:py-4 rounded-2xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 animate-magnetic"
+              className="group bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-700 hover:to-accent-700 text-white px-8 py-4 md:px-10 md:py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 animate-magnetic active:scale-95"
             >
-              <span className="flex items-center justify-center text-sm md:text-base">
+              <span className="flex items-center justify-center text-base md:text-base">
                 🚀 Explore Projects
-                <svg className="w-4 h-4 md:w-5 md:h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 md:w-5 md:h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </span>
             </button>
             <button
               onClick={() => setActiveTab('ai-chat')}
-              className="group bg-gradient-to-r from-neural-600 to-purple-600 hover:from-neural-700 hover:to-purple-700 text-white px-6 py-3 md:px-10 md:py-4 rounded-2xl font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 animate-magnetic"
+              className="group bg-gradient-to-r from-neural-600 to-purple-600 hover:from-neural-700 hover:to-purple-700 text-white px-8 py-4 md:px-10 md:py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 animate-magnetic active:scale-95"
             >
-              <span className="flex items-center justify-center text-sm md:text-base">
+              <span className="flex items-center justify-center text-base md:text-base">
                 🤖 Chat with AI
-                <svg className="w-4 h-4 md:w-5 md:h-5 ml-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 md:w-5 md:h-5 ml-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
               </span>
             </button>
             <button
               onClick={() => setActiveTab('resume')}
-              className="group border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-6 py-3 md:px-10 md:py-4 rounded-2xl font-semibold transition-all duration-300 animate-magnetic"
+              className="group border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-8 py-4 md:px-10 md:py-4 rounded-2xl font-semibold transition-all duration-300 animate-magnetic shadow-sm hover:shadow-lg active:scale-95"
             >
-              <span className="flex items-center justify-center text-sm md:text-base">
+              <span className="flex items-center justify-center text-base md:text-base">
                 📄 View Resume
-                <svg className="w-4 h-4 md:w-5 md:h-5 ml-2 group-hover:translate-y-[-2px] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 md:w-5 md:h-5 ml-2 group-hover:translate-y-[-2px] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </span>
