@@ -148,12 +148,14 @@ from app.routers import chatbot
 from app.routers import github_explainer
 from app.routers import auth
 from app.routers import analytics
+from app.routers import voice
 
 # Include routers
 app.include_router(auth.router, prefix="/api", tags=["authentication"])
 app.include_router(chatbot.router, prefix="/api", tags=["chatbot"])
 app.include_router(github_explainer.router, prefix="/api", tags=["github", "code-explainer"])
 app.include_router(analytics.router, prefix="/api", tags=["analytics"])
+app.include_router(voice.router, prefix="/api", tags=["voice"])
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

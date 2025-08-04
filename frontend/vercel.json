@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "isaac-mineo-portfolio",
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
@@ -46,7 +45,7 @@
       ]
     },
     {
-      "source": "*.js",
+      "source": "(.*)\\.js",
       "headers": [
         {
           "key": "Content-Type",

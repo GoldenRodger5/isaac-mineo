@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import VoiceChat from './VoiceChat';
 
 const MobileChatInterface = ({ 
   messages, 
   onSendMessage, 
   isLoading, 
   suggestedQuestions = [],
-  placeholder = "Type your message..." 
+  placeholder = "Type your message...",
+  sessionId,
+  onVoiceResponse,
+  onVoiceError
 }) => {
   const [inputValue, setInputValue] = useState('');
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
@@ -162,6 +166,16 @@ const MobileChatInterface = ({
               </div>
             )}
           </div>
+          
+          {/* Voice Controls */}
+          {onVoiceResponse && (
+            <VoiceChat
+              onVoiceResponse={onVoiceResponse}
+              sessionId={sessionId}
+              disabled={isLoading}
+              className="mobile-voice-controls"
+            />
+          )}
           
           <button
             onClick={() => handleSend()}

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { apiClient } from '../services/apiClient';
 import MobileChatInterface from './MobileChatInterface';
+import VoiceChat from './VoiceChat';
 
 const AIChat = () => {
   const [messages, setMessages] = useState([
@@ -136,6 +137,16 @@ const AIChat = () => {
       };
 
       setMessages(prev => [...prev, botMessage]);
+
+      // Try to generate voice response if voice API is available
+      if (window.voiceChatAPI && window.voiceChatAPI.sendTextWithVoice) {
+        try {
+          await window.voiceChatAPI.sendTextWithVoice(aiResponse.text);
+        } catch (voiceError) {
+          console.log('Voice response not available:', voiceError);
+        }
+      }
+
     } catch (error) {
       console.error('Error getting AI response:', error);
       
@@ -174,6 +185,28 @@ const AIChat = () => {
     setSessionId(generateSessionId());
   };
 
+  const handleVoiceResponse = (voiceData) => {
+    // Add voice message to chat
+    const voiceMessage = {
+      id: messages.length + 1,
+      text: voiceData.text,
+      isBot: true,
+      timestamp: voiceData.timestamp,
+      metadata: {
+        isVoice: true,
+        audioUrl: voiceData.audioUrl
+      }
+    };
+
+    setMessages(prev => [...prev, voiceMessage]);
+    setConversationCount(prev => prev + 1);
+  };
+
+  const handleVoiceError = (error) => {
+    console.error('Voice error:', error);
+    // Optionally show error message in chat
+  };
+
   return (
     <section className="py-4 relative overflow-hidden">
       {/* Static background */}
@@ -202,6 +235,9 @@ const AIChat = () => {
               isLoading={isLoading}
               suggestedQuestions={suggestedQuestions}
               placeholder="Ask me anything about Isaac's background, skills, projects, or career goals..."
+              sessionId={sessionId}
+              onVoiceResponse={handleVoiceResponse}
+              onVoiceError={(error) => console.error('Voice error:', error)}
             />
           </div>
 
@@ -356,6 +392,15 @@ const AIChat = () => {
               </div>
             </div>
           )}
+
+          {/* Voice Chat Controls */}
+          <div className="glass-heavy rounded-lg border border-white/30 p-4 shadow-xl mb-4">
+            <VoiceChat 
+              sessionId={sessionId}
+              onVoiceResponse={handleVoiceResponse}
+              onError={handleVoiceError}
+            />
+          </div>
 
           {/* Input Area - Enhanced Professional Design */}
           <div className="glass-heavy rounded-b-2xl border border-white/30 p-8 shadow-2xl">

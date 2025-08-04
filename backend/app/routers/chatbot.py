@@ -217,115 +217,110 @@ def get_contextual_instructions(entities: Dict[str, List[str]], conversation_his
     
     return " ".join(instructions) if instructions else ""
 
-@router.post("/chatbot", response_model=ChatResponse)
-async def chat_with_assistant(request: ChatRequest, req: Request):
+async def chat_with_assistant_core(request: ChatRequest, client_ip: str = "unknown") -> ChatResponse:
     """
-    Enhanced AI Chatbot endpoint with guardrails, entity tracking and context awareness
+    Core chat function that can be used by both REST API and WebSocket endpoints
     """
+    # Rate limiting - 60 requests per hour
+    if not rate_limiter.check_rate_limit(client_ip, limit=60, window=3600):
+        raise HTTPException(
+            status_code=429, 
+            detail={"error": "Rate limit exceeded. Please try again later.", "retryAfter": 3600}
+        )
+    
+    # GUARDRAILS: Check if question is obviously off-topic (basic filter)
+    if not is_portfolio_related(request.question):
+        # Return redirect response for clearly off-topic questions
+        redirect_response = generate_redirect_response(request.question)
+        
+        return ChatResponse(
+            response=redirect_response,
+            sessionId=request.sessionId or str(uuid4()),
+            searchMethod="guardrail_redirect",
+            conversationLength=1,
+            cached=False,
+            timestamp=datetime.now().isoformat(),
+            entities={"projects": [], "topics": ["redirect"], "skills": [], "companies": []},
+            contextUsed=["Off-topic question filtered by keyword guardrails"]
+        )
+    
+    # Ensure cache manager is connected
+    if not cache_manager.connected:
+        await cache_manager.connect()
+    
+    # Session management with enhanced entity tracking
+    session_id = request.sessionId or str(uuid4())
+    session_data = await cache_manager.get_session(session_id)
+    
+    if not session_data:
+        session_data = {
+            "messages": [], 
+            "lastUpdated": time.time(),
+            "entities": {"projects": [], "topics": [], "skills": [], "companies": []}
+        }
+    
+    # Extract entities from current question
+    current_entities = extract_entities(request.question)
+    
+    # Update session entities
+    for entity_type, entity_list in current_entities.items():
+        if entity_type in session_data["entities"]:
+            session_data["entities"][entity_type].extend(entity_list)
+            # Remove duplicates while preserving order
+            session_data["entities"][entity_type] = list(dict.fromkeys(session_data["entities"][entity_type]))
+    
+    # Get contextual instructions
+    contextual_instructions = get_contextual_instructions(current_entities, session_data["messages"])
+    
+    # Check for cached response (30 minutes cache)
+    cache_key = f"{request.question}_{hash(str(session_data['entities']))}"
+    cached_response = await cache_manager.get_cached_response(cache_key)
+    if cached_response and (time.time() - cached_response.get("timestamp", 0)) < 1800:
+        # Update session with cached interaction
+        session_data["messages"].extend([
+            {"role": "user", "content": request.question, "timestamp": time.time(), "entities": current_entities},
+            {"role": "assistant", "content": cached_response["response"], "timestamp": time.time(), "cached": True}
+        ])
+        
+        await cache_manager.cache_session(session_id, session_data)
+        
+        return ChatResponse(
+            response=cached_response["response"],
+            sessionId=session_id,
+            searchMethod="cached",
+            conversationLength=len(session_data["messages"]) // 2,
+            cached=True,
+            timestamp=datetime.now().isoformat(),
+            entities=current_entities,
+            contextUsed=[contextual_instructions] if contextual_instructions else []
+        )
+    
+    # Search the knowledge base using hybrid search
     try:
-        # Get client IP for rate limiting
-        client_ip = req.headers.get("x-forwarded-for", req.client.host if req.client else "unknown")
-        
-        # Rate limiting - 60 requests per hour
-        if not rate_limiter.check_rate_limit(client_ip, limit=60, window=3600):
-            raise HTTPException(
-                status_code=429, 
-                detail={"error": "Rate limit exceeded. Please try again later.", "retryAfter": 3600}
-            )
-        
-        # GUARDRAILS: Check if question is obviously off-topic (basic filter)
-        if not is_portfolio_related(request.question):
-            # Return redirect response for clearly off-topic questions
-            redirect_response = generate_redirect_response(request.question)
-            
-            return ChatResponse(
-                response=redirect_response,
-                sessionId=request.sessionId or str(uuid4()),
-                searchMethod="guardrail_redirect",
-                conversationLength=1,
-                cached=False,
-                timestamp=datetime.now().isoformat(),
-                entities={"projects": [], "topics": ["redirect"], "skills": [], "companies": []},
-                contextUsed=["Off-topic question filtered by keyword guardrails"]
-            )
-        
-        # Ensure cache manager is connected
-        if not cache_manager.connected:
-            await cache_manager.connect()
-        
-        # Session management with enhanced entity tracking
-        session_id = request.sessionId or str(uuid4())
-        session_data = await cache_manager.get_session(session_id)
-        
-        if not session_data:
-            session_data = {
-                "messages": [], 
-                "lastUpdated": time.time(),
-                "entities": {"projects": [], "topics": [], "skills": [], "companies": []}
-            }
-        
-        # Extract entities from current question
-        current_entities = extract_entities(request.question)
-        
-        # Update session entities
-        for entity_type, entity_list in current_entities.items():
-            if entity_type in session_data["entities"]:
-                session_data["entities"][entity_type].extend(entity_list)
-                # Remove duplicates while preserving order
-                session_data["entities"][entity_type] = list(dict.fromkeys(session_data["entities"][entity_type]))
-        
-        # Get contextual instructions
-        contextual_instructions = get_contextual_instructions(current_entities, session_data["messages"])
-        
-        # Check for cached response (30 minutes cache)
-        cache_key = f"{request.question}_{hash(str(session_data['entities']))}"
-        cached_response = await cache_manager.get_cached_response(cache_key)
-        if cached_response and (time.time() - cached_response.get("timestamp", 0)) < 1800:
-            # Update session with cached interaction
-            session_data["messages"].extend([
-                {"role": "user", "content": request.question, "timestamp": time.time(), "entities": current_entities},
-                {"role": "assistant", "content": cached_response["response"], "timestamp": time.time(), "cached": True}
-            ])
-            
-            await cache_manager.cache_session(session_id, session_data)
-            
-            return ChatResponse(
-                response=cached_response["response"],
-                sessionId=session_id,
-                searchMethod="cached",
-                conversationLength=len(session_data["messages"]) // 2,
-                cached=True,
-                timestamp=datetime.now().isoformat(),
-                entities=current_entities,
-                contextUsed=[contextual_instructions] if contextual_instructions else []
-            )
-        
-        # Search the knowledge base using hybrid search
-        try:
-            relevant_info = await hybrid_search(request.question)
-            search_successful = True
-        except Exception as search_error:
-            print(f"Hybrid search failed: {search_error}")
-            relevant_info = get_fallback_info(request.question)
-            search_successful = False
-        
-        # Build enhanced conversation context with entity awareness
-        recent_messages = session_data["messages"][-6:]  # Last 3 exchanges
-        conversation_context = ""
-        if recent_messages:
-            conversation_context = "\\n\\nRecent conversation context:\\n" + \
-                "\\n".join([f"{msg['role']}: {msg['content']}" for msg in recent_messages])
-        
-        # Add entity context
-        entity_context = ""
-        if any(session_data["entities"].values()):
-            entity_context = "\\n\\nConversation entities tracked:\\n"
-            for entity_type, entities in session_data["entities"].items():
-                if entities:
-                    entity_context += f"- {entity_type}: {', '.join(entities)}\\n"
-        
-        # Create enhanced prompt for GPT-4o with contextual awareness and strong guardrails
-        system_prompt = f"""You are Isaac Mineo's AI portfolio assistant. Your SOLE PURPOSE is to discuss Isaac's professional portfolio, projects, and technical expertise.
+        relevant_info = await hybrid_search(request.question)
+        search_successful = True
+    except Exception as search_error:
+        print(f"Hybrid search failed: {search_error}")
+        relevant_info = get_fallback_info(request.question)
+        search_successful = False
+    
+    # Build enhanced conversation context with entity awareness
+    recent_messages = session_data["messages"][-6:]  # Last 3 exchanges
+    conversation_context = ""
+    if recent_messages:
+        conversation_context = "\\n\\nRecent conversation context:\\n" + \
+            "\\n".join([f"{msg['role']}: {msg['content']}" for msg in recent_messages])
+    
+    # Add entity context
+    entity_context = ""
+    if any(session_data["entities"].values()):
+        entity_context = "\\n\\nConversation entities tracked:\\n"
+        for entity_type, entities in session_data["entities"].items():
+            if entities:
+                entity_context += f"- {entity_type}: {', '.join(entities)}\\n"
+    
+    # Create enhanced prompt for GPT-4o with contextual awareness and strong guardrails
+    system_prompt = f"""You are Isaac Mineo's AI portfolio assistant. Your SOLE PURPOSE is to discuss Isaac's professional portfolio, projects, and technical expertise.
 
 🚨 STRICT GUARDRAILS - MUST FOLLOW:
 1. ONLY respond to questions about:
@@ -355,7 +350,7 @@ Use markdown formatting extensively for better readability. Be thorough and info
 
 For contact: isaacmineo@gmail.com"""
 
-        user_prompt = f"""KNOWLEDGE BASE: {relevant_info}
+    user_prompt = f"""KNOWLEDGE BASE: {relevant_info}
 
 CONTEXT: {conversation_context}{entity_context}
 
@@ -370,50 +365,61 @@ Provide a comprehensive, detailed response about Isaac. Be thorough and informat
 
 Make your response engaging and conversational while maintaining professionalism. Aim for depth and detail rather than brevity."""
 
-        # Call OpenAI API with GPT-4o
-        completion = openai_client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            max_tokens=800,
-            temperature=0.7,
-            presence_penalty=0.1,
-            frequency_penalty=0.1
-        )
+    # Call OpenAI API with GPT-4o
+    completion = openai_client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        max_tokens=800,
+        temperature=0.7,
+        presence_penalty=0.1,
+        frequency_penalty=0.1
+    )
+    
+    response_text = completion.choices[0].message.content or "I'm having trouble processing your question right now."
+    
+    # Update session with new interaction including entities
+    session_data["messages"].extend([
+        {"role": "user", "content": request.question, "timestamp": time.time(), "entities": current_entities},
+        {"role": "assistant", "content": response_text, "timestamp": time.time()}
+    ])
+    
+    # Keep only last 20 messages to prevent bloat
+    if len(session_data["messages"]) > 20:
+        session_data["messages"] = session_data["messages"][-20:]
+    
+    # Cache the session and response
+    await cache_manager.cache_session(session_id, session_data)
+    await cache_manager.cache_response(cache_key, response_text, {
+        "searchSuccessful": search_successful,
+        "sessionId": session_id,
+        "entities": current_entities,
+        "userIP": client_ip[:8] if client_ip != "unknown" else "unknown"
+    })
+    
+    return ChatResponse(
+        response=response_text,
+        sessionId=session_id,
+        searchMethod="vector_search" if search_successful else "fallback",
+        conversationLength=len(session_data["messages"]) // 2,
+        cached=False,
+        timestamp=datetime.now().isoformat(),
+        entities=current_entities,
+        contextUsed=[contextual_instructions] if contextual_instructions else []
+    )
+
+@router.post("/chatbot", response_model=ChatResponse)
+async def chat_with_assistant(request: ChatRequest, req: Request):
+    """
+    Enhanced AI Chatbot endpoint with guardrails, entity tracking and context awareness
+    """
+    try:
+        # Get client IP for rate limiting
+        client_ip = req.headers.get("x-forwarded-for", req.client.host if req.client else "unknown")
         
-        response_text = completion.choices[0].message.content or "I'm having trouble processing your question right now."
-        
-        # Update session with new interaction including entities
-        session_data["messages"].extend([
-            {"role": "user", "content": request.question, "timestamp": time.time(), "entities": current_entities},
-            {"role": "assistant", "content": response_text, "timestamp": time.time()}
-        ])
-        
-        # Keep only last 20 messages to prevent bloat
-        if len(session_data["messages"]) > 20:
-            session_data["messages"] = session_data["messages"][-20:]
-        
-        # Cache the session and response
-        await cache_manager.cache_session(session_id, session_data)
-        await cache_manager.cache_response(cache_key, response_text, {
-            "searchSuccessful": search_successful,
-            "sessionId": session_id,
-            "entities": current_entities,
-            "userIP": client_ip[:8] if client_ip != "unknown" else "unknown"
-        })
-        
-        return ChatResponse(
-            response=response_text,
-            sessionId=session_id,
-            searchMethod="vector_search" if search_successful else "fallback",
-            conversationLength=len(session_data["messages"]) // 2,
-            cached=False,
-            timestamp=datetime.now().isoformat(),
-            entities=current_entities,
-            contextUsed=[contextual_instructions] if contextual_instructions else []
-        )
+        return await chat_with_assistant_core(request, client_ip)
         
     except HTTPException:
         raise

@@ -18,3 +18,6 @@ PyJWT
 pytest
 pytest-asyncio
 pytest-mock
+websockets
+deepgram-sdk
+elevenlabs

@@ -179,6 +179,19 @@ else
     echo -e "${RED}❌ Backend requirements.txt not found${NC}"
 fi
 
+echo -e "\n${YELLOW}6. Voice Features Test${NC}"
+echo "----------------------"
+
+# Test voice status endpoint
+test_endpoint "GET" "$BASE_URL/api/voice/status" "Voice Service Status"
+
+# Test voice synthesis (text-only)
+test_endpoint "POST" "$BASE_URL/api/voice/synthesize" "Voice Synthesis" '{
+    "text": "Hello, this is a test of the voice synthesis feature.",
+    "session_id": "test_voice_session",
+    "return_audio": false
+}'
+
 echo -e "\n${BLUE}📊 Analytics Test Summary${NC}"
 echo "========================="
 echo "✅ Test completed successfully"
