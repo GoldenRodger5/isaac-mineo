@@ -182,21 +182,43 @@ const MobileCodeExplainerFlow = ({
       );
     }
 
+    // Debug: Log the file structure
+    console.log('🔍 Mobile File List Debug:', repoFiles);
+    console.log('🔍 First file structure:', repoFiles[0]);
+
     return (
       <div className="p-4 h-full overflow-y-auto">
+        {/* Debug info */}
+        <div className="mb-4 p-2 bg-yellow-100 border border-yellow-300 rounded text-xs">
+          <strong>Debug:</strong> Found {repoFiles.length} files
+          <br />
+          First file: {JSON.stringify(repoFiles[0], null, 2)}
+        </div>
+        
         <div className="space-y-2">
-          {repoFiles.map((file, index) => (
-            <button
-              key={file.path || file.name || index}
-              onClick={() => handleFileSelect(file)}
-              className="w-full text-left p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
-            >
-              <div className="flex items-center space-x-3">
-                <span className="text-lg">{file.type === 'file' ? '📄' : '📁'}</span>
-                <span className="font-medium text-gray-900 truncate">{file.name}</span>
-              </div>
-            </button>
-          ))}
+          {repoFiles.map((file, index) => {
+            // Try multiple possible name properties
+            const fileName = file.name || file.path?.split('/').pop() || file.filename || file.path || `File ${index + 1}`;
+            const fileType = file.type || (file.path?.includes('.') ? 'file' : 'dir');
+            
+            return (
+              <button
+                key={file.path || file.name || index}
+                onClick={() => handleFileSelect(file)}
+                className="w-full text-left p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200"
+              >
+                <div className="flex items-center space-x-3">
+                  <span className="text-lg">{fileType === 'file' ? '📄' : '📁'}</span>
+                  <div className="flex-1">
+                    <span className="font-medium text-gray-900 truncate block">{fileName}</span>
+                    {file.path && file.path !== fileName && (
+                      <span className="text-xs text-gray-500 truncate block">{file.path}</span>
+                    )}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     );
