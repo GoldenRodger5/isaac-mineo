@@ -22,15 +22,33 @@ app = FastAPI(
     version="4.0.0"
 )
 
-# Configure CORS
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:3000,https://isaac-mineo.vercel.app,https://isaacmineo.com,https://www.isaacmineo.com").split(",")
+# Configure CORS with explicit origins and robust fallback
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
+default_origins = [
+    "http://localhost:5173",
+    "http://localhost:5174", 
+    "http://localhost:5175",
+    "http://localhost:3000",
+    "https://isaac-mineo.vercel.app",
+    "https://isaacmineo.com",
+    "https://www.isaacmineo.com",
+    "https://isaac-mineo-frontend.vercel.app"
+]
+
+if allowed_origins_env:
+    allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",")]
+else:
+    allowed_origins = default_origins
+
+print(f"🌐 CORS Allowed Origins: {allowed_origins}")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 # Add authentication and performance middleware
@@ -76,6 +94,11 @@ async def root():
             "GPT-4o Integration"
         ]
     }
+
+@app.options("/{path:path}")
+async def options_handler(path: str):
+    """Handle CORS preflight requests"""
+    return {"message": "OK"}
 
 @app.get("/health")
 async def health_check():

@@ -50,6 +50,97 @@ class ContactResponse(BaseModel):
     status: str
     message: str
 
+def is_portfolio_related(text: str) -> bool:
+    """Check if the question is related to Isaac's portfolio, projects, or professional background"""
+    text_lower = text.lower()
+    
+    # Portfolio-related keywords
+    portfolio_keywords = [
+        # Personal/Professional
+        "isaac", "you", "your", "yourself", "who are you", "tell me about",
+        
+        # Projects
+        "nutrivize", "echopod", "quizium", "signalflow", "project", "projects", "work", "built", "created",
+        
+        # Technical skills
+        "tech stack", "technology", "technologies", "programming", "coding", "development", "developer",
+        "react", "fastapi", "python", "javascript", "ai", "machine learning", "mongodb", "redis",
+        "framework", "library", "database", "api", "backend", "frontend", "full-stack",
+        
+        # Professional background
+        "experience", "background", "education", "skills", "abilities", "expertise", "career",
+        "work history", "professional", "resume", "cv", "qualifications", "achievements",
+        
+        # Contact/Business
+        "contact", "reach", "email", "hire", "opportunity", "available", "collaboration",
+        "freelance", "consulting", "services"
+    ]
+    
+    # Off-topic indicators (things clearly not about Isaac)
+    off_topic_indicators = [
+        "weather", "news", "politics", "sports", "movie", "recipe", "cooking", "travel",
+        "health advice", "medical", "legal advice", "financial advice", "investment",
+        "how to", "tutorial", "explain quantum", "what is the capital", "who won",
+        "current events", "celebrity", "entertainment", "joke", "funny", "meme"
+    ]
+    
+    # Check for off-topic indicators first
+    if any(indicator in text_lower for indicator in off_topic_indicators):
+        return False
+    
+    # Check for portfolio-related content
+    return any(keyword in text_lower for keyword in portfolio_keywords)
+
+def generate_redirect_response(question: str) -> str:
+    """Generate a friendly response that redirects off-topic questions back to portfolio topics"""
+    question_lower = question.lower()
+    
+    # Specific redirects based on question type
+    if any(word in question_lower for word in ["football", "sports", "team", "game"]):
+        return """I appreciate your curiosity! While I don't have information about Isaac's sports preferences, I'd love to tell you about his **professional interests** and **technical projects**. 
+
+🚀 **What I can help you with:**
+- **Projects**: Nutrivize (AI nutrition tracker), EchoPod (podcast generator), Quizium (AI flashcard creator)
+- **Technical Skills**: React, FastAPI, Python, AI/ML integrations
+- **Professional Background**: Full-stack development, AI engineering
+- **Career Goals**: What Isaac is looking for in his next role
+
+What aspect of Isaac's **portfolio** or **technical expertise** would you like to explore?"""
+    
+    elif any(word in question_lower for word in ["weather", "news", "politics"]):
+        return """I'm focused on sharing information about **Isaac's professional portfolio** and **technical projects**! 
+
+🎯 **I can tell you about:**
+- **Featured Projects**: Nutrivize, EchoPod, Quizium, and Signalflow
+- **Technical Expertise**: React, FastAPI, Python, AI APIs, and full-stack development  
+- **Educational Background**: Computer Science studies and technical achievements
+- **Career Aspirations**: What Isaac is looking for in his next opportunity
+
+Which of Isaac's **projects** or **technical skills** interests you most?"""
+    
+    elif any(word in question_lower for word in ["recipe", "cooking", "food"]) and "nutrivize" not in question_lower:
+        return """While I can't help with recipes, I can tell you about Isaac's **Nutrivize project** - an AI-powered nutrition tracker that uses computer vision for food recognition! 
+
+🍎 **Nutrivize Features:**
+- **AI Food Recognition**: Upload photos to automatically identify meals
+- **Nutrition Tracking**: Detailed macro and micronutrient analysis  
+- **Tech Stack**: React frontend, FastAPI backend, OpenAI GPT-4 Vision
+- **Real-world Impact**: Helps users maintain healthy eating habits
+
+Want to learn more about **Nutrivize** or Isaac's other **technical projects**?"""
+    
+    else:
+        return """I'm Isaac's **portfolio assistant**, focused on sharing information about his **professional work** and **technical projects**! 
+
+💼 **I can help you discover:**
+- **Project Portfolio**: Nutrivize, EchoPod, Quizium, and more
+- **Technical Skills**: React, FastAPI, Python, AI integrations
+- **Professional Experience**: Full-stack development and AI engineering
+- **Educational Background**: Computer Science and technical achievements
+- **Contact Information**: How to reach Isaac for opportunities
+
+What would you like to know about Isaac's **professional background** or **technical projects**?"""
+
 def extract_entities(text: str) -> Dict[str, List[str]]:
     """Extract entities and topics from user messages for context tracking"""
     entities = {
@@ -65,7 +156,8 @@ def extract_entities(text: str) -> Dict[str, List[str]]:
     project_patterns = {
         "nutrivize": ["nutrivize", "nutrition tracker", "food recognition"],
         "echopod": ["echopod", "podcast", "echo pod"],
-        "quizium": ["quizium", "quiz", "flashcard"]
+        "quizium": ["quizium", "quiz", "flashcard"],
+        "signalflow": ["signalflow", "signal flow", "trading"]
     }
     
     for project, keywords in project_patterns.items():
@@ -128,7 +220,7 @@ def get_contextual_instructions(entities: Dict[str, List[str]], conversation_his
 @router.post("/chatbot", response_model=ChatResponse)
 async def chat_with_assistant(request: ChatRequest, req: Request):
     """
-    Enhanced AI Chatbot endpoint with entity tracking and context awareness
+    Enhanced AI Chatbot endpoint with guardrails, entity tracking and context awareness
     """
     try:
         # Get client IP for rate limiting
@@ -139,6 +231,22 @@ async def chat_with_assistant(request: ChatRequest, req: Request):
             raise HTTPException(
                 status_code=429, 
                 detail={"error": "Rate limit exceeded. Please try again later.", "retryAfter": 3600}
+            )
+        
+        # GUARDRAILS: Check if question is obviously off-topic (basic filter)
+        if not is_portfolio_related(request.question):
+            # Return redirect response for clearly off-topic questions
+            redirect_response = generate_redirect_response(request.question)
+            
+            return ChatResponse(
+                response=redirect_response,
+                sessionId=request.sessionId or str(uuid4()),
+                searchMethod="guardrail_redirect",
+                conversationLength=1,
+                cached=False,
+                timestamp=datetime.now().isoformat(),
+                entities={"projects": [], "topics": ["redirect"], "skills": [], "companies": []},
+                contextUsed=["Off-topic question filtered by keyword guardrails"]
             )
         
         # Ensure cache manager is connected
@@ -216,12 +324,34 @@ async def chat_with_assistant(request: ChatRequest, req: Request):
                 if entities:
                     entity_context += f"- {entity_type}: {', '.join(entities)}\\n"
         
-        # Create enhanced prompt for GPT-4o with contextual awareness
-        system_prompt = f"""You are Isaac Mineo's AI assistant. Provide comprehensive, detailed responses about Isaac's projects, skills, and background using the knowledge base. 
+        # Create enhanced prompt for GPT-4o with contextual awareness and strong guardrails
+        system_prompt = f"""You are Isaac Mineo's AI portfolio assistant. Your SOLE PURPOSE is to discuss Isaac's professional portfolio, projects, and technical expertise.
+
+🚨 STRICT GUARDRAILS - MUST FOLLOW:
+1. ONLY respond to questions about:
+   - Isaac's projects (Nutrivize, EchoPod, Quizium, Signalflow, etc.)
+   - His technical skills and expertise
+   - Professional background and experience
+   - Education and achievements
+   - Career goals and aspirations
+   - Contact information for professional inquiries
+
+2. If asked about ANYTHING else (sports, personal preferences, general knowledge, current events, other people, weather, politics, entertainment, recipes, travel, health advice, etc.), you MUST:
+   - Politely acknowledge the question
+   - Explain you're focused on Isaac's portfolio
+   - Redirect to relevant portfolio topics
+   - Offer specific alternatives about Isaac's work
+
+3. ALWAYS redirect off-topic questions with responses like:
+   "I'm Isaac's portfolio assistant focused on his professional work. Instead, I can tell you about [specific Isaac project/skill]. What interests you about Isaac's [technical expertise/projects]?"
+
+4. Never make up information about Isaac that isn't in the knowledge base
+5. Stay professional but conversational
+6. Use the knowledge base as your primary source
 
 CONTEXTUAL INSTRUCTIONS: {contextual_instructions}
 
-Use markdown formatting extensively for better readability. Be thorough and informative while maintaining a conversational tone that reflects Isaac's personality and expertise. Include specific examples, technical details, and context. 
+Use markdown formatting extensively for better readability. Be thorough and informative while maintaining a conversational tone that reflects Isaac's personality and expertise. Include specific examples, technical details, and context from the knowledge base.
 
 For contact: isaacmineo@gmail.com"""
 

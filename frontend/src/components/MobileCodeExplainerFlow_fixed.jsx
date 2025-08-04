@@ -217,6 +217,11 @@ const MobileCodeExplainerFlow = ({
       );
     }
 
+    // Debug content
+    const contentToShow = fileContent?.content || fileContent || 'No content available';
+    console.log('Mobile Code Viewer - Content length:', contentToShow.length);
+    console.log('Mobile Code Viewer - Content preview:', contentToShow.substring(0, 100));
+
     return (
       <div className="h-full flex flex-col">
         {/* Action Bar */}
@@ -239,13 +244,20 @@ const MobileCodeExplainerFlow = ({
         </div>
 
         {/* Code Content */}
-        <div className="flex-1 overflow-auto p-4">
+        <div className="flex-1 overflow-auto p-4 bg-gray-50">
           <pre
-            className="text-sm bg-gray-900 text-gray-100 p-4 rounded-lg overflow-auto select-text"
+            className="text-sm bg-gray-900 text-gray-100 p-4 rounded-lg overflow-auto select-text code-content border border-gray-700"
             onMouseUp={handleTextSelection}
-            style={{ fontFamily: 'JetBrains Mono, monospace' }}
+            style={{ 
+              fontFamily: 'JetBrains Mono, Consolas, Monaco, "Courier New", monospace',
+              minHeight: '200px',
+              lineHeight: '1.5',
+              fontSize: '14px'
+            }}
           >
-            <code>{fileContent?.content || fileContent || 'No content available'}</code>
+            <code className="text-gray-100 whitespace-pre-wrap break-words">
+              {contentToShow}
+            </code>
           </pre>
           {selectedCode && (
             <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
