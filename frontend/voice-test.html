@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Implementation Test</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .test-container {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-ready { background-color: #10b981; }
+        .status-checking { 
+            background-color: #f59e0b; 
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .status-error { background-color: #ef4444; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        
+        .recording-pulse {
+            animation: recordPulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes recordPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 test-container">
+    <div id="root" class="h-screen">
+        <div class="flex h-full">
+            <!-- Test Panel -->
+            <div class="w-1/3 bg-white border-r border-gray-200 p-6">
+                <h1 class="text-2xl font-bold mb-6 text-gray-800">🎤 Voice Implementation Test</h1>
+                
+                <!-- Voice Status -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h2 class="font-semibold mb-3 text-gray-700">Voice Status</h2>
+                    <div id="voiceStatus" class="flex items-center mb-2">
+                        <span class="status-indicator status-checking"></span>
+                        <span class="text-sm text-gray-600">Checking voice services...</span>
+                    </div>
+                    <div id="voiceDetails" class="text-xs text-gray-500">
+                        Initializing...
+                    </div>
+                </div>
+
+                <!-- Browser Compatibility -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h2 class="font-semibold mb-3 text-gray-700">Browser Compatibility</h2>
+                    <div id="browserTests" class="space-y-1 text-sm">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Test Controls -->
+                <div class="space-y-3 mb-6">
+                    <button id="testMicrophone" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        🎙️ Test Microphone Permission
+                    </button>
+                    
+                    <button id="testRecording" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                        🔴 Test Recording (3s)
+                    </button>
+                    
+                    <button id="testWebSocket" class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors font-medium">
+                        🔌 Test WebSocket Connection
+                    </button>
+                    
+                    <button id="testAudioPlayback" class="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors font-medium">
+                        🔊 Test Audio Playback
+                    </button>
+                </div>
+
+                <!-- Test Results -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="font-semibold text-gray-700">Test Log</h2>
+                        <button id="clearLog" class="text-sm text-gray-500 hover:text-gray-700">Clear</button>
+                    </div>
+                    
+                    <div id="testLog" class="h-48 overflow-y-auto space-y-1 text-xs bg-white p-2 rounded border">
+                        <!-- Test results will appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voice Controls Demo -->
+            <div class="flex-1 bg-white p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Voice Controls Demo</h2>
+                
+                <div class="mb-6 p-4 border-2 border-dashed border-gray-300 rounded-lg">
+                    <div class="text-center">
+                        <p class="text-gray-600 mb-4">Voice controls will appear here when enabled</p>
+                        <div id="voiceControls" class="hidden">
+                            <!-- Voice controls will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Voice Test -->
+                <div class="space-y-4">
+                    <h3 class="font-semibold text-gray-700">Manual Voice Test</h3>
+                    
+                    <div class="flex space-x-3">
+                        <button id="startVoiceChat" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400" disabled>
+                            Start Voice Chat
+                        </button>
+                        
+                        <button id="stopVoiceChat" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:bg-gray-400" disabled>
+                            Stop Voice Chat
+                        </button>
+                    </div>
+                    
+                    <div id="voiceStatus2" class="text-sm text-gray-600">
+                        Voice chat not started
+                    </div>
+                </div>
+
+                <!-- Test Messages -->
+                <div class="mt-6">
+                    <h3 class="font-semibold text-gray-700 mb-3">Test Messages</h3>
+                    <div id="testMessages" class="space-y-2 h-32 overflow-y-auto bg-gray-50 p-3 rounded-lg">
+                        <div class="text-sm text-gray-500">Test messages will appear here...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Voice Implementation Test Script
+        let testLog = [];
+        let isRecording = false;
+        let mediaRecorder = null;
+        let websocket = null;
+        
+        function addToLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            testLog.push({ timestamp, message, type });
+            updateLogDisplay();
+        }
+        
+        function updateLogDisplay() {
+            const logElement = document.getElementById('testLog');
+            logElement.innerHTML = testLog.map(log => {
+                const colorClass = {
+                    'info': 'text-blue-600',
+                    'success': 'text-green-600',
+                    'error': 'text-red-600',
+                    'warning': 'text-yellow-600'
+                }[log.type] || 'text-gray-600';
+                
+                return `<div class="flex"><span class="text-gray-400 mr-2">${log.timestamp}</span><span class="${colorClass}">${log.message}</span></div>`;
+            }).join('');
+            
+            // Auto-scroll to bottom
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function updateVoiceStatus(status, details) {
+            const statusElement = document.getElementById('voiceStatus');
+            const detailsElement = document.getElementById('voiceDetails');
+            
+            let statusClass = 'status-checking';
+            let statusText = 'Checking...';
+            
+            switch(status) {
+                case 'ready':
+                    statusClass = 'status-ready';
+                    statusText = 'Voice Ready';
+                    break;
+                case 'error':
+                    statusClass = 'status-error';
+                    statusText = 'Voice Error';
+                    break;
+                case 'not_supported':
+                    statusClass = 'status-error';
+                    statusText = 'Not Supported';
+                    break;
+            }
+            
+            statusElement.innerHTML = `<span class="status-indicator ${statusClass}"></span><span class="text-sm text-gray-600">${statusText}</span>`;
+            detailsElement.textContent = details || '';
+        }
+        
+        function checkBrowserCompatibility() {
+            const tests = {
+                'getUserMedia': !!navigator.mediaDevices?.getUserMedia,
+                'WebSocket': !!window.WebSocket,
+                'AudioContext': !!(window.AudioContext || window.webkitAudioContext),
+                'MediaRecorder': !!window.MediaRecorder,
+                'HTTPS': location.protocol === 'https:' || location.hostname === 'localhost'
+            };
+            
+            const browserTestsElement = document.getElementById('browserTests');
+            browserTestsElement.innerHTML = Object.entries(tests).map(([feature, supported]) => {
+                const icon = supported ? '✅' : '❌';
+                const colorClass = supported ? 'text-green-600' : 'text-red-600';
+                return `<div class="${colorClass}">${icon} ${feature}</div>`;
+            }).join('');
+            
+            const allSupported = Object.values(tests).every(Boolean);
+            addToLog(`Browser compatibility: ${allSupported ? 'PASSED' : 'FAILED'}`, allSupported ? 'success' : 'error');
+            
+            return tests;
+        }
+        
+        async function testMicrophonePermission() {
+            addToLog('Testing microphone permission...', 'info');
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        sampleRate: 16000,
+                        channelCount: 1,
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    }
+                });
+                
+                // Stop the stream immediately
+                stream.getTracks().forEach(track => track.stop());
+                
+                addToLog('✅ Microphone permission granted', 'success');
+                return true;
+            } catch (error) {
+                addToLog(`❌ Microphone permission denied: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        async function testRecording() {
+            if (isRecording) {
+                addToLog('Recording already in progress', 'warning');
+                return;
+            }
+            
+            addToLog('Starting recording test...', 'info');
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                
+                const chunks = [];
+                mediaRecorder.ondataavailable = (event) => {
+                    chunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'audio/wav' });
+                    addToLog(`✅ Recording completed: ${Math.round(blob.size / 1024)}KB`, 'success');
+                    stream.getTracks().forEach(track => track.stop());
+                    isRecording = false;
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+                addToLog('🔴 Recording started (3 seconds)...', 'info');
+                
+                // Stop after 3 seconds
+                setTimeout(() => {
+                    if (mediaRecorder && isRecording) {
+                        mediaRecorder.stop();
+                    }
+                }, 3000);
+                
+            } catch (error) {
+                addToLog(`❌ Recording test failed: ${error.message}`, 'error');
+                isRecording = false;
+            }
+        }
+        
+        async function testWebSocketConnection() {
+            addToLog('Testing WebSocket connection...', 'info');
+            
+            try {
+                // Try to determine the backend URL
+                const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const host = location.hostname;
+                const port = location.hostname === 'localhost' ? '8000' : '';
+                const wsUrl = `${protocol}//${host}${port ? ':' + port : ''}/voice/status`;
+                
+                addToLog(`Attempting connection to: ${wsUrl}`, 'info');
+                
+                // First check if backend is reachable
+                const httpUrl = `${location.protocol}//${host}${port ? ':' + port : ''}/voice/status`;
+                
+                try {
+                    const response = await fetch(httpUrl);
+                    const data = await response.json();
+                    addToLog(`✅ Backend reachable: Voice ${data.voice_enabled ? 'enabled' : 'disabled'}`, 'success');
+                    
+                    if (data.voice_enabled) {
+                        updateVoiceStatus('ready', 'Voice services are configured and ready');
+                    } else {
+                        updateVoiceStatus('error', 'Voice services are not configured on the backend');
+                    }
+                } catch (fetchError) {
+                    addToLog(`❌ Backend not reachable: ${fetchError.message}`, 'error');
+                    updateVoiceStatus('error', 'Cannot connect to backend services');
+                }
+                
+            } catch (error) {
+                addToLog(`❌ WebSocket test failed: ${error.message}`, 'error');
+                updateVoiceStatus('error', error.message);
+            }
+        }
+        
+        function testAudioPlayback() {
+            addToLog('Testing audio playback...', 'info');
+            
+            try {
+                // Create a simple test tone
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 440; // A4 note
+                gainNode.gain.value = 0.1; // Low volume
+                
+                oscillator.start();
+                
+                setTimeout(() => {
+                    oscillator.stop();
+                    addToLog('✅ Audio playback test completed', 'success');
+                }, 500);
+                
+                addToLog('🔊 Playing test tone...', 'info');
+                
+            } catch (error) {
+                addToLog(`❌ Audio playback test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Initialize the tests
+        document.addEventListener('DOMContentLoaded', () => {
+            addToLog('🎤 Voice Implementation Test Started', 'info');
+            
+            // Check browser compatibility first
+            const compatibility = checkBrowserCompatibility();
+            
+            // Set up event listeners
+            document.getElementById('testMicrophone').addEventListener('click', testMicrophonePermission);
+            document.getElementById('testRecording').addEventListener('click', testRecording);
+            document.getElementById('testWebSocket').addEventListener('click', testWebSocketConnection);
+            document.getElementById('testAudioPlayback').addEventListener('click', testAudioPlayback);
+            document.getElementById('clearLog').addEventListener('click', () => {
+                testLog = [];
+                updateLogDisplay();
+                addToLog('Test log cleared', 'info');
+            });
+            
+            // Auto-run initial tests
+            setTimeout(() => {
+                testWebSocketConnection();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -71,7 +71,7 @@ class VoiceService:
         try:
             from deepgram import LiveTranscriptionEvents, LiveOptions
             
-            # Configure live transcription options with keep-alive
+            # Configure live transcription options
             options = LiveOptions(
                 model="nova-2",
                 language="en-US",
@@ -79,8 +79,7 @@ class VoiceService:
                 interim_results=False,
                 punctuate=True,
                 filler_words=False,
-                endpointing=300,  # End utterance after 300ms of silence
-                keep_alive=True  # Keep connection alive
+                endpointing=300  # End utterance after 300ms of silence
             )
             
             # Create Deepgram connection
@@ -110,8 +109,8 @@ class VoiceService:
             dg_connection.on(LiveTranscriptionEvents.Close, on_close)
             dg_connection.on(LiveTranscriptionEvents.Open, on_open)
             
-            # Start connection
-            if not await dg_connection.start(options):
+            # Start connection (this is synchronous, not async)
+            if not dg_connection.start(options):
                 logger.error("Failed to start Deepgram connection")
                 return None
                 

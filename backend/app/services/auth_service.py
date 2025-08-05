@@ -37,7 +37,7 @@ class AuthService:
         self.rate_limits = {
             "explanation_requests": {"limit": 50, "window": 3600},  # 50 per hour
             "auth_attempts": {"limit": 5, "window": 900},           # 5 per 15 minutes
-            "api_requests": {"limit": 200, "window": 3600}          # 200 per hour
+            "api_requests": {"limit": 1000, "window": 3600}         # 1000 per hour for development
         }
 
     async def create_access_token(self, data: Dict[str, Any]) -> str:

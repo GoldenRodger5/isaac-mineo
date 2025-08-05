@@ -31,6 +31,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
             "/api/analytics/public/metrics",  # Public analytics (corrected path)
             "/api/analytics/admin/dashboard",  # Admin analytics (uses internal auth)
             "/api/analytics/admin/test",  # Admin test endpoint
+            "/api/voice/status",  # Voice service status
+            "/api/voice/synthesize",  # Voice synthesis
             "/health",
             "/docs",
             "/openapi.json"
