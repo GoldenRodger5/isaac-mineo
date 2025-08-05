@@ -81,11 +81,11 @@ const MobileChatInterface = ({
               )}
               <div className="text-sm leading-relaxed">
                 {typeof message.text === 'string' ? (
-                  <ReactMarkdown 
-                    className="prose prose-sm max-w-none prose-p:my-2 prose-strong:font-bold prose-em:italic prose-ul:my-2 prose-li:my-0"
-                  >
-                    {message.text}
-                  </ReactMarkdown>
+                  <div className="prose prose-sm max-w-none prose-p:my-2 prose-strong:font-bold prose-em:italic prose-ul:my-2 prose-li:my-0">
+                    <ReactMarkdown>
+                      {message.text}
+                    </ReactMarkdown>
+                  </div>
                 ) : (
                   message.text
                 )}

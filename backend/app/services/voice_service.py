@@ -71,7 +71,7 @@ class VoiceService:
         try:
             from deepgram import LiveTranscriptionEvents, LiveOptions
             
-            # Configure live transcription options
+            # Configure live transcription options with keep-alive
             options = LiveOptions(
                 model="nova-2",
                 language="en-US",
@@ -79,24 +79,36 @@ class VoiceService:
                 interim_results=False,
                 punctuate=True,
                 filler_words=False,
-                endpointing=300  # End utterance after 300ms of silence
+                endpointing=300,  # End utterance after 300ms of silence
+                keep_alive=True  # Keep connection alive
             )
             
             # Create Deepgram connection
             dg_connection = self.deepgram_client.listen.websocket.v("1")
             
             def on_message(self, result, **kwargs):
-                sentence = result.channel.alternatives[0].transcript
-                if sentence and len(sentence.strip()) > 0:
-                    logger.info(f"📝 Transcript: {sentence}")
-                    asyncio.create_task(on_transcript(sentence))
+                try:
+                    sentence = result.channel.alternatives[0].transcript
+                    if sentence and len(sentence.strip()) > 0:
+                        logger.info(f"📝 Transcript: {sentence}")
+                        asyncio.create_task(on_transcript(sentence))
+                except Exception as e:
+                    logger.error(f"Error processing transcript: {e}")
                     
             def on_error(self, error, **kwargs):
                 logger.error(f"Deepgram error: {error}")
+                
+            def on_close(self, close, **kwargs):
+                logger.info(f"Deepgram connection closed: {close}")
+                
+            def on_open(self, open, **kwargs):
+                logger.info("Deepgram connection opened")
             
             # Set up event handlers
             dg_connection.on(LiveTranscriptionEvents.Transcript, on_message)
             dg_connection.on(LiveTranscriptionEvents.Error, on_error)
+            dg_connection.on(LiveTranscriptionEvents.Close, on_close)
+            dg_connection.on(LiveTranscriptionEvents.Open, on_open)
             
             # Start connection
             if not await dg_connection.start(options):

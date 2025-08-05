@@ -292,11 +292,11 @@ const MobileCodeExplainerFlow = ({
           <div className="p-4">
             <div className="prose prose-sm max-w-none">
               {explanation ? (
-                <ReactMarkdown 
-                  className="prose prose-sm max-w-none prose-p:my-2 prose-strong:font-bold prose-em:italic prose-ul:my-2 prose-li:my-0 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded"
-                >
-                  {explanation}
-                </ReactMarkdown>
+                <div className="prose prose-sm max-w-none prose-p:my-2 prose-strong:font-bold prose-em:italic prose-ul:my-2 prose-li:my-0 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded">
+                  <ReactMarkdown>
+                    {explanation}
+                  </ReactMarkdown>
+                </div>
               ) : (
                 <div 
                   className="bg-gray-50 rounded-lg p-4 text-sm leading-relaxed text-gray-600 italic"

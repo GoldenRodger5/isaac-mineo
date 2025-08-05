@@ -101,7 +101,18 @@ class VoiceService {
       
       // Connect to voice WebSocket
       const baseUrl = apiClient.getApiBaseUrl();
-      const wsUrl = `${baseUrl.replace('http', 'ws')}/voice/chat`;
+      // Convert HTTP/HTTPS to WS/WSS properly
+      let wsUrl;
+      if (baseUrl.startsWith('https://')) {
+        wsUrl = baseUrl.replace('https://', 'wss://') + '/voice/chat';
+      } else if (baseUrl.startsWith('http://')) {
+        wsUrl = baseUrl.replace('http://', 'ws://') + '/voice/chat';
+      } else {
+        // Fallback - assume http for localhost
+        wsUrl = `ws://${baseUrl}/voice/chat`;
+      }
+      
+      console.log('🔌 Connecting to WebSocket:', wsUrl);
       this.websocket = new WebSocket(wsUrl);
       
       this.websocket.onopen = () => {
@@ -196,21 +207,47 @@ class VoiceService {
         } 
       });
       
-      // Create MediaRecorder for sending audio to server
-      this.mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
+      // Create AudioContext for processing raw audio data
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+        sampleRate: 16000
       });
       
-      this.mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0 && this.websocket && this.websocket.readyState === WebSocket.OPEN) {
-          this.websocket.send(event.data);
+      const source = this.audioContext.createMediaStreamSource(stream);
+      
+      // Create ScriptProcessorNode for capturing raw audio data
+      this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+      
+      this.processor.onaudioprocess = (event) => {
+        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+          const inputBuffer = event.inputBuffer;
+          const inputData = inputBuffer.getChannelData(0);
+          
+          // Convert Float32Array to Int16Array for Deepgram
+          const pcmData = new Int16Array(inputData.length);
+          for (let i = 0; i < inputData.length; i++) {
+            pcmData[i] = Math.max(-32768, Math.min(32767, inputData[i] * 32768));
+          }
+          
+          // Send raw PCM data as ArrayBuffer
+          this.websocket.send(pcmData.buffer);
         }
       };
       
-      this.mediaRecorder.start(250); // Send chunks every 250ms
-      this.isRecording = true;
+      source.connect(this.processor);
+      this.processor.connect(this.audioContext.destination);
       
-      console.log('🎙️ Recording started');
+      this.isRecording = true;
+      this.audioStream = stream;
+      
+      // Send keep-alive messages to prevent Deepgram timeout
+      this.keepAliveInterval = setInterval(() => {
+        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+          // Send a keep-alive message (empty audio buffer or text message)
+          this.websocket.send(JSON.stringify({ type: 'keep_alive' }));
+        }
+      }, 10000); // Every 10 seconds
+      
+      console.log('🎙️ Recording started with raw audio processing');
       
     } catch (error) {
       console.error('Failed to start recording:', error);
@@ -224,13 +261,27 @@ class VoiceService {
     if (!this.isRecording) return;
     
     try {
-      if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
-        this.mediaRecorder.stop();
-        
-        // Stop all tracks
-        if (this.mediaRecorder.stream) {
-          this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
-        }
+      // Stop audio processing
+      if (this.processor) {
+        this.processor.disconnect();
+        this.processor = null;
+      }
+      
+      if (this.audioContext) {
+        this.audioContext.close();
+        this.audioContext = null;
+      }
+      
+      // Stop all audio tracks
+      if (this.audioStream) {
+        this.audioStream.getTracks().forEach(track => track.stop());
+        this.audioStream = null;
+      }
+      
+      // Clear keep-alive interval
+      if (this.keepAliveInterval) {
+        clearInterval(this.keepAliveInterval);
+        this.keepAliveInterval = null;
       }
       
       this.isRecording = false;
@@ -337,6 +388,12 @@ class VoiceService {
   stopVoiceChat() {
     this.stopRecording();
     this.stopCurrentAudio();
+    
+    // Clear keep-alive interval
+    if (this.keepAliveInterval) {
+      clearInterval(this.keepAliveInterval);
+      this.keepAliveInterval = null;
+    }
     
     if (this.websocket) {
       this.websocket.send(JSON.stringify({
