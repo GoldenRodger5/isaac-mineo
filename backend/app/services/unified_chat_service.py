@@ -28,25 +28,40 @@ class UnifiedChatService:
         
         # AI routing prompts
         self.classifier_prompt = """Classify this query into one of these categories:
-1. SIMPLE - Basic questions about projects, skills, or contact info
-2. DETAILED - Complex queries requiring comprehensive responses
-3. CONTACT - Direct requests for contact information
+
+1. SIMPLE - Only for very basic greetings like "hi", "hello", "thanks", "ok" (< 15 characters)
+2. DETAILED - All substantive questions about projects, skills, experience, technology, etc. (DEFAULT)
+3. CONTACT - Direct requests for contact information only
+
+Default to DETAILED unless it's clearly a simple greeting or contact request.
 
 Query: {query}
 Response: Just the category name (SIMPLE/DETAILED/CONTACT)"""
 
-        self.simple_prompt = """You are Isaac Mineo's portfolio assistant. Provide clear, concise responses about Isaac's work.
+        self.simple_prompt = """You are Isaac Mineo's portfolio assistant. Provide clear, informative responses about Isaac's work and experience.
 
-Isaac is a full-stack developer specializing in React, Python, FastAPI, and AI integration.
+Isaac is a full-stack developer and AI engineer specializing in modern web technologies and intelligent applications.
 
-Contact information (freely shareable):
+**Technical Skills:**
+• Frontend: React 18, JavaScript/TypeScript, Tailwind CSS, HTML5/CSS3, responsive design
+• Backend: Python, FastAPI, Node.js, API development, database design
+• AI/ML: OpenAI APIs, Claude API, machine learning integration, intelligent systems
+• Databases: MongoDB, Redis, PostgreSQL, Firebase Firestore
+• Cloud & DevOps: AWS, Vercel, Render, Docker, Git/GitHub
+• Tools: VS Code, Chrome DevTools, Postman, command line
+
+**Featured Projects:**
+• Nutrivize: AI-powered nutrition tracker with ML recommendations and personalized guidance
+• EchoPod: AI podcast generator with advanced voice synthesis technology
+• Quizium: Intelligent flashcard creator using spaced repetition for optimal learning
+• SignalFlow: Advanced trading analysis platform with real-time market insights
+
+**Contact Information:**
 • Email: isaacmineo@gmail.com
 • LinkedIn: https://linkedin.com/in/isaac-mineo
 • GitHub: https://github.com/isaac-mineo
 
-Key projects: Nutrivize (AI nutrition), EchoPod (AI podcasts), Quizium (smart learning), Signalflow (trading analysis).
-
-Keep responses helpful but concise. Use markdown for formatting."""
+Provide helpful, informative responses with good detail. Use markdown formatting for clarity."""
 
         self.detailed_prompt = """You are Isaac Mineo's professional portfolio assistant for recruiters and collaborators. Provide comprehensive, impressive responses showcasing Isaac's expertise.
 
@@ -143,21 +158,27 @@ Create detailed, professional responses with markdown formatting. Highlight tech
             if classification in ["SIMPLE", "DETAILED", "CONTACT"]:
                 return classification
             else:
-                # Default fallback based on query length and keywords
-                if len(question) > 50 or any(word in question.lower() for word in ["detailed", "comprehensive", "explain", "experience"]):
-                    return "DETAILED"
-                else:
+                # Default fallback - MOST queries should be DETAILED
+                # Only very simple greetings/basic questions should be SIMPLE
+                simple_keywords = ["hi", "hello", "hey", "thanks", "thank you", "ok", "okay", "yes", "no"]
+                very_short = len(question.strip()) < 15
+                is_greeting = any(question.lower().strip() == keyword for keyword in simple_keywords)
+                
+                # Only classify as SIMPLE if it's a very short greeting or acknowledgment
+                if very_short and is_greeting:
                     return "SIMPLE"
+                else:
+                    return "DETAILED"  # Default to detailed for everything else
                     
         except Exception as e:
             print(f"⚠️ Classification fallback: {e}")
-            # Smart fallback classification
+            # Smart fallback classification - default to DETAILED for most queries
             if any(word in question.lower() for word in ["email", "contact", "phone", "linkedin"]):
                 return "CONTACT"
-            elif len(question) > 50:
-                return "DETAILED"
-            else:
+            elif len(question.strip()) < 15 and any(question.lower().strip() == keyword for keyword in ["hi", "hello", "hey", "thanks", "thank you", "ok", "okay", "yes", "no"]):
                 return "SIMPLE"
+            else:
+                return "DETAILED"  # Default to detailed
 
     async def _get_context(self, question: str, query_type: str) -> str:
         """Get context using ultra-fast search"""
@@ -187,8 +208,8 @@ Create detailed, professional responses with markdown formatting. Highlight tech
             else:  # SIMPLE or CONTACT
                 model = "gpt-4o-mini"  # Fast model for simple responses
                 system_prompt = self.simple_prompt
-                max_tokens = 800
-                timeout = 10.0
+                max_tokens = 1200  # Increased for more informative simple responses
+                timeout = 12.0  # Slightly increased timeout
             
             # Create messages
             messages = [
