@@ -15,6 +15,8 @@ from app.utils.pinecone_service import hybrid_search, initialize_pinecone_indexe
 from app.utils.cache_manager import CacheManager
 from app.utils.rate_limiter import RateLimiter
 from app.services.email_service import email_service
+from app.services.unified_chat_service import unified_chat_service
+from app.models.chat_models import ChatRequest, ChatResponse, ContactRequest, ContactResponse
 
 router = APIRouter()
 
@@ -24,31 +26,6 @@ rate_limiter = RateLimiter()
 
 # Initialize OpenAI client
 openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-class ChatRequest(BaseModel):
-    question: str
-    sessionId: Optional[str] = None
-
-class ChatResponse(BaseModel):
-    response: str
-    sessionId: str
-    searchMethod: str
-    conversationLength: int
-    cached: bool = False
-    timestamp: str
-    entities: Optional[Dict[str, Any]] = None
-    contextUsed: Optional[List[str]] = None
-
-class ContactRequest(BaseModel):
-    name: str
-    email: str
-    subject: str
-    message: str
-    interest: Optional[str] = None
-
-class ContactResponse(BaseModel):
-    status: str
-    message: str
 
 def is_portfolio_related(text: str) -> bool:
     """Check if the question is related to Isaac's portfolio, projects, or professional background"""
@@ -413,26 +390,104 @@ Make your response engaging and conversational while maintaining professionalism
 @router.post("/chatbot", response_model=ChatResponse)
 async def chat_with_assistant(request: ChatRequest, req: Request):
     """
-    Enhanced AI Chatbot endpoint with guardrails, entity tracking and context awareness
+    Main AI Chatbot endpoint - now uses unified service for optimal performance
     """
     try:
         # Get client IP for rate limiting
         client_ip = req.headers.get("x-forwarded-for", req.client.host if req.client else "unknown")
         
-        return await chat_with_assistant_core(request, client_ip)
+        # Rate limiting - 60 requests per hour for main endpoint
+        if not rate_limiter.check_rate_limit(client_ip, limit=60, window=3600):
+            raise HTTPException(
+                status_code=429, 
+                detail={"error": "Rate limit exceeded. Please try again later.", "retryAfter": 3600}
+            )
+        
+        # Use unified chat service for all processing
+        result = await unified_chat_service.process_message(
+            question=request.question,
+            session_id=request.sessionId,
+            client_ip=client_ip
+        )
+        
+        # Convert to ChatResponse format
+        return ChatResponse(
+            response=result["response"],
+            sessionId=result["sessionId"],
+            searchMethod=result["searchMethod"],
+            conversationLength=result["conversationLength"],
+            cached=result["cached"],
+            timestamp=result["timestamp"],
+            entities=result["entities"],
+            contextUsed=result["contextUsed"]
+        )
         
     except HTTPException:
         raise
     except Exception as error:
-        print(f"Error in chatbot API: {error}")
+        print(f"Error in main chatbot API: {error}")
         
-        # Fallback response with entity awareness
+        # Fallback response
         fallback_response = get_fallback_response(request.question)
         
         return ChatResponse(
             response=fallback_response,
             sessionId=request.sessionId or str(uuid4()),
-            searchMethod="fallback",
+            searchMethod="fallback_unified",
+            conversationLength=0,
+            cached=False,
+            timestamp=datetime.now().isoformat(),
+            entities=extract_entities(request.question),
+            contextUsed=[]
+        )
+
+@router.post("/chatbot/fast", response_model=ChatResponse)
+async def fast_chat_with_assistant(request: ChatRequest, req: Request):
+    """
+    Fast optimized chat endpoint with unified service
+    """
+    try:
+        # Get client IP for rate limiting
+        client_ip = req.headers.get("x-forwarded-for", req.client.host if req.client else "unknown")
+        
+        # Rate limiting - 120 requests per hour (higher for fast endpoint)
+        if not rate_limiter.check_rate_limit(client_ip, limit=120, window=3600):
+            raise HTTPException(
+                status_code=429, 
+                detail={"error": "Rate limit exceeded. Please try again later.", "retryAfter": 3600}
+            )
+        
+        # Use unified chat service for all processing
+        result = await unified_chat_service.process_message(
+            question=request.question,
+            session_id=request.sessionId,
+            client_ip=client_ip
+        )
+        
+        # Convert to ChatResponse format
+        return ChatResponse(
+            response=result["response"],
+            sessionId=result["sessionId"],
+            searchMethod=result["searchMethod"],
+            conversationLength=result["conversationLength"],
+            cached=result["cached"],
+            timestamp=result["timestamp"],
+            entities=result["entities"],
+            contextUsed=result["contextUsed"]
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as error:
+        print(f"Error in fast chat API: {error}")
+        
+        # Fallback response
+        fallback_response = get_fallback_response(request.question)
+        
+        return ChatResponse(
+            response=fallback_response,
+            sessionId=request.sessionId or str(uuid4()),
+            searchMethod="fallback_fast",
             conversationLength=0,
             cached=False,
             timestamp=datetime.now().isoformat(),

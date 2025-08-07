@@ -20,6 +20,9 @@ const AIChat = () => {
   const [backendStatus, setBackendStatus] = useState('checking');
   const [showSuggestions, setShowSuggestions] = useState(true);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+  const [responseTime, setResponseTime] = useState(null);
+  const [avgResponseTime, setAvgResponseTime] = useState(null);
+  const [responseTimes, setResponseTimes] = useState([]);
   const messagesEndRef = useRef(null);
 
   const suggestedQuestions = [
@@ -66,8 +69,22 @@ const AIChat = () => {
   };
 
   const getAIResponse = async (question) => {
+    const startTime = Date.now();
     try {
       const result = await apiClient.sendMessage(question, sessionId);
+      const endTime = Date.now();
+      const currentResponseTime = endTime - startTime;
+      
+      // Update response time tracking
+      setResponseTime(currentResponseTime);
+      setResponseTimes(prev => {
+        const newTimes = [...prev, currentResponseTime];
+        // Keep only last 10 responses for average calculation
+        const recentTimes = newTimes.slice(-10);
+        const average = recentTimes.reduce((sum, time) => sum + time, 0) / recentTimes.length;
+        setAvgResponseTime(Math.round(average));
+        return recentTimes;
+      });
       
       if (result.success) {
         if (result.data.sessionId) {
@@ -132,7 +149,8 @@ const AIChat = () => {
         metadata: {
           searchMethod: aiResponse.searchMethod,
           cached: aiResponse.cached,
-          error: aiResponse.error
+          error: aiResponse.error,
+          responseTime: responseTime
         }
       };
 
@@ -262,7 +280,7 @@ const AIChat = () => {
                     <h3 className="text-lg font-bold text-gray-900">Isaac's AI Assistant</h3>
                     <p className="text-sm font-medium text-gray-800">
                       {backendStatus === 'connected' ? (
-                        `🟢 Connected • ${conversationCount} messages exchanged`
+                        `🟢 Connected • ${conversationCount} messages exchanged${avgResponseTime ? ` • ~${avgResponseTime}ms avg` : ''}`
                       ) : backendStatus === 'disconnected' ? (
                         '🔴 Backend offline • Using fallback responses'
                       ) : (
@@ -306,21 +324,21 @@ const AIChat = () => {
                       )}
                       <div className="flex-1 min-w-0">
                         {message.isBot ? (
-                          <div className="text-sm prose prose-sm max-w-none leading-relaxed">
+                          <div className="text-sm prose prose-sm max-w-none leading-normal">
                             <ReactMarkdown 
                               components={{
-                                p: ({children}) => <p className="mb-3 last:mb-0 text-gray-900 font-medium leading-relaxed">{children}</p>,
+                                p: ({children}) => <p className="mb-1 last:mb-0 text-gray-900 font-medium leading-normal">{children}</p>,
                                 strong: ({children}) => <strong className="font-bold text-gray-900">{children}</strong>,
                                 em: ({children}) => <em className="italic text-gray-800">{children}</em>,
-                                ul: ({children}) => <ul className="list-disc list-inside mb-3 space-y-2">{children}</ul>,
-                                ol: ({children}) => <ol className="list-decimal list-inside mb-3 space-y-2">{children}</ol>,
+                                ul: ({children}) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                                ol: ({children}) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
                                 li: ({children}) => <li className="text-sm text-gray-900 font-medium">{children}</li>,
                                 code: ({children}) => <code className="bg-gray-100 border border-gray-300 px-2 py-1 rounded text-xs font-mono text-primary-800 font-bold">{children}</code>,
-                                blockquote: ({children}) => <blockquote className="border-l-4 border-primary-500 pl-4 italic my-3 text-gray-800 font-medium bg-gray-50 py-2 rounded-r">{children}</blockquote>,
-                                h1: ({children}) => <h1 className="text-lg font-bold mb-3 text-gray-900">{children}</h1>,
-                                h2: ({children}) => <h2 className="text-base font-bold mb-2 text-gray-900">{children}</h2>,
-                                h3: ({children}) => <h3 className="text-sm font-bold mb-2 text-gray-900">{children}</h3>,
-                                hr: () => <hr className="my-4 border-gray-400" />,
+                                blockquote: ({children}) => <blockquote className="border-l-4 border-primary-500 pl-4 italic my-2 text-gray-800 font-medium bg-gray-50 py-2 rounded-r">{children}</blockquote>,
+                                h1: ({children}) => <h1 className="text-lg font-bold mb-1 mt-2 text-gray-900">{children}</h1>,
+                                h2: ({children}) => <h2 className="text-base font-bold mb-1 mt-2 text-gray-900">{children}</h2>,
+                                h3: ({children}) => <h3 className="text-sm font-bold mb-1 mt-1 text-gray-900">{children}</h3>,
+                                hr: () => <hr className="my-2 border-gray-400" />,
                                 a: ({href, children}) => <a href={href} className="text-primary-700 hover:text-primary-800 underline font-semibold" target="_blank" rel="noopener noreferrer">{children}</a>
                               }}
                             >
@@ -344,6 +362,11 @@ const AIChat = () => {
                               Fallback
                             </span>
                           )}
+                          {message.metadata?.responseTime && message.isBot && (
+                            <span className="text-xs bg-blue-500/10 text-blue-600 px-2 py-1 rounded-full border border-blue-500/20 font-medium">
+                              {message.metadata.responseTime}ms
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -355,17 +378,22 @@ const AIChat = () => {
                 <div className="flex justify-start">
                   <div className="bg-white border-2 border-gray-300 rounded-2xl px-6 py-4 shadow-xl backdrop-blur-sm">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl flex items-center justify-center shadow-lg">
+                      <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl flex items-center justify-center shadow-lg animate-pulse">
                         <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                       </div>
                       <div className="flex space-x-1">
-                        <div className="w-3 h-3 bg-accent-400 rounded-full"></div>
-                        <div className="w-3 h-3 bg-accent-400 rounded-full"></div>
-                        <div className="w-3 h-3 bg-accent-400 rounded-full"></div>
+                        <div className="w-3 h-3 bg-accent-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                        <div className="w-3 h-3 bg-accent-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                        <div className="w-3 h-3 bg-accent-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
                       </div>
-                      <span className="text-sm font-bold text-gray-900">AI is thinking...</span>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-gray-900">AI is thinking...</span>
+                        {avgResponseTime && (
+                          <span className="text-xs text-gray-500">Avg: {avgResponseTime}ms</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -4,11 +4,13 @@ from pydantic import BaseModel
 import json
 import asyncio
 import logging
+import time
 from typing import Dict, Any, Optional
 import base64
 
 from app.services.voice_service import voice_service
-from app.routers.chatbot import ChatRequest, ChatResponse, chat_with_assistant_core
+from app.services.voice_chat_service import voice_chat_response
+from app.routers.chatbot import ChatRequest, ChatResponse
 
 logger = logging.getLogger(__name__)
 
@@ -51,8 +53,8 @@ async def synthesize_voice(request: VoiceChatRequest):
             sessionId=request.session_id
         )
         
-        # Use the existing chat function
-        chat_response = await chat_with_assistant_core(chat_request)
+        # Use voice-optimized chat for faster responses
+        chat_response = await voice_chat_response(chat_request)
         
         if not request.return_audio:
             # Return just text response
@@ -125,13 +127,13 @@ async def voice_chat_websocket(websocket: WebSocket):
                     "text": transcript
                 })
                 
-                # Get AI response using existing chat logic
+                # Get AI response using voice-optimized chat
                 chat_request = ChatRequest(
                     question=transcript,
                     sessionId=session_id
                 )
                 
-                chat_response = await chat_with_assistant_core(chat_request)
+                chat_response = await voice_chat_response(chat_request)
                 session_id = chat_response.sessionId  # Update session ID
                 
                 # Send text response
@@ -141,18 +143,28 @@ async def voice_chat_websocket(websocket: WebSocket):
                     "session_id": session_id
                 })
                 
-                # Generate and send audio
-                audio_url = await voice_service.synthesize_speech_url(chat_response.response)
-                if audio_url:
-                    await websocket.send_json({
-                        "type": "audio_response",
-                        "audio_url": audio_url,
-                        "text": chat_response.response
-                    })
-                else:
+                # Generate and send audio with timeout
+                try:
+                    audio_url = await asyncio.wait_for(
+                        voice_service.synthesize_speech_url(chat_response.response),
+                        timeout=20.0  # 20 second timeout for audio generation
+                    )
+                    if audio_url:
+                        await websocket.send_json({
+                            "type": "audio_response",
+                            "audio_url": audio_url,
+                            "text": chat_response.response
+                        })
+                    else:
+                        await websocket.send_json({
+                            "type": "error",
+                            "message": "Failed to generate audio response"
+                        })
+                except asyncio.TimeoutError:
+                    logger.warning("Audio synthesis timed out")
                     await websocket.send_json({
                         "type": "error",
-                        "message": "Failed to generate audio response"
+                        "message": "Audio generation timed out"
                     })
                     
             except Exception as e:
@@ -175,17 +187,22 @@ async def voice_chat_websocket(websocket: WebSocket):
             })
             return
         
-        # Handle incoming messages
+        # Handle incoming messages with timeout
         while True:
             try:
-                message = await websocket.receive()
+                # Add timeout to prevent hanging connections
+                message = await asyncio.wait_for(
+                    websocket.receive(), 
+                    timeout=30.0  # 30 second timeout
+                )
                 
                 if message["type"] == "websocket.receive":
                     if "bytes" in message:
                         # Audio data from client
                         audio_data = message["bytes"]
                         if dg_connection:
-                            await dg_connection.send(audio_data)
+                            # Deepgram send is synchronous, not async
+                            dg_connection.send(audio_data)
                     elif "text" in message:
                         # Text message from client
                         data = json.loads(message["text"])
@@ -209,6 +226,13 @@ async def voice_chat_websocket(websocket: WebSocket):
                 elif message["type"] == "websocket.disconnect":
                     break
                     
+            except asyncio.TimeoutError:
+                # Send keepalive and continue
+                await websocket.send_json({
+                    "type": "keepalive",
+                    "timestamp": time.time()
+                })
+                continue
             except WebSocketDisconnect:
                 break
             except Exception as e:

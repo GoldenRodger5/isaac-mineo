@@ -1,0 +1,54 @@
+{
+  "test_suite": "Voice Implementation Optimization Tests",
+  "timestamp": "2025-08-05T23:30:05.043897",
+  "summary": {
+    "total_tests": 5,
+    "passed": 0,
+    "failed": 5,
+    "warnings": 1,
+    "success_rate": "0.0%"
+  },
+  "backend_port": 8001,
+  "results": [
+    {
+      "test": "Environment Check",
+      "passed": false,
+      "warning": true,
+      "message": "Missing: DEEPGRAM_API_KEY, ELEVENLABS_API_KEY",
+      "execution_time": 0,
+      "timestamp": "2025-08-05T23:29:59.730701"
+    },
+    {
+      "test": "Voice Status Check",
+      "passed": false,
+      "warning": false,
+      "message": "HTTP 405: {\"detail\":\"Method Not Allowed\"}",
+      "execution_time": 0.0032930374145507812,
+      "timestamp": "2025-08-05T23:30:04.790537"
+    },
+    {
+      "test": "Voice Synthesis (Optimized)",
+      "passed": false,
+      "warning": false,
+      "message": "HTTP 405: {\"detail\":\"Method Not Allowed\"}",
+      "execution_time": 0.0030012130737304688,
+      "timestamp": "2025-08-05T23:30:04.793631"
+    },
+    {
+      "test": "WebSocket Connection (Optimized)",
+      "passed": false,
+      "warning": false,
+      "message": "WebSocket error: BaseEventLoop.create_connection() got an unexpected keyword argument 'timeout'",
+      "execution_time": 0.012425899505615234,
+      "timestamp": "2025-08-05T23:30:04.806285"
+    },
+    {
+      "test": "Concurrent Requests",
+      "passed": false,
+      "warning": false,
+      "message": "All concurrent requests failed",
+      "execution_time": 0.006710052490234375,
+      "timestamp": "2025-08-05T23:30:04.813068"
+    }
+  ]
+}

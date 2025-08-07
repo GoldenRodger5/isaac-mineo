@@ -1,0 +1,231 @@
+{
+  "timestamp": "2025-08-05T23:26:21.597014",
+  "test_summary": {
+    "total_tests": 22,
+    "passed": 18,
+    "failed": 4,
+    "warnings": 1
+  },
+  "deployment_ready": false,
+  "recommendations": [
+    "\u274c Critical failures detected - resolve before deployment",
+    "\u26a0\ufe0f 1 warnings detected - review recommended"
+  ],
+  "test_details": [
+    {
+      "timestamp": "23:25:49",
+      "status": "INFO",
+      "message": "\ud83c\udfa4 Starting Comprehensive Voice Implementation Tests"
+    },
+    {
+      "timestamp": "23:25:49",
+      "status": "INFO",
+      "message": "============================================================"
+    },
+    {
+      "timestamp": "23:25:49",
+      "status": "SUCCESS",
+      "message": "\u2705 Environment variables loaded successfully"
+    },
+    {
+      "timestamp": "23:25:49",
+      "status": "INFO",
+      "message": "\ud83d\ude80 Starting backend on port 8001"
+    },
+    {
+      "timestamp": "23:25:52",
+      "status": "SUCCESS",
+      "message": "\u2705 Backend started successfully on port 8001"
+    },
+    {
+      "timestamp": "23:25:52",
+      "status": "INFO",
+      "message": "Running Backend Health test..."
+    },
+    {
+      "timestamp": "23:25:52",
+      "status": "INFO",
+      "message": "Testing backend health..."
+    },
+    {
+      "timestamp": "23:25:52",
+      "status": "SUCCESS",
+      "message": "\u2705 Backend healthy: healthy"
+    },
+    {
+      "timestamp": "23:25:52",
+      "status": "SUCCESS",
+      "message": "\u2705 Backend Health: PASSED"
+    },
+    {
+      "timestamp": "23:25:52",
+      "status": "INFO",
+      "message": "Running Voice Status test..."
+    },
+    {
+      "timestamp": "23:25:52",
+      "status": "INFO",
+      "message": "Testing voice status endpoint..."
+    },
+    {
+      "timestamp": "23:25:52",
+      "status": "SUCCESS",
+      "message": "\u2705 Voice Status: {'voice_enabled': True, 'deepgram_available': True, 'elevenlabs_available': True, 'status': 'Voice services ready'}"
+    },
+    {
+      "timestamp": "23:25:52",
+      "status": "SUCCESS",
+      "message": "\u2705 Voice Status: PASSED"
+    },
+    {
+      "timestamp": "23:25:52",
+      "status": "INFO",
+      "message": "Running Voice Synthesis test..."
+    },
+    {
+      "timestamp": "23:25:52",
+      "status": "INFO",
+      "message": "Testing voice synthesis endpoint..."
+    },
+    {
+      "timestamp": "23:26:02",
+      "status": "ERROR",
+      "message": "\u274c Voice synthesis error: HTTPConnectionPool(host='localhost', port=8001): Read timed out. (read timeout=10)"
+    },
+    {
+      "timestamp": "23:26:02",
+      "status": "ERROR",
+      "message": "\u274c Voice Synthesis: FAILED"
+    },
+    {
+      "timestamp": "23:26:02",
+      "status": "INFO",
+      "message": "Running WebSocket Connection test..."
+    },
+    {
+      "timestamp": "23:26:02",
+      "status": "INFO",
+      "message": "Testing WebSocket voice connection..."
+    },
+    {
+      "timestamp": "23:26:12",
+      "status": "ERROR",
+      "message": "\u274c WebSocket connection error: timed out during handshake"
+    },
+    {
+      "timestamp": "23:26:12",
+      "status": "ERROR",
+      "message": "\u274c WebSocket Connection: FAILED"
+    },
+    {
+      "timestamp": "23:26:12",
+      "status": "INFO",
+      "message": "Running Voice Security test..."
+    },
+    {
+      "timestamp": "23:26:12",
+      "status": "INFO",
+      "message": "Testing voice endpoint security..."
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "SUCCESS",
+      "message": "\u2705 CORS headers present"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "INFO",
+      "message": "Testing rate limiting..."
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "INFO",
+      "message": "\ud83d\udcca Average response time: 0.003s"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "WARNING",
+      "message": "\u26a0\ufe0f No rate limiting detected"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "SUCCESS",
+      "message": "\u2705 Voice Security: PASSED"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "INFO",
+      "message": "Running Error Handling test..."
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "INFO",
+      "message": "Testing voice error handling..."
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "SUCCESS",
+      "message": "\u2705 Invalid JSON handled correctly"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "SUCCESS",
+      "message": "\u2705 Missing fields handled correctly"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "SUCCESS",
+      "message": "\u2705 Error Handling: PASSED"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "INFO",
+      "message": "Running Frontend Integration test..."
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "INFO",
+      "message": "Validating frontend voice integration..."
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "SUCCESS",
+      "message": "\u2705 Found: frontend/src/components/VoiceChat.jsx"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "SUCCESS",
+      "message": "\u2705 frontend/src/components/VoiceChat.jsx: React hooks detected"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "SUCCESS",
+      "message": "\u2705 Found: frontend/src/components/MobileChatInterface.jsx"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "SUCCESS",
+      "message": "\u2705 frontend/src/components/MobileChatInterface.jsx: React hooks detected"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "SUCCESS",
+      "message": "\u2705 Found: frontend/src/services/voiceService.js"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "SUCCESS",
+      "message": "\u2705 frontend/src/services/voiceService.js: Service pattern detected"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "SUCCESS",
+      "message": "\u2705 Frontend Integration: PASSED"
+    },
+    {
+      "timestamp": "23:26:21",
+      "status": "INFO",
+      "message": "Generating deployment readiness report..."
+    }
+  ]
+}

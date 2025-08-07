@@ -110,7 +110,8 @@ class VoiceService:
             dg_connection.on(LiveTranscriptionEvents.Open, on_open)
             
             # Start connection (this is synchronous, not async)
-            if not dg_connection.start(options):
+            start_result = dg_connection.start(options)
+            if not start_result:
                 logger.error("Failed to start Deepgram connection")
                 return None
                 
@@ -177,9 +178,10 @@ class VoiceService:
         except Exception as e:
             logger.error(f"Failed to stream speech: {e}")
     
-    async def synthesize_speech_url(self, text: str) -> Optional[str]:
+    async def synthesize_speech_url(self, text: str, timeout: int = 30) -> Optional[str]:
         """
         Generate speech and return a URL for playback (alternative to streaming)
+        Uses async wrapper with timeout for better performance
         """
         if not self.elevenlabs_client:
             logger.error("ElevenLabs client not available")
@@ -188,20 +190,36 @@ class VoiceService:
         try:
             logger.info(f"🔊 Generating speech for: {text[:50]}...")
             
-            # Generate audio
-            audio = self.elevenlabs_client.generate(
-                text=text,
-                voice=self.elevenlabs_voice_id,
-                model="eleven_turbo_v2"
+            # Wrap synchronous API call in async executor with timeout
+            def generate_audio():
+                audio_generator = self.elevenlabs_client.generate(
+                    text=text,
+                    voice=self.elevenlabs_voice_id,
+                    model="eleven_turbo_v2"
+                )
+                # Collect all chunks from the generator
+                audio_chunks = []
+                for chunk in audio_generator:
+                    audio_chunks.append(chunk)
+                return b''.join(audio_chunks)
+            
+            # Run with timeout
+            loop = asyncio.get_event_loop()
+            audio_bytes = await asyncio.wait_for(
+                loop.run_in_executor(None, generate_audio),
+                timeout=timeout
             )
             
             # Convert to base64 for data URL
-            audio_base64 = base64.b64encode(audio).decode('utf-8')
+            audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
             audio_url = f"data:audio/mpeg;base64,{audio_base64}"
             
             logger.info("✅ Speech generation complete")
             return audio_url
             
+        except asyncio.TimeoutError:
+            logger.error(f"Speech synthesis timed out after {timeout} seconds")
+            return None
         except Exception as e:
             logger.error(f"Failed to synthesize speech: {e}")
             return None

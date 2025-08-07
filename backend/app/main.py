@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 import uvicorn
 import asyncio
+from pathlib import Path
 
 # Import services
 from app.services.error_handler import error_handler
@@ -13,9 +14,24 @@ from app.middleware.auth_middleware import AuthMiddleware
 from app.services.auth_service import auth_service
 from app.services.performance_service import performance_service
 
-# Load environment variables from root .env file
-load_dotenv(dotenv_path='../.env')  # Load from project root
-load_dotenv()  # Also check current directory
+# Load environment variables from project root .env file with robust path finding
+def load_project_env():
+    """Load environment variables from the project root .env file"""
+    current_dir = Path(__file__).resolve()
+    
+    # Search for .env file in parent directories first (prioritize root .env)
+    for parent in [current_dir.parent.parent.parent, current_dir.parent.parent, current_dir.parent]:
+        env_file = parent / '.env'
+        if env_file.exists():
+            print(f"📄 Loading .env from: {env_file}")
+            load_dotenv(env_file, override=True)  # Override any existing values
+            return True
+    
+    print("⚠️ No .env file found in project directory tree")
+    return False
+
+# Load environment variables
+load_project_env()
 
 app = FastAPI(
     title="Isaac Mineo Portfolio API",

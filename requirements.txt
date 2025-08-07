@@ -1,16 +1,41 @@
+# Isaac Mineo Portfolio - Production Requirements
+# Updated for unified chat service deployment
+
 # FastAPI Backend Dependencies
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
-pydantic==2.5.0
+pydantic==2.10.4
 python-dotenv==1.0.0
 python-multipart==0.0.6
 
 # AI/ML Dependencies
-openai==1.97.1
-pinecone-client==2.2.4
+openai==1.62.0
+anthropic
+pinecone==7.2.0
 
 # Database and Caching
 redis==5.0.1
 
+# Voice AI Services
+deepgram-sdk
+elevenlabs
+
 # Additional utilities
 requests==2.31.0
+httpx
+aiohttp
+websockets
+
+# Authentication & Security
+python-jose[cryptography]
+passlib[bcrypt]
+PyJWT
+
+# Development & Testing
+pytest
+pytest-asyncio
+pytest-mock
+
+# File handling
+aiofiles
+jinja2

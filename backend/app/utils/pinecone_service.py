@@ -39,10 +39,21 @@ openai_client = None
 def initialize_clients():
     """Initialize Pinecone and OpenAI clients"""
     global pc, openai_client
+    
+    api_key = os.getenv("PINECONE_API_KEY")
+    if not api_key:
+        raise ValueError("PINECONE_API_KEY environment variable not set")
+    
     if pc is None:
-        pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+        pc = Pinecone(api_key=api_key)
+        print(f"✅ Pinecone client initialized with key: {api_key[:20]}...")
+    
+    openai_key = os.getenv("OPENAI_API_KEY") 
+    if not openai_key:
+        raise ValueError("OPENAI_API_KEY environment variable not set")
+        
     if openai_client is None:
-        openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        openai_client = openai.OpenAI(api_key=openai_key)
 
 async def initialize_pinecone_indexes():
     """Initialize all Pinecone indexes if they don't exist"""
@@ -148,6 +159,10 @@ async def semantic_search(query: str, index_type: IndexType, top_k: int = 3) -> 
     """Perform semantic vector search on specific index"""
     try:
         initialize_clients()
+        
+        if pc is None:
+            raise ValueError("Pinecone client not initialized")
+            
         index_name = INDEX_CONFIGS[index_type]["name"]
         index = pc.Index(index_name)
         
@@ -162,10 +177,10 @@ async def semantic_search(query: str, index_type: IndexType, top_k: int = 3) -> 
             include_values=False
         )
         
-        # Format results
+        # Format results - lower threshold for testing
         results = []
         for match in search_results.matches:
-            if match.score > 0.75:  # Higher threshold for better quality
+            if match.score > 0.5:  # Lower threshold for better coverage
                 results.append({
                     'content': match.metadata.get('text', ''),
                     'source': match.metadata.get('source', ''),
@@ -174,10 +189,13 @@ async def semantic_search(query: str, index_type: IndexType, top_k: int = 3) -> 
                     'metadata': match.metadata
                 })
         
+        print(f"🔍 Search '{query}' in {index_type.value}: {len(results)} results (from {len(search_results.matches)} total)")
         return results
         
     except Exception as error:
         print(f"Error in semantic search for {index_type.value}: {error}")
+        import traceback
+        traceback.print_exc()
         return []
 
 async def keyword_search(query: str, index_type: IndexType, top_k: int = 3) -> List[Dict[str, Any]]:
