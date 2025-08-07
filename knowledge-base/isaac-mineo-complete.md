@@ -27,46 +27,93 @@ When not coding, Isaac enjoys gaming, lifting weights, exploring music, and spon
 
 ## TECHNICAL SKILLS
 
-### Frontend Development (Expert Level)
-- **React 18** (Expert) - Hooks, Context, state management, performance optimization
-- **JavaScript/TypeScript** (Advanced) - ES6+, async/await, modern patterns
-- **Tailwind CSS** (Advanced) - Utility-first styling, responsive design, custom components
-- **Vite** (Advanced) - Build tool, dev server, optimizations
-- **HTML5/CSS3** (Expert) - Semantic markup, animations, responsive design
+### COMPLETE TECHNOLOGY STACK
+
+#### Frontend Technologies
+- **React 18** - Hooks, Context, state management, performance optimization
+- **JavaScript/TypeScript** - ES6+, async/await, modern patterns
+- **HTML5/CSS3** - Semantic markup, animations, responsive design
+- **Tailwind CSS** - Utility-first styling, responsive design, custom components
+- **Vite** - Build tool, dev server, optimizations
 - **PWA Development** - Service workers, manifest files, offline functionality
 
-### Backend Development (Expert Level)
-- **FastAPI** (Expert) - API design, async programming, documentation, performance
-- **Python** (Advanced) - Object-oriented design, async programming, clean architecture
-- **Node.js** (Intermediate) - Express, REST APIs, middleware
-- **API Design** (Expert) - RESTful services, OpenAPI documentation, error handling
-- **Database Design** (Advanced) - Schema design, optimization, relationships
+#### Backend Technologies  
+- **FastAPI** - API design, async programming, documentation, performance
+- **Python** - Object-oriented design, async programming, clean architecture
+- **Node.js** - Express, REST APIs, middleware
+- **API Design** - RESTful services, OpenAPI documentation, error handling
+- **Database Design** - Schema design, optimization, relationships
 
-### AI & Machine Learning (Advanced)
-- **OpenAI API Integration** (Expert) - GPT-4, embeddings, vision models, prompt engineering
-- **Claude API** (Advanced) - Anthropic's AI models, conversation design
-- **Vector Databases** (Intermediate) - Pinecone, embeddings, semantic search
-- **Prompt Engineering** (Advanced) - Context design, response optimization
-- **AI-Powered Applications** (Expert) - Building intelligent user experiences
+#### AI & Machine Learning
+- **OpenAI API Integration** - GPT-4, embeddings, vision models, prompt engineering
+- **Claude API** - Anthropic's AI models, conversation design
+- **Vector Databases** - Pinecone, embeddings, semantic search
+- **Prompt Engineering** - Context design, response optimization
+- **AI-Powered Applications** - Building intelligent user experiences
 
-### Databases (Advanced)
-- **MongoDB** (Advanced) - Document design, aggregation, indexing, Atlas
-- **Redis** (Advanced) - Caching, session management, rate limiting
-- **PostgreSQL** (Intermediate) - Relational design, queries, optimization
-- **Firebase Firestore** (Intermediate) - Real-time databases, authentication
+#### Databases
+- **MongoDB** - Document design, aggregation, indexing, Atlas
+- **Redis** - Caching, session management, rate limiting
+- **PostgreSQL** - Relational design, queries, optimization
+- **Firebase Firestore** - Real-time databases, authentication
 
-### Cloud & DevOps (Advanced)
-- **Vercel** (Expert) - Frontend deployment, serverless functions, domains
-- **Render** (Advanced) - Backend deployment, databases, monitoring
-- **AWS** (Intermediate) - S3, Lambda, basic services
-- **Docker** (Intermediate) - Containerization, development environments
-- **Git/GitHub** (Expert) - Version control, collaboration, CI/CD
+#### Cloud & DevOps
+- **Vercel** - Frontend deployment, serverless functions, domains
+- **Render** - Backend deployment, databases, monitoring
+- **AWS** - S3, Lambda, basic services
+- **Docker** - Containerization, development environments
+- **Git/GitHub** - Version control, collaboration, CI/CD
 
-### Development Tools (Expert)
-- **VS Code** (Expert) - Extensions, debugging, productivity workflows
-- **Chrome DevTools** (Advanced) - Debugging, performance analysis, network inspection
-- **Postman** (Advanced) - API testing, automation, documentation
-- **Command Line** (Advanced) - Bash/Zsh, automation scripts, system administration
+#### Development Tools
+- **VS Code** - Extensions, debugging, productivity workflows
+- **Chrome DevTools** - Debugging, performance analysis, network inspection
+- **Postman** - API testing, automation, documentation
+- **Command Line** - Bash/Zsh, automation scripts, system administration
+
+---
+
+## DETAILED TECHNICAL SKILLS
+
+### Frontend Development
+- **React 18** - Hooks, Context, state management, performance optimization
+- **JavaScript/TypeScript** - ES6+, async/await, modern patterns
+- **Tailwind CSS** - Utility-first styling, responsive design, custom components
+- **Vite** - Build tool, dev server, optimizations
+- **HTML5/CSS3** - Semantic markup, animations, responsive design
+- **PWA Development** - Service workers, manifest files, offline functionality
+
+### Backend Development
+- **FastAPI** - API design, async programming, documentation, performance
+- **Python** - Object-oriented design, async programming, clean architecture
+- **Node.js** - Express, REST APIs, middleware
+- **API Design** - RESTful services, OpenAPI documentation, error handling
+- **Database Design** - Schema design, optimization, relationships
+
+### AI & Machine Learning
+- **OpenAI API Integration** - GPT-4, embeddings, vision models, prompt engineering
+- **Claude API** - Anthropic's AI models, conversation design
+- **Vector Databases** - Pinecone, embeddings, semantic search
+- **Prompt Engineering** - Context design, response optimization
+- **AI-Powered Applications** - Building intelligent user experiences
+
+### Databases
+- **MongoDB** - Document design, aggregation, indexing, Atlas
+- **Redis** - Caching, session management, rate limiting
+- **PostgreSQL** - Relational design, queries, optimization
+- **Firebase Firestore** - Real-time databases, authentication
+
+### Cloud & DevOps
+- **Vercel** - Frontend deployment, serverless functions, domains
+- **Render** - Backend deployment, databases, monitoring
+- **AWS** - S3, Lambda, basic services
+- **Docker** - Containerization, development environments
+- **Git/GitHub** - Version control, collaboration, CI/CD
+
+### Development Tools
+- **VS Code** - Extensions, debugging, productivity workflows
+- **Chrome DevTools** - Debugging, performance analysis, network inspection
+- **Postman** - API testing, automation, documentation
+- **Command Line** - Bash/Zsh, automation scripts, system administration
 
 ---
 

@@ -2,65 +2,65 @@ Isaac Mineo - Technical Skills & Stack
 
 FRONTEND DEVELOPMENT:
 - React 18 (Expert level) - Hooks, Context, state management
-- JavaScript/TypeScript (Advanced) - ES6+, async programming
-- Tailwind CSS (Advanced) - Responsive design, custom components
+- JavaScript/TypeScript - ES6+, async programming
+- Tailwind CSS - Responsive design, custom components
 - Vite (Proficient) - Build tool and development environment
-- HTML5/CSS3 (Advanced) - Semantic markup, modern CSS features
-- Responsive Design (Expert) - Mobile-first, cross-browser compatibility
+- HTML5/CSS3 - Semantic markup, modern CSS features
+- Responsive Design - Mobile-first, cross-browser compatibility
 
 BACKEND DEVELOPMENT:
 - FastAPI (Expert level) - RESTful APIs, async programming
-- Python (Advanced) - Object-oriented programming, data structures
+- Python - Object-oriented programming, data structures
 - Node.js (Proficient) - Server-side JavaScript, API development
-- RESTful API Design (Advanced) - Clean architecture, documentation
+- RESTful API Design - Clean architecture, documentation
 - Database Design (Proficient) - Schema design, relationships
 
 DATABASES:
-- MongoDB (Advanced) - NoSQL, document-based storage
+- MongoDB - NoSQL, document-based storage
 - PostgreSQL (Proficient) - Relational database management
 - Redis (Proficient) - Caching, session management
 - Firebase Firestore (Proficient) - Real-time database
 
 AI & MACHINE LEARNING:
-- OpenAI API Integration (Advanced) - GPT models, prompt engineering
+- OpenAI API Integration - GPT models, prompt engineering
 - Claude API (Proficient) - Anthropic's AI models
-- Prompt Engineering (Advanced) - Effective AI communication
+- Prompt Engineering - Effective AI communication
 - Vector Databases (Learning) - Pinecone, embeddings
-- AI-powered Applications (Advanced) - Smart features, automation
+- AI-powered Applications - Smart features, automation
 
 AUTHENTICATION & SECURITY:
-- Firebase Auth (Advanced) - Multi-provider authentication
+- Firebase Auth - Multi-provider authentication
 - JWT Tokens (Proficient) - Secure API authentication
 - OAuth 2.0 (Proficient) - Third-party authentication
-- Session Management (Advanced) - Secure user sessions
+- Session Management - Secure user sessions
 - Security Best Practices (Proficient) - Data protection, validation
 
 CLOUD & DEPLOYMENT:
-- Vercel (Expert) - Frontend deployment, serverless functions
-- Render (Advanced) - Backend hosting, database management
+- Vercel - Frontend deployment, serverless functions
+- Render - Backend hosting, database management
 - AWS Services (Learning) - Cloud infrastructure
 - Docker (Basic) - Containerization
-- Git/GitHub (Advanced) - Version control, collaboration
+- Git/GitHub - Version control, collaboration
 
 DEVELOPMENT TOOLS:
-- VS Code (Expert) - Extensions, debugging, productivity
-- GitHub (Advanced) - Version control, project management
-- Postman (Advanced) - API testing and documentation
-- Chrome DevTools (Advanced) - Debugging, performance analysis
-- Terminal/CLI (Advanced) - Command line proficiency
+- VS Code - Extensions, debugging, productivity
+- GitHub - Version control, project management
+- Postman - API testing and documentation
+- Chrome DevTools - Debugging, performance analysis
+- Terminal/CLI - Command line proficiency
 
 PERFORMANCE & OPTIMIZATION:
 - Code Splitting (Proficient) - Bundle optimization
-- Caching Strategies (Advanced) - Redis, browser caching
+- Caching Strategies - Redis, browser caching
 - Performance Monitoring (Proficient) - Web vitals, optimization
 - SEO Optimization (Proficient) - Search engine optimization
-- Progressive Web Apps (Advanced) - PWA implementation
+- Progressive Web Apps - PWA implementation
 
 PROGRAMMING PARADIGMS:
-- Object-Oriented Programming (Advanced)
+- Object-Oriented Programming
 - Functional Programming (Proficient)
-- Asynchronous Programming (Advanced)
-- Clean Code Principles (Advanced)
+- Asynchronous Programming
+- Clean Code Principles
 - Test-Driven Development (Learning)
 
 Isaac continuously learns new technologies and stays current with industry trends. He's particularly interested in AI integration, performance optimization, and building scalable applications.

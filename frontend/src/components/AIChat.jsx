@@ -156,14 +156,8 @@ const AIChat = () => {
 
       setMessages(prev => [...prev, botMessage]);
 
-      // Try to generate voice response if voice API is available
-      if (window.voiceChatAPI && window.voiceChatAPI.sendTextWithVoice) {
-        try {
-          await window.voiceChatAPI.sendTextWithVoice(aiResponse.text);
-        } catch (voiceError) {
-          console.log('Voice response not available:', voiceError);
-        }
-      }
+      // Note: Voice synthesis is only used for actual voice chat, not text chat
+      // Users can use the voice chat controls separately if they want voice responses
 
     } catch (error) {
       console.error('Error getting AI response:', error);

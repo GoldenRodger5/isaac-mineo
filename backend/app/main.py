@@ -55,7 +55,13 @@ default_origins = [
 if allowed_origins_env:
     allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",")]
 else:
-    allowed_origins = default_origins
+    allow_origins=[
+        "https://isaacmineo.com",
+        "https://www.isaacmineo.com", 
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:3000"
+    ],
 
 print(f"🌐 CORS Allowed Origins: {allowed_origins}")
 

@@ -211,8 +211,73 @@ async def voice_chat_websocket(websocket: WebSocket):
                             session_id = data.get("session_id")
                             logger.info(f"Voice session started: {session_id}")
                             
+                        elif data.get("type") == "process_transcript":
+                            # Handle final transcript processing for AI response
+                            transcript_text = data.get("text", "").strip()
+                            if transcript_text:
+                                try:
+                                    logger.info(f"Processing transcript for AI response: {transcript_text}")
+                                    
+                                    # Get AI response using existing voice chat service
+                                    chat_request = ChatRequest(
+                                        question=transcript_text,
+                                        sessionId=session_id
+                                    )
+                                    
+                                    chat_response = await voice_chat_response(chat_request)
+                                    
+                                    # Send AI response first
+                                    await websocket.send_json({
+                                        "type": "ai_response",
+                                        "text": chat_response.response,
+                                        "session_id": session_id
+                                    })
+                                    
+                                    # Generate and send voice response
+                                    if voice_service:
+                                        try:
+                                            audio_url = await voice_service.synthesize_speech_url(
+                                                chat_response.response
+                                            )
+                                            
+                                            if audio_url:
+                                                await websocket.send_json({
+                                                    "type": "audio_response",
+                                                    "text": chat_response.response,
+                                                    "audio_url": audio_url,
+                                                    "session_id": session_id
+                                                })
+                                            else:
+                                                logger.warning("Voice synthesis failed, text response already sent")
+                                                
+                                        except Exception as voice_error:
+                                            logger.error(f"Voice synthesis error: {voice_error}")
+                                            # AI response was already sent, so user still gets text
+                                
+                                except Exception as ai_error:
+                                    logger.error(f"AI response error: {ai_error}")
+                                    await websocket.send_json({
+                                        "type": "error",
+                                        "message": "Failed to process your message. Please try again."
+                                    })
+                
+                        elif data.get("type") == "interrupt":
+                            # Handle user interruption of AI response
+                            logger.info("User interrupted AI response")
+                            await voice_service.stop_current_playback()
+                            await websocket.send_json({
+                                "type": "interrupted",
+                                "message": "AI response interrupted by user"
+                            })
+                            
                         elif data.get("type") == "end_session":
+                            # Handle session cleanup
                             logger.info("Voice session ended by client")
+                            await websocket.send_json({
+                                "type": "session_ended",
+                                "message": "Voice session ended successfully"
+                            })
+                            break
                             break
                             
                         elif data.get("type") == "interrupt":

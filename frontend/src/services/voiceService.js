@@ -3,6 +3,7 @@ import { apiClient } from './apiClient.js';
 class VoiceService {
   constructor() {
     this.isRecording = false;
+    this.isListening = false;
     this.mediaRecorder = null;
     this.audioContext = null;
     this.websocket = null;
@@ -13,11 +14,20 @@ class VoiceService {
     this.isEnabled = false;
     this.status = 'checking';
     
+    // Real-time transcription
+    this.liveTranscript = '';
+    this.finalTranscript = '';
+    this.silenceTimer = null;
+    this.silenceThreshold = 2000; // 2 seconds of silence to trigger AI response
+    this.isAIResponding = false;
+    
     // Event callbacks
     this.onTranscript = null;
+    this.onLiveTranscript = null;
     this.onResponse = null;
     this.onError = null;
     this.onStatusChange = null;
+    this.onAIStateChange = null;
     
     this.checkVoiceSupport();
   }
@@ -158,14 +168,38 @@ class VoiceService {
         break;
         
       case 'transcript':
-        console.log('📝 Transcript:', data.text);
-        if (this.onTranscript) {
-          this.onTranscript(data.text);
+        console.log('📝 Live Transcript:', data.text);
+        
+        // Check if this is interim or final transcript
+        if (data.is_final) {
+          this.finalTranscript = data.text;
+          this.liveTranscript = ''; // Clear live transcript
+          
+          // Reset silence timer and start waiting for pause
+          this.resetSilenceTimer();
+          this.startSilenceTimer();
+          
+          if (this.onTranscript) {
+            this.onTranscript(data.text, true); // true = final
+          }
+        } else {
+          this.liveTranscript = data.text;
+          
+          // Clear silence timer while user is still talking
+          this.clearSilenceTimer();
+          
+          if (this.onLiveTranscript) {
+            this.onLiveTranscript(data.text);
+          }
         }
         break;
         
       case 'ai_response':
         console.log('🤖 AI Response:', data.text);
+        this.isAIResponding = true;
+        if (this.onAIStateChange) {
+          this.onAIStateChange(true);
+        }
         if (this.onResponse) {
           this.onResponse(data.text, null);
         }
@@ -173,6 +207,10 @@ class VoiceService {
         
       case 'audio_response':
         console.log('🔊 Audio response received');
+        this.isAIResponding = true;
+        if (this.onAIStateChange) {
+          this.onAIStateChange(true);
+        }
         this.playAudioResponse(data.audio_url);
         if (this.onResponse) {
           this.onResponse(data.text, data.audio_url);
@@ -180,8 +218,12 @@ class VoiceService {
         break;
         
       case 'interrupted':
-        console.log('🛑 Audio playback interrupted');
+        console.log('🛑 Audio playback interrupted by user speech');
         this.stopCurrentAudio();
+        this.isAIResponding = false;
+        if (this.onAIStateChange) {
+          this.onAIStateChange(false);
+        }
         break;
         
       case 'error':
@@ -193,8 +235,8 @@ class VoiceService {
     }
   }
   
-  async startRecording() {
-    if (this.isRecording || !this.websocket) return;
+  async startContinuousListening() {
+    if (this.isListening || !this.websocket) return false;
     
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -218,7 +260,7 @@ class VoiceService {
       this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
       
       this.processor.onaudioprocess = (event) => {
-        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+        if (this.websocket && this.websocket.readyState === WebSocket.OPEN && this.isListening) {
           const inputBuffer = event.inputBuffer;
           const inputData = inputBuffer.getChannelData(0);
           
@@ -236,31 +278,35 @@ class VoiceService {
       source.connect(this.processor);
       this.processor.connect(this.audioContext.destination);
       
-      this.isRecording = true;
+      this.isListening = true;
       this.audioStream = stream;
       
       // Send keep-alive messages to prevent Deepgram timeout
       this.keepAliveInterval = setInterval(() => {
         if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
-          // Send a keep-alive message (empty audio buffer or text message)
           this.websocket.send(JSON.stringify({ type: 'keep_alive' }));
         }
       }, 10000); // Every 10 seconds
       
-      console.log('🎙️ Recording started with raw audio processing');
+      console.log('🎙️ Continuous listening started');
+      return true;
       
     } catch (error) {
-      console.error('Failed to start recording:', error);
+      console.error('Failed to start continuous listening:', error);
       if (this.onError) {
-        this.onError('Failed to start recording. Please check your microphone.');
+        this.onError('Failed to start listening. Please check your microphone.');
       }
+      return false;
     }
   }
-  
-  stopRecording() {
-    if (!this.isRecording) return;
+
+  stopContinuousListening() {
+    if (!this.isListening) return;
     
     try {
+      // Clear timers
+      this.clearSilenceTimer();
+      
       // Stop audio processing
       if (this.processor) {
         this.processor.disconnect();
@@ -284,43 +330,132 @@ class VoiceService {
         this.keepAliveInterval = null;
       }
       
-      this.isRecording = false;
-      console.log('🎙️ Recording stopped');
+      this.isListening = false;
+      this.liveTranscript = '';
+      this.finalTranscript = '';
+      
+      console.log('🎙️ Continuous listening stopped');
       
     } catch (error) {
-      console.error('Error stopping recording:', error);
+      console.error('Error stopping continuous listening:', error);
     }
   }
-  
-  async playAudioResponse(audioUrl) {
+
+  startSilenceTimer() {
+    this.clearSilenceTimer();
+    
+    this.silenceTimer = setTimeout(() => {
+      if (this.finalTranscript.trim() && !this.isAIResponding) {
+        console.log('🤖 Silence detected, sending to AI:', this.finalTranscript);
+        
+        // Send the final transcript to AI
+        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+          this.websocket.send(JSON.stringify({
+            type: 'process_transcript',
+            text: this.finalTranscript,
+            session_id: this.sessionId
+          }));
+        }
+        
+        // Clear the transcript
+        this.finalTranscript = '';
+      }
+    }, this.silenceThreshold);
+  }
+
+  clearSilenceTimer() {
+    if (this.silenceTimer) {
+      clearTimeout(this.silenceTimer);
+      this.silenceTimer = null;
+    }
+  }
+
+  resetSilenceTimer() {
+    this.clearSilenceTimer();
+  }
+
+  // Legacy method for backwards compatibility
+  async startRecording() {
+    return this.startContinuousListening();
+  }
+
+  // Legacy method for backwards compatibility
+  stopRecording() {
+    this.stopContinuousListening();
+  }  async playAudioResponse(audioUrl) {
     try {
       // Stop any currently playing audio
       this.stopCurrentAudio();
       
       if (audioUrl) {
         this.currentAudio = new Audio(audioUrl);
-        this.currentAudio.play();
+        
+        // Monitor for user speech while AI is talking
+        this.currentAudio.onplay = () => {
+          this.isAIResponding = true;
+          if (this.onAIStateChange) {
+            this.onAIStateChange(true);
+          }
+        };
         
         this.currentAudio.onended = () => {
           this.currentAudio = null;
+          this.isAIResponding = false;
+          if (this.onAIStateChange) {
+            this.onAIStateChange(false);
+          }
         };
         
         this.currentAudio.onerror = (error) => {
           console.error('Audio playback error:', error);
           this.currentAudio = null;
+          this.isAIResponding = false;
+          if (this.onAIStateChange) {
+            this.onAIStateChange(false);
+          }
         };
+        
+        this.currentAudio.play();
       }
       
     } catch (error) {
       console.error('Failed to play audio response:', error);
+      this.isAIResponding = false;
+      if (this.onAIStateChange) {
+        this.onAIStateChange(false);
+      }
     }
   }
-  
+
   stopCurrentAudio() {
     if (this.currentAudio) {
       this.currentAudio.pause();
       this.currentAudio.currentTime = 0;
       this.currentAudio = null;
+      this.isAIResponding = false;
+      if (this.onAIStateChange) {
+        this.onAIStateChange(false);
+      }
+    }
+  }
+
+  // Smart interruption - called when user starts speaking while AI is responding
+  handleUserInterruption() {
+    console.log('🎤 User interruption detected');
+    
+    // Stop AI audio immediately
+    this.stopCurrentAudio();
+    
+    // Send interrupt signal to server
+    if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+      this.websocket.send(JSON.stringify({
+        type: 'interrupt'
+      }));
+    }
+    
+    this.isAIResponding = false;
+    if (this.onAIStateChange) {
+      this.onAIStateChange(false);
     }
   }
   
@@ -346,6 +481,10 @@ class VoiceService {
     
     try {
       const baseUrl = apiClient.getApiBaseUrl();
+      
+      // Ensure we have a session ID
+      const currentSessionId = this.sessionId || `voice_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
       const response = await fetch(`${baseUrl}/voice/synthesize`, {
         method: 'POST',
         headers: {
@@ -353,7 +492,7 @@ class VoiceService {
         },
         body: JSON.stringify({
           text: text,
-          session_id: this.sessionId,
+          session_id: currentSessionId,
           return_audio: true
         })
       });
@@ -386,10 +525,11 @@ class VoiceService {
   }
   
   stopVoiceChat() {
-    this.stopRecording();
+    this.stopContinuousListening();
     this.stopCurrentAudio();
     
-    // Clear keep-alive interval
+    // Clear all timers
+    this.clearSilenceTimer();
     if (this.keepAliveInterval) {
       clearInterval(this.keepAliveInterval);
       this.keepAliveInterval = null;
@@ -404,12 +544,17 @@ class VoiceService {
     }
     
     this.sessionId = null;
+    this.isAIResponding = false;
     console.log('🔊 Voice chat stopped');
   }
   
   // Event handler setters
   setOnTranscript(callback) {
     this.onTranscript = callback;
+  }
+  
+  setOnLiveTranscript(callback) {
+    this.onLiveTranscript = callback;
   }
   
   setOnResponse(callback) {
@@ -423,7 +568,13 @@ class VoiceService {
   setOnStatusChange(callback) {
     this.onStatusChange = callback;
   }
+  
+  setOnAIStateChange(callback) {
+    this.onAIStateChange = callback;
+  }
 }
 
 // Export singleton instance
-export const voiceService = new VoiceService();
+const voiceService = new VoiceService();
+export { voiceService };
+export default voiceService;

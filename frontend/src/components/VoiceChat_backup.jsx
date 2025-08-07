@@ -11,36 +11,43 @@ const VoiceChat = ({ sessionId, onVoiceResponse, onError, className = '', disabl
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    voiceService.setOnLiveTranscript((text) => {
-      setLiveTranscript(text);
+    voiceService.setTranscriptCallback((data) => {
+      if (data.type === 'live') {
+        setLiveTranscript(data.text);
+      }
     });
 
-    voiceService.setOnTranscript((text) => {
-      setFinalTranscript(text);
-      setLiveTranscript(''); // Clear live transcript when we get final
+    voiceService.setFinalTranscriptCallback((data) => {
+      if (data.type === 'final') {
+        setFinalTranscript(data.text);
+        setLiveTranscript(''); // Clear live transcript when we get final
+      }
     });
 
-    voiceService.setOnStatusChange((status) => {
+    voiceService.setStatusCallback((status) => {
       setVoiceStatus(status);
       setIsVoiceEnabled(status === 'ready');
     });
 
-    voiceService.setOnResponse((response) => {
-      if (response && onVoiceResponse) {
+    voiceService.setAIResponseCallback((data) => {
+      setIsAIResponding(data.isResponding);
+      if (data.response && onVoiceResponse) {
         onVoiceResponse({
-          response: response,
+          response: data.response,
           timestamp: new Date()
         });
       }
     });
 
-    voiceService.setOnAIStateChange((state) => {
-      setIsAIResponding(state.isResponding || false);
-      setIsProcessing(state.isProcessing || false);
-      setIsListening(state.isListening || false);
+    voiceService.setProcessingCallback((isProcessingNow) => {
+      setIsProcessing(isProcessingNow);
     });
 
-    voiceService.setOnError((error) => {
+    voiceService.setListeningCallback((listening) => {
+      setIsListening(listening);
+    });
+
+    voiceService.setErrorCallback((error) => {
       if (onError) {
         onError({
           message: error.message || 'Voice service error',
@@ -50,7 +57,7 @@ const VoiceChat = ({ sessionId, onVoiceResponse, onError, className = '', disabl
     });
 
     return () => {
-      // No cleanup needed as voiceService is a singleton
+      voiceService.cleanup();
     };
   }, [onVoiceResponse, onError]);
 
@@ -75,7 +82,7 @@ const VoiceChat = ({ sessionId, onVoiceResponse, onError, className = '', disabl
 
   const toggleListening = () => {
     if (isListening) {
-      voiceService.stopContinuousListening();
+      voiceService.stopListening();
     } else {
       voiceService.startContinuousListening();
     }
@@ -109,15 +116,10 @@ const VoiceChat = ({ sessionId, onVoiceResponse, onError, className = '', disabl
   const sendTextWithVoice = async (text) => {
     if (!text?.trim()) return null;
     
-    console.log('🔊 Sending text with voice:', text);
-    
-    // Ensure session ID is set before making the call
-    if (!voiceService.sessionId && sessionId) {
-      voiceService.sessionId = sessionId;
-    }
-    
+    setIsProcessing(true);
     const result = await voiceService.sendTextWithVoice(text);
-    console.log('🔊 Voice result:', result);
+    setIsProcessing(false);
+    
     return result;
   };
 
@@ -126,7 +128,7 @@ const VoiceChat = ({ sessionId, onVoiceResponse, onError, className = '', disabl
     if (typeof window !== 'undefined') {
       window.voiceChatAPI = { sendTextWithVoice };
     }
-  }, [sessionId]);
+  }, []);
 
   if (!isVoiceEnabled && voiceStatus === 'checking') {
     return (
