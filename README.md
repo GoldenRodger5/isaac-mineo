@@ -1,470 +1,333 @@
 # Isaac Mineo - AI-Powered Portfolio 🚀
 
-A modern, full-stack portfolio application with **FastAPI backend** and **React frontend**, featuring advanced AI chatbot capabilities with **enhanced context awareness** and **entity tracking**.
+A modern, full-stack portfolio application with **FastAPI backend** and **React frontend**, featuring advanced AI chatbot with voice chat capabilities, real-time analytics, and intelligent conversation management.
 
-## 🏗️ Clean Architecture
+## 🏗️ Architecture Overview
 
-This project follows a **consolidated architecture** where all AI functionality, caching, and API logic resides in the FastAPI backend, while the frontend focuses purely on UI/UX.
+This project follows a **clean separation of concerns** architecture:
+- **FastAPI Backend**: All AI logic, data processing, WebSocket services, and API endpoints
+- **React Frontend**: Pure UI/UX focused interface with responsive design
+- **Real-time Features**: WebSocket-based voice chat with speech-to-text and text-to-speech
+- **Analytics**: Comprehensive visitor tracking and interaction monitoring
 
 ## 📁 Project Structure
 
 ```
 isaac-mineo/
-├── backend/                 # 🐍 FastAPI Backend (All Logic)
+├── backend/                 # 🐍 FastAPI Backend
 │   ├── app/
 │   │   ├── main.py         # FastAPI application entry
 │   │   ├── routers/        # API endpoints
-│   │   │   └── chatbot.py  # Enhanced AI chatbot with context
-│   │   ├── services/       # Business logic
-│   │   └── utils/          # Pinecone, Redis, utilities
-│   └── knowledge-base/     # AI knowledge base documents
-├── frontend/               # ⚛️ React Frontend (UI Only)
+│   │   │   ├── chatbot.py  # AI chatbot with context awareness
+│   │   │   ├── voice.py    # WebSocket voice chat handler
+│   │   │   ├── analytics.py # Visitor tracking & metrics
+│   │   │   ├── auth.py     # Authentication endpoints
+│   │   │   └── github_explainer.py # Code explanation service
+│   │   ├── services/       # Business logic & AI services
+│   │   ├── middleware/     # CORS, logging, rate limiting
+│   │   ├── models/         # Pydantic data models
+│   │   └── utils/          # Database, caching, utilities
+│   ├── tests/              # Backend test suite
+│   └── requirements.txt    # Python dependencies
+├── frontend/               # ⚛️ React Frontend
 │   ├── src/
-│   │   ├── components/     # React components
-│   │   └── services/       # API client (calls FastAPI)
-│   ├── public/             # Static assets
-│   └── scripts/            # Testing utilities
-├── deployment scripts...   # 🚀 Deployment automation
-└── README.md              # This file
+│   │   ├── components/     # React components & UI
+│   │   ├── services/       # API client services
+│   │   ├── contexts/       # React context providers
+│   │   ├── hooks/          # Custom React hooks
+│   │   └── utils/          # Frontend utilities
+│   ├── public/             # Static assets, PWA manifest
+│   └── package.json        # Node.js dependencies
+├── knowledge-base/         # AI knowledge documents
+├── .env                    # Environment configuration
+├── start-dev.sh           # Development startup script
+├── start-backend.sh       # Backend-only startup
+├── start-frontend.sh      # Frontend-only startup
+└── deploy-*.sh            # Deployment scripts
 ```
 
-## ✨ Enhanced Features
+## ✨ Key Features
 
-### 🤖 AI-Powered Backend (FastAPI)
-- **GPT-4o Chatbot** with **enhanced context awareness**
-- **Entity Tracking** - remembers projects, topics, and skills mentioned
-- **Conversational Memory** - understands follow-up questions in context
-- **Vector Search** using Pinecone for semantic question answering
-- **Redis Caching** with session management for conversations
-- **Rate Limiting** and comprehensive error handling
-- **API Documentation** at `/docs` endpoint
+### 🤖 AI-Powered Chatbot
+- **OpenAI GPT Integration** with intelligent conversation management
+- **Context-aware responses** that understand follow-up questions
+- **Session management** with conversation history tracking
+- **Fallback support** for enhanced reliability
+- **Real-time streaming responses** for better user experience
 
-### 💬 Context-Aware Conversations
-```
-User: "Tell me about Nutrivize"
-Bot: [Explains Nutrivize project in detail]
+### 🎤 Voice Chat Capabilities
+- **Real-time voice conversations** via WebSocket connections
+- **Speech-to-text** using Deepgram API
+- **Text-to-speech** using ElevenLabs for natural voice responses
+- **Continuous listening** with automatic pause detection
+- **Barge-in support** allowing interruption of AI responses
+- **Mobile-optimized** voice controls with visual feedback
 
-User: "What's the tech stack?"  
-Bot: [Understands you mean Nutrivize's tech stack specifically]
-```
+### 📊 Analytics & Tracking
+- **Real-time visitor analytics** with detailed metrics
+- **AI interaction tracking** to monitor chatbot usage
+- **Page view analytics** with engagement metrics
+- **Project interest tracking** to understand user preferences
+- **Contact form analytics** for lead generation insights
+- **Admin dashboard** for comprehensive data visualization
 
-### 🎨 Modern Frontend (React + Vite)
-- **Clean Architecture** - No duplicate files or obsolete code
-- **FastAPI Integration** - Single source of truth for all API calls
-- **Responsive Design** with Tailwind CSS
-- **Progressive Web App** capabilities
-- **Professional Sections**: About, Projects, Resume, Contact
+### 💻 Code Intelligence
+- **GitHub repository analysis** and code explanation
+- **Intelligent code parsing** with context understanding
+- **Educational explanations** of technical implementations
+- **Interactive code exploration** features
+
+### 🎨 Modern Frontend Experience
+- **Responsive design** optimized for all devices
+- **Progressive Web App (PWA)** capabilities
+- **Clean, professional interface** with smooth animations
+- **Dark/light theme support** with user preferences
+- **Mobile-first approach** with touch-optimized controls
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- **Python 3.12+** for backend
-- **Node.js 18+** for frontend
+- **Python** for backend services
+- **Node.js** and npm for frontend development
 - **Git** for version control
 
-### Development Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/GoldenRodger5/isaac-mineo.git
-   cd isaac-mineo
-   ```
-
-2. **Configure Environment**
-   ```bash
-   # Copy the .env file and add your API keys
-   # The .env file contains all configuration in one place
-   # Update the following with your actual values:
-   # - OPENAI_API_KEY
-   # - PINECONE_API_KEY (optional)
-   # - REDIS_URL (optional)
-   # - Email settings (optional)
-   
-   # Validate your environment setup
-   ./validate-env.sh
-   ```
-
-3. **Start Development Environment**
-   ```bash
-   # Start both backend and frontend with automatic configuration
-   ./start-dev.sh
-   ```
-
-   This script will:
-   - Load environment variables from .env
-   - Automatically detect and use available ports
-   - Start FastAPI backend (usually port 8000)
-   - Start React frontend (usually port 5173)
-   - Configure frontend to communicate with backend
-
-### Manual Start (Alternative)
-
-**Backend Only:**
+### 1. Clone and Setup
 ```bash
-./start-backend.sh
-# Backend will be available at http://localhost:8001
-# API docs at http://localhost:8001/docs
+# Clone the repository
+git clone https://github.com/GoldenRodger5/isaac-mineo.git
+cd isaac-mineo
+
+# Make scripts executable
+chmod +x *.sh
 ```
 
-**Frontend Only:**
+### 2. Environment Configuration
 ```bash
-./start-frontend.sh  
-# Frontend will be available at http://localhost:5173+
+# Copy environment template and configure
+cp .env.example .env
+
+# Add your API keys to .env file:
+# OPENAI_API_KEY=your_openai_key_here
+# DEEPGRAM_API_KEY=your_deepgram_key_here (for voice features)
+# ELEVENLABS_API_KEY=your_elevenlabs_key_here (for voice responses)
 ```
+
+### 3. Start Development Environment
+```bash
+# Option 1: Start both backend and frontend automatically
+./start-dev.sh
+
+# Option 2: Start individually
+./start-backend.sh    # Backend on port 8000
+./start-frontend.sh   # Frontend on port 5173
+```
+
+### 4. Access the Application
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs
+- **Health Check**: http://localhost:8000/health
 
 ## 🌐 Deployment
 
-### Production Deployment to Render
-
+### Backend Deployment (Render)
 ```bash
-./render-deploy.sh
+# Deploy FastAPI backend to Render
+./deploy-backend.sh
 ```
 
-This will deploy the FastAPI backend to Render. The frontend can be deployed to Vercel using their Git integration.
+### Frontend Deployment (Vercel)
+```bash
+# Deploy React frontend to Vercel
+./deploy-frontend.sh
+```
+
+The backend and frontend are designed to work independently, allowing for flexible deployment strategies across different hosting platforms.
 
 ## 📚 API Documentation
 
-### Enhanced Chatbot Endpoint
+### Core Endpoints
 
+#### Chatbot API
 **Endpoint:** `POST /api/chatbot`
+- Enhanced AI chatbot with conversation context
+- Session management for multi-turn conversations
+- Real-time streaming responses available
 
-**Features:**
-- **Entity Tracking** - Remembers projects, skills, companies mentioned
-- **Context Awareness** - Understands follow-up questions  
-- **Session Management** - Maintains conversation history
-- **Vector Search** - Semantic search through knowledge base
-- **Caching** - Improved response times
-
-**Request Example:**
+**Request:**
 ```json
 {
-  "question": "What's the tech stack?",
-  "sessionId": "existing-session-id-or-null"
+  "question": "Tell me about your experience with React",
+  "sessionId": "optional-session-id"
 }
 ```
 
-**Response Example:**
+**Response:**
 ```json
 {
-  "response": "Based on our previous discussion about Nutrivize...",
-  "sessionId": "uuid-session-id",
-  "searchMethod": "vector_search",
-  "conversationLength": 2,
-  "entities": {
-    "projects": ["nutrivize"],
-    "topics": ["tech_stack"],
-    "skills": ["react", "fastapi"]
-  },
-  "contextUsed": ["User is asking about Nutrivize's tech stack specifically."]
+  "response": "I have extensive experience with React...",
+  "sessionId": "unique-session-id",
+  "conversationLength": 1
 }
 ```
 
-### Other Endpoints
+#### Voice Chat WebSocket
+**Endpoint:** `WebSocket /api/voice/chat`
+- Real-time voice conversations
+- Deepgram speech-to-text integration
+- ElevenLabs text-to-speech responses
+- Binary audio data streaming
 
+#### Analytics Endpoints
+- `POST /api/analytics/track/visitor` - Track visitor sessions
+- `POST /api/analytics/track/page` - Track page views
+- `POST /api/analytics/track/ai-interaction` - Track AI usage
+- `GET /api/analytics/public/metrics` - Public analytics data
+
+#### Other Services
+- `POST /api/contact` - Contact form submission
+- `POST /api/github/explain` - Code explanation service
+- `GET /api/health` - Health check endpoint
+
+### Interactive API Documentation
 Once the backend is running, visit:
-- **API Documentation**: http://localhost:8001/docs
-- **Health Check**: http://localhost:8001/health  
-- **Contact Form**: `POST /api/contact`
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
 
 ## 🛠️ Technology Stack
 
-### 🐍 Backend (FastAPI) - **All Logic & AI**
-- **FastAPI** - Modern Python web framework
-- **OpenAI GPT-4o** - Enhanced AI chatbot with context awareness
-- **Pinecone** - Vector database for semantic search
-- **Redis** - Session management and caching
-- **Uvicorn** - ASGI server
-- **Comprehensive APIs** - Chatbot, Contact, Health endpoints
+### 🐍 Backend (FastAPI)
+- **FastAPI** - Modern Python web framework with automatic OpenAPI documentation
+- **OpenAI GPT** - Advanced AI chatbot with conversation management
+- **Deepgram** - Real-time speech-to-text for voice chat
+- **ElevenLabs** - High-quality text-to-speech synthesis
+- **WebSocket** - Real-time bidirectional communication
+- **Uvicorn** - High-performance ASGI server
+- **Pydantic** - Data validation and serialization
+- **Python** - Modern Python runtime
 
-### ⚛️ Frontend (React + Vite) - **Pure UI**
-- **React 18** - UI framework
-- **Vite** - Build tool and dev server  
-- **Tailwind CSS** - Styling framework
-- **Clean Architecture** - No backend logic, calls FastAPI only
+### ⚛️ Frontend (React + Vite)
+- **React** - Component-based UI framework
+- **Vite** - Fast build tool and development server
+- **Tailwind CSS** - Utility-first styling framework
+- **JavaScript/JSX** - Modern JavaScript with React syntax
+- **WebSocket API** - Real-time communication with backend
+- **PWA Features** - Progressive web app capabilities
 
-### 🚀 DevOps & Deployment
-- **Render** - Backend hosting
-- **Vercel** - Frontend hosting (SPA routing configured)
-- **Dynamic Scripts** - Automatic port detection
-- **Git** - Version control
+### 🌐 Infrastructure & Deployment
+- **Render** - Backend hosting platform
+- **Vercel** - Frontend hosting with edge deployment
+- **WebSocket Protocol** - Real-time communication
+- **RESTful APIs** - Standard HTTP/JSON communication
+- **Git** - Version control and deployment automation
 
-## 🧹 Recent Architecture Improvements
+### 🔧 Development Tools
+- **Environment Variables** - Centralized configuration management
+- **Shell Scripts** - Automated development and deployment
+- **Hot Reloading** - Fast development iteration
+- **API Documentation** - Automatic Swagger/OpenAPI docs
+- **Health Checks** - System monitoring and status
 
-### ✅ Consolidated Codebase
-- **Removed duplicate files** - No more `vercel_new.json`, `App_old.jsx`, etc.
-- **Single source of truth** - All AI logic in FastAPI backend
-- **No Vercel functions** - Everything goes through FastAPI endpoints
-- **Clean frontend** - Focused on UI/UX only
+## 📝 Environment Configuration
 
-### ✅ Enhanced AI Capabilities  
-- **Entity tracking** across conversations
-- **Context-aware responses** to follow-up questions
-- **Session management** with conversation memory
-- **Improved caching** for better performance
+All configuration is managed through environment variables in the `.env` file:
 
-## 📝 Environment Variables
-
-All configuration is centralized in a single `.env` file in the project root:
-
+### Required Variables
 ```env
-# Site Configuration
-VITE_SITE_PASSWORD=Buddydog#41
-
-# AI API Keys
+# AI Services (Required for core functionality)
 OPENAI_API_KEY=your_openai_api_key_here
-PINECONE_API_KEY=your_pinecone_api_key_here
 
-# Email Configuration (for contact form)
-SENDER_EMAIL=noreply@isaacmineo.com
-SENDER_PASSWORD=your_gmail_app_password_here
+# Voice Chat Features (Required for voice functionality)
+DEEPGRAM_API_KEY=your_deepgram_api_key_here
+ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
 
-# Optional: Redis for caching
-REDIS_URL=redis://localhost:6379
+# Site Configuration
+VITE_SITE_PASSWORD=Buddydog#41  # Already configured
 ```
 
-**Required for basic functionality:**
-- `VITE_SITE_PASSWORD` - Already set to "Buddydog#41"
-- `OPENAI_API_KEY` - Required for AI chatbot functionality
-
-**Optional for enhanced features:**
-- `PINECONE_API_KEY` - For vector search capabilities
-- `REDIS_URL` - For improved caching and session management
-- Email settings - For contact form functionality
-
-## 📖 Additional Documentation
-
-- **[Architecture Guide](./ARCHITECTURE.md)** - Detailed architecture documentation
-- **[Frontend README](./frontend/README.md)** - Frontend-specific documentation  
-- **[Backend README](./backend/README.md)** - Backend-specific documentation
-
-## 🔄 Recent Updates
-
-### ✅ Architecture Consolidation (Latest)
-- **Removed 22+ duplicate/obsolete files** for cleaner codebase
-- **Consolidated all AI logic** in FastAPI backend
-- **Enhanced context awareness** with entity tracking
-- **Improved session management** with conversation memory
-- **Single source of truth** for all configurations
-
-### 🧹 Cleanup Highlights
-- No more duplicate `vercel_*.json` files
-- No more old component versions (`App_old.jsx`, etc.)
-- No more unused utilities or API functions
-- Clean, focused frontend that calls FastAPI only
-
----
-
-## 🚀 Get Started
-
-```bash
-git clone https://github.com/GoldenRodger5/isaac-mineo.git
-cd isaac-mineo
-./start-dev.sh
-```
-
-Visit http://localhost:5173 to see the portfolio in action! 🎉
-- `OPENAI_API_KEY` - Get from https://platform.openai.com/api-keys
-
-**Optional but recommended:**
-- `PINECONE_API_KEY` - For enhanced vector search
-- `SENDER_EMAIL` & `SENDER_PASSWORD` - For contact form emails
-- `REDIS_URL` - For caching and performance
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test with `./start-dev.sh`
-5. Submit a pull request
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## 📧 Contact
-
-**Isaac Mineo**
-- **Email**: isaac@isaacmineo.com
-- **Portfolio**: [isaacmineo.com](https://isaacmineo.com)
-- **GitHub**: [@GoldenRodger5](https://github.com/GoldenRodger5)
-
----
----
-*Built with ❤️ using FastAPI, React, and AI*
-```
-
-## � Quick Start
-
-### Prerequisites
-- Node.js 18+ and npm
-- Python 3.8+ (for AI features)
-- API Keys: OpenAI, Claude (Anthropic), Pinecone, Redis
-
-### 1. Clone and Install
-```bash
-git clone https://github.com/GoldenRodger5/isaac-mineo.git
-cd isaac-mineo
-chmod +x start.sh
-./start.sh
-```
-
-### 2. Environment Setup
-```bash
-cd frontend
-cp .env.example .env.local
-# Add your API keys to .env.local
-```
-
-### 3. Run Development Server
-```bash
-# Option 1: Use automation script
-./dev.sh
-
-# Option 2: Manual start
-cd frontend
-npm install
-npm run dev
-```
-
-## 🔧 Configuration
-
-### Environment Variables (.env.local)
+### Optional Variables
 ```env
-# AI APIs
-OPENAI_API_KEY=your_openai_key
-CLAUDE_API_KEY=your_claude_key
+# Contact Form (Optional)
+SENDER_EMAIL=your_email@gmail.com
+SENDER_PASSWORD=your_gmail_app_password
 
-# Vector Database
-PINECONE_API_KEY=your_pinecone_key
-PINECONE_ENVIRONMENT=your_environment
-PINECONE_INDEX_NAME=isaac-portfolio
-
-# Caching
-REDIS_URL=your_redis_url
-
-# Optional
-VERCEL_ENV=development
+# Analytics & Monitoring (Optional)
+ENABLE_ANALYTICS=true
 ```
 
-### API Keys Setup
-1. **OpenAI**: Get key from [OpenAI Dashboard](https://platform.openai.com/api-keys)
-2. **Claude**: Get key from [Anthropic Console](https://console.anthropic.com/)
-3. **Pinecone**: Get key from [Pinecone Console](https://app.pinecone.io/)
-4. **Redis**: Get URL from [Redis Cloud](https://redis.com/try-free/)
+### API Key Sources
+- **OpenAI**: Get from [OpenAI Platform](https://platform.openai.com/api-keys)
+- **Deepgram**: Get from [Deepgram Console](https://console.deepgram.com/)
+- **ElevenLabs**: Get from [ElevenLabs Platform](https://elevenlabs.io/)
 
-## 🧠 AI Features
+## � Development Workflow
 
-### Semantic Search
-- Searches across resume, transcript, and curated knowledge base
-- Uses text-embedding-3-small for vector embeddings
-- Cached results for optimal performance
-
-### Document Processing
-- Intelligent PDF parsing and text chunking
-- Context-aware document sections
-- Optimized for question-answering
-
-### Conversation Management
-- Session-based chat history
-- Context-aware responses
-- Fallback between OpenAI and Claude APIs
-
-## 📱 PWA Features
-
-- **Offline Support**: Service worker with intelligent caching
-- **App-like Experience**: Installable on mobile and desktop
-- **Fast Loading**: Optimized assets and lazy loading
-- **Responsive**: Mobile-first design with dynamic layouts
-
-## 🚀 Deployment
-
-### Vercel (Recommended)
+### Starting Development
 ```bash
-# Automated deployment
-./deploy.sh
+# Full development environment
+./start-dev.sh
 
-# Manual deployment
-cd frontend
-vercel --prod
+# Individual services
+./start-backend.sh    # FastAPI backend only
+./start-frontend.sh   # React frontend only
 ```
 
-### Manual Deployment
-1. Build the project: `npm run build`
-2. Deploy `frontend/dist/` to your hosting provider
-3. Configure environment variables on your platform
+### Testing Voice Features
+1. Start the development environment
+2. Navigate to the portfolio site
+3. Use the microphone button in the chat interface
+4. Test voice conversations with the AI
 
-## 📚 Documentation
+### Monitoring and Debugging
+- **Backend logs**: Check terminal running backend service
+- **Frontend console**: Use browser developer tools
+- **API testing**: Use `/docs` endpoint for interactive testing
+- **Health checks**: Visit `/health` endpoint
 
-- [`QUICKSTART.md`](./QUICKSTART.md) - Rapid setup guide
-- [`STRUCTURE.md`](./STRUCTURE.md) - Project architecture
-- [`frontend/AI_CHATBOT_SETUP.md`](./frontend/AI_CHATBOT_SETUP.md) - AI configuration
-- [`frontend/DEPLOYMENT.md`](./frontend/DEPLOYMENT.md) - Deployment guide
-- [`FIXES.md`](./FIXES.md) - Troubleshooting guide
+## � Additional Documentation
 
-## �️ Development
-
-### Project Scripts
-```bash
-# Start development server
-./dev.sh
-
-# Deploy to production  
-./deploy.sh
-
-# Full project setup
-./start.sh
-
-# Run tests
-cd frontend && npm test
-```
-
-### Testing AI Features
-```bash
-cd frontend
-node scripts/testChatbot.js
-node scripts/initializeKnowledgeBase.js
-```
-
-## � Performance
-
-- **Lighthouse Score**: 95+ across all metrics
-- **First Contentful Paint**: < 1.5s
-- **Interactive**: < 2.5s
-- **Cached AI Responses**: < 200ms
-- **Vector Search**: < 500ms
-
-## 🔒 Security
-
-- Environment variable isolation
-- API key encryption in transit
-- Rate limiting on AI endpoints
-- Input sanitization and validation
-- CORS configuration for production
+- **[Backend README](./backend/README.md)** - FastAPI backend details
+- **[Frontend README](./frontend/README.md)** - React frontend specifics  
+- **[Architecture Guide](./ARCHITECTURE.md)** - System architecture overview
+- **[Development Guide](./DEVELOPMENT.md)** - Development best practices
+- **[Environment Setup](./ENVIRONMENT_CONFIG.md)** - Detailed environment configuration
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
+3. Commit your changes: `git commit -m 'Add amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
+
+### Development Guidelines
+- Follow existing code style and patterns
+- Test voice features thoroughly on different devices
+- Ensure responsive design works across screen sizes
+- Maintain API compatibility when making backend changes
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 About Isaac Mineo
+## �‍💻 About Isaac Mineo
 
-Computer Science student at the University of Iowa with a passion for AI, full-stack development, and creating innovative solutions. This portfolio showcases both technical skills and the ability to integrate cutting-edge AI technologies into practical applications.
+Computer Science student at the University of Iowa with expertise in full-stack development, AI integration, and modern web technologies. This portfolio demonstrates practical application of:
+
+- **AI/ML Integration** - Real-world implementation of OpenAI, Deepgram, and ElevenLabs APIs
+- **Full-Stack Architecture** - Clean separation between FastAPI backend and React frontend
+- **Real-time Systems** - WebSocket implementation for voice chat functionality
+- **Modern DevOps** - Automated deployment and environment management
+- **User Experience** - Mobile-first, accessible design with progressive web app features
 
 **Connect with me:**
 - 📧 Email: isaac-mineo@uiowa.edu
 - 💼 LinkedIn: [Isaac Mineo](https://linkedin.com/in/isaac-mineo)
 - 🐱 GitHub: [@GoldenRodger5](https://github.com/GoldenRodger5)
+- 🌐 Portfolio: [isaacmineo.com](https://isaacmineo.com)
 
 ---
 
-⭐ Star this repo if you found it helpful!
+⭐ **Star this repo if you found it helpful!**
 
-*Built with React, Vite, Tailwind CSS, OpenAI, Claude, Pinecone, and Redis*
+*Built with FastAPI, React, OpenAI, Deepgram, ElevenLabs, and modern web technologies*

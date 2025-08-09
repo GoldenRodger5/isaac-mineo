@@ -40,6 +40,16 @@ const VoiceChat = ({ sessionId, onVoiceResponse, onError, className = '', disabl
       setIsListening(state.isListening || false);
     });
 
+    // Add dedicated listener for voice service listening state changes
+    voiceService.setOnListeningStateChange = (callback) => {
+      voiceService.onListeningStateChange = callback;
+    };
+    
+    voiceService.setOnListeningStateChange((isListeningNow) => {
+      console.log('🎙️ Listening state changed:', isListeningNow);
+      setIsListening(isListeningNow);
+    });
+
     voiceService.setOnError((error) => {
       if (onError) {
         onError({
@@ -48,6 +58,11 @@ const VoiceChat = ({ sessionId, onVoiceResponse, onError, className = '', disabl
         });
       }
     });
+
+    // Force re-check of voice support after component mounts
+    setTimeout(() => {
+      voiceService.checkVoiceSupport();
+    }, 1000);
 
     return () => {
       // No cleanup needed as voiceService is a singleton
@@ -73,11 +88,28 @@ const VoiceChat = ({ sessionId, onVoiceResponse, onError, className = '', disabl
     setIsProcessing(false);
   };
 
-  const toggleListening = () => {
+  const toggleListening = async () => {
     if (isListening) {
       voiceService.stopContinuousListening();
     } else {
-      voiceService.startContinuousListening();
+      // First ensure voice chat WebSocket is connected
+      if (!voiceService.websocket || voiceService.websocket.readyState !== WebSocket.OPEN) {
+        console.log('🔌 Starting voice chat session first...');
+        const success = await voiceService.startVoiceChat(sessionId);
+        if (!success) {
+          console.error('Failed to start voice chat session');
+          return;
+        }
+        // Wait a moment for connection to establish
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      // Now start continuous listening
+      console.log('🎙️ Starting continuous listening...');
+      const success = await voiceService.startContinuousListening();
+      if (!success) {
+        console.error('Failed to start continuous listening');
+      }
     }
   };
 
@@ -130,70 +162,68 @@ const VoiceChat = ({ sessionId, onVoiceResponse, onError, className = '', disabl
 
   if (!isVoiceEnabled && voiceStatus === 'checking') {
     return (
-      <div className={`flex items-center justify-center p-4 text-sm text-gray-500 ${className}`}>
+      <div className={`flex items-center justify-center p-2 text-sm text-gray-500 ${className}`}>
         <span className="animate-spin mr-2">🔄</span>
         <span>{getStatusMessage()}</span>
       </div>
     );
   }
 
+  // Show voice controls regardless of voice status for better UX
+  const showVoiceControls = isVoiceEnabled || voiceStatus === 'checking';
+
   return (
     <div className={`voice-chat-container ${className}`}>
       {/* Voice Status Display */}
       {voiceStatus !== 'ready' && (
-        <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <span className="text-gray-600">{getStatusMessage()}</span>
+        <div className="mb-2 p-2 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
+          <span className="text-gray-600 text-xs">{getStatusMessage()}</span>
         </div>
       )}
 
       {/* Voice Controls */}
-      {isVoiceEnabled && (
-        <div className="flex flex-col items-center space-y-4">
-          {/* Main Voice Button */}
-          {!isListening ? (
+      {showVoiceControls && (
+        <div className="flex items-center justify-center space-x-2">
+          {/* Main Microphone Button - Primary Action */}
+          <button
+            onClick={toggleListening}
+            disabled={disabled || isProcessing || voiceStatus !== 'ready'}
+            className={`p-3 rounded-full transition-all duration-200 ${
+              isListening
+                ? 'bg-red-600 hover:bg-red-700 animate-pulse text-white shadow-lg'
+                : voiceStatus === 'ready'
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg'
+                  : 'bg-gray-400 cursor-not-allowed text-white'
+            }`}
+            title={
+              voiceStatus !== 'ready' 
+                ? 'Voice services initializing...' 
+                : isListening 
+                  ? 'Click to stop listening' 
+                  : 'Click to start voice chat'
+            }
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+          </button>
+          
+          {/* Stop Voice Chat Button (only show when listening) */}
+          {isListening && (
             <button
-              onClick={startVoiceChat}
-              disabled={disabled || isProcessing}
-              className={`p-4 rounded-full transition-all duration-200 ${
-                isProcessing
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-primary-600 hover:bg-primary-700 active:scale-95'
-              } text-white shadow-lg hover:shadow-xl`}
+              onClick={stopVoiceChat}
+              className="p-2 bg-gray-500 hover:bg-gray-600 text-white rounded-full transition-colors"
+              title="Stop voice chat"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-          ) : (
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={toggleListening}
-                className={`p-4 rounded-full transition-all duration-200 ${
-                  isListening
-                    ? 'bg-red-600 hover:bg-red-700 animate-pulse'
-                    : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-                } text-white shadow-lg hover:shadow-xl`}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                </svg>
-              </button>
-
-              <button
-                onClick={stopVoiceChat}
-                className="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors"
-                title="Stop voice chat"
-              >
-                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
           )}
 
           {/* Live Transcription Display */}
           {isListening && (liveTranscript || finalTranscript) && (
-            <div className="max-w-xs bg-gray-100 border rounded-lg p-2 text-sm">
+            <div className="max-w-xs bg-gray-100 border rounded-lg p-2 text-sm mt-2">
               {liveTranscript && (
                 <div className="text-gray-600 italic">
                   <span className="text-blue-600">🎤</span> {liveTranscript}
@@ -209,7 +239,7 @@ const VoiceChat = ({ sessionId, onVoiceResponse, onError, className = '', disabl
 
           {/* AI Response Status */}
           {isAIResponding && (
-            <div className="flex items-center space-x-2 text-blue-600">
+            <div className="flex items-center space-x-2 text-blue-600 mt-2">
               <span className="animate-spin">🤖</span>
               <span className="text-sm font-medium">AI is responding...</span>
             </div>
@@ -217,25 +247,18 @@ const VoiceChat = ({ sessionId, onVoiceResponse, onError, className = '', disabl
 
           {/* Processing Status */}
           {isProcessing && (
-            <div className="flex items-center space-x-2 text-orange-600">
+            <div className="flex items-center space-x-2 text-orange-600 mt-2">
               <span className="animate-spin">⚙️</span>
               <span className="text-sm font-medium">Processing...</span>
             </div>
           )}
-
-          {/* Status Message */}
-          <div className="text-center">
-            <p className="text-xs text-gray-500 font-medium">
-              {getStatusMessage()}
-            </p>
-          </div>
         </div>
       )}
 
       {/* Voice Not Available */}
       {voiceStatus === 'not_supported' && (
-        <div className="text-center py-6">
-          <div className="text-4xl mb-3">🚫</div>
+        <div className="text-center py-4">
+          <div className="text-3xl mb-2">🚫</div>
           <p className="text-gray-600 text-sm">
             Voice chat is not supported in your browser.
             <br />
@@ -246,8 +269,8 @@ const VoiceChat = ({ sessionId, onVoiceResponse, onError, className = '', disabl
 
       {/* Voice Needs Setup */}
       {voiceStatus === 'needs_setup' && (
-        <div className="text-center py-6">
-          <div className="text-4xl mb-3">⚠️</div>
+        <div className="text-center py-4">
+          <div className="text-3xl mb-2">⚠️</div>
           <p className="text-gray-600 text-sm">
             Voice services need to be configured.
             <br />

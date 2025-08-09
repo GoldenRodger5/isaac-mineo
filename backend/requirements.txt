@@ -7,7 +7,7 @@ anthropic
 pinecone
 redis
 pydantic
-requests
+requests>=2.32.3
 aiofiles
 jinja2
 python-jose[cryptography]

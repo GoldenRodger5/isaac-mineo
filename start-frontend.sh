@@ -12,8 +12,31 @@ if [ -f ".env.backend" ]; then
     source .env.backend
 fi
 
-# Check for backend URL
-BACKEND_URL=${VITE_BACKEND_URL:-"http://localhost:8000"}
+# Dynamic backend port detection for local testing (early check)
+detect_backend_port() {
+    local backend_port=""
+    for port in 8000 8001 8002 8003; do
+        if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
+            if curl -s --max-time 2 "http://localhost:$port/health" >/dev/null 2>&1; then
+                backend_port=$port
+                break
+            fi
+        fi
+    done
+    if [ -z "$backend_port" ]; then
+        backend_port=8000
+    fi
+    echo $backend_port
+}
+
+# Check for backend URL (early configuration)
+if [ -z "$VITE_BACKEND_URL" ]; then
+    DETECTED_PORT=$(detect_backend_port)
+    BACKEND_URL="http://localhost:$DETECTED_PORT"
+    echo -e "${GREEN}🔍 Auto-detected backend port: $DETECTED_PORT${NC}"
+else
+    BACKEND_URL="$VITE_BACKEND_URL"
+fi
 echo -e "${GREEN}✅ Using backend URL: $BACKEND_URL${NC}"tarter
 # Automatically configures backend URL and starts Vite dev server
 
@@ -66,8 +89,37 @@ if [ -f ".env" ]; then
     source .env
 fi
 
-# Check for backend URL
-BACKEND_URL=${VITE_BACKEND_URL:-"http://localhost:8000"}
+# Dynamic backend port detection for local testing
+detect_backend_port() {
+    local backend_port=""
+    
+    # Check if there's a FastAPI process running and get its port
+    for port in 8000 8001 8002 8003; do
+        if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
+            # Check if it's actually a FastAPI server by testing the /health endpoint
+            if curl -s --max-time 2 "http://localhost:$port/health" >/dev/null 2>&1; then
+                backend_port=$port
+                break
+            fi
+        fi
+    done
+    
+    # If no backend found, default to 8000
+    if [ -z "$backend_port" ]; then
+        backend_port=8000
+    fi
+    
+    echo $backend_port
+}
+
+# Check for backend URL - use dynamic detection if not explicitly set
+if [ -z "$VITE_BACKEND_URL" ]; then
+    DETECTED_PORT=$(detect_backend_port)
+    BACKEND_URL="http://localhost:$DETECTED_PORT"
+    echo -e "${GREEN}🔍 Auto-detected backend port: $DETECTED_PORT${NC}"
+else
+    BACKEND_URL="$VITE_BACKEND_URL"
+fi
 echo -e "${GREEN}✅ Using backend URL: $BACKEND_URL${NC}"
 
 # Navigate to frontend directory

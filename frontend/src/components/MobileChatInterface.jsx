@@ -171,6 +171,7 @@ const MobileChatInterface = ({
           {onVoiceResponse && (
             <VoiceChat
               onVoiceResponse={onVoiceResponse}
+              onVoiceError={onVoiceError}
               sessionId={sessionId}
               disabled={isLoading}
               className="mobile-voice-controls"

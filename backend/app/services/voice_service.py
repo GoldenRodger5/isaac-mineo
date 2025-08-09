@@ -35,11 +35,13 @@ class VoiceService:
         
         if self.elevenlabs_api_key:
             try:
-                from elevenlabs import ElevenLabs
+                from elevenlabs.client import ElevenLabs
                 self.elevenlabs_client = ElevenLabs(api_key=self.elevenlabs_api_key)
                 logger.info("✅ ElevenLabs client initialized")
-            except ImportError:
-                logger.warning("ElevenLabs SDK not installed - voice synthesis disabled")
+            except ImportError as e:
+                logger.warning(f"ElevenLabs SDK not installed - voice synthesis disabled: {e}")
+            except Exception as e:
+                logger.warning(f"ElevenLabs initialization failed - voice synthesis disabled: {e}")
         else:
             logger.warning("ELEVENLABS_API_KEY not found - voice synthesis disabled")
             

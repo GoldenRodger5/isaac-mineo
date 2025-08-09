@@ -28,6 +28,7 @@ class VoiceService {
     this.onError = null;
     this.onStatusChange = null;
     this.onAIStateChange = null;
+    this.onListeningStateChange = null;
     
     this.checkVoiceSupport();
   }
@@ -146,7 +147,7 @@ class VoiceService {
       };
       
       this.websocket.onclose = () => {
-        console.log('🔊 Voice chat WebSocket disconnected');
+        console.log('🔊 Voice chat WebSocket disconnected - stopping recording');
         this.stopRecording();
       };
       
@@ -249,46 +250,68 @@ class VoiceService {
         } 
       });
       
-      // Create AudioContext for processing raw audio data
+      // Create AudioContext for processing raw audio data  
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
         sampleRate: 16000
       });
       
       const source = this.audioContext.createMediaStreamSource(stream);
       
-      // Create ScriptProcessorNode for capturing raw audio data
-      this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
-      
-      this.processor.onaudioprocess = (event) => {
-        if (this.websocket && this.websocket.readyState === WebSocket.OPEN && this.isListening) {
+      // Use AudioWorkletProcessor for modern audio processing
+      // But fallback to ScriptProcessorNode for compatibility with Deepgram's expected raw PCM format
+      try {
+        // Try modern approach first - but convert to PCM for Deepgram
+        this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+        
+        this.processor.onaudioprocess = (event) => {
+          if (!this.isListening) return;
+          
+          // Get raw audio data as Float32Array
           const inputBuffer = event.inputBuffer;
           const inputData = inputBuffer.getChannelData(0);
           
-          // Convert Float32Array to Int16Array for Deepgram
+          // Convert Float32Array to Int16Array (PCM format expected by Deepgram)
           const pcmData = new Int16Array(inputData.length);
           for (let i = 0; i < inputData.length; i++) {
-            pcmData[i] = Math.max(-32768, Math.min(32767, inputData[i] * 32768));
+            // Convert from [-1, 1] to [-32768, 32767] and clamp
+            const sample = Math.max(-1, Math.min(1, inputData[i]));
+            pcmData[i] = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
           }
           
-          // Send raw PCM data as ArrayBuffer
-          this.websocket.send(pcmData.buffer);
-        }
-      };
-      
-      source.connect(this.processor);
-      this.processor.connect(this.audioContext.destination);
+          // Send raw PCM data that Deepgram expects
+          if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+            console.log('🎤 Sending PCM audio data:', pcmData.length, 'samples');
+            this.websocket.send(pcmData.buffer);
+          }
+        };
+        
+        // Connect the audio processing chain
+        source.connect(this.processor);
+        this.processor.connect(this.audioContext.destination);
+        
+        console.log('🎙️ Using ScriptProcessorNode for PCM audio processing');
+        
+      } catch (audioProcessorError) {
+        console.warn('Failed to set up audio processor:', audioProcessorError);
+        throw new Error('Audio processing setup failed');
+      }
       
       this.isListening = true;
       this.audioStream = stream;
+      
+      // Notify UI of listening state change
+      if (this.onListeningStateChange) {
+        this.onListeningStateChange(true);
+      }
       
       // Send keep-alive messages to prevent Deepgram timeout
       this.keepAliveInterval = setInterval(() => {
         if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
           this.websocket.send(JSON.stringify({ type: 'keep_alive' }));
         }
-      }, 10000); // Every 10 seconds
+      }, 8000); // Every 8 seconds (before 10s timeout)
       
-      console.log('🎙️ Continuous listening started');
+      console.log('🎙️ Continuous listening started with raw PCM audio');
       return true;
       
     } catch (error) {
@@ -301,6 +324,9 @@ class VoiceService {
   }
 
   stopContinuousListening() {
+    console.log('🛑 stopContinuousListening() called - Stack trace:');
+    console.trace();
+    
     if (!this.isListening) return;
     
     try {
@@ -313,7 +339,7 @@ class VoiceService {
         this.processor = null;
       }
       
-      if (this.audioContext) {
+      if (this.audioContext && this.audioContext.state !== 'closed') {
         this.audioContext.close();
         this.audioContext = null;
       }
@@ -333,6 +359,16 @@ class VoiceService {
       this.isListening = false;
       this.liveTranscript = '';
       this.finalTranscript = '';
+      
+      // Notify UI of listening state change
+      if (this.onListeningStateChange) {
+        this.onListeningStateChange(false);
+      }
+      
+      // Notify UI of listening state change
+      if (this.onListeningStateChange) {
+        this.onListeningStateChange(false);
+      }
       
       console.log('🎙️ Continuous listening stopped');
       
