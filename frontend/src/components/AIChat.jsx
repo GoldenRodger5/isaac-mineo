@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { apiClient } from '../services/apiClient';
+import { optimizedApiClient } from '../services/optimizedApiClient';
 import MobileChatInterface from './MobileChatInterface';
 import VoiceChat from './VoiceChat';
+import PerformanceDashboard from './PerformanceDashboard';
 
 const AIChat = () => {
   const [messages, setMessages] = useState([
@@ -23,6 +25,7 @@ const AIChat = () => {
   const [responseTime, setResponseTime] = useState(null);
   const [avgResponseTime, setAvgResponseTime] = useState(null);
   const [responseTimes, setResponseTimes] = useState([]);
+  const [showPerformanceDashboard, setShowPerformanceDashboard] = useState(false);
   const messagesEndRef = useRef(null);
 
   const suggestedQuestions = [
@@ -71,7 +74,13 @@ const AIChat = () => {
   const getAIResponse = async (question) => {
     const startTime = Date.now();
     try {
-      const result = await apiClient.sendMessage(question, sessionId);
+      // Use optimized API client for better performance
+      const result = await optimizedApiClient.optimizedRequest('/chatbot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, sessionId })
+      });
+      
       const endTime = Date.now();
       const currentResponseTime = endTime - startTime;
       
@@ -454,14 +463,29 @@ const AIChat = () => {
             </div>
             <div className="mt-4 flex items-center justify-between text-sm text-gray-800">
               <p className="font-medium">💡 Press Enter to send, Shift+Enter for new line</p>
-              <p className="bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent font-bold">
-                ⚡ Powered by GPT-4o • Isaac's Knowledge Base
-              </p>
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => setShowPerformanceDashboard(true)}
+                  className="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-lg transition-colors duration-200 font-medium"
+                  title="View Performance Metrics"
+                >
+                  📊 Performance
+                </button>
+                <p className="bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent font-bold">
+                  ⚡ Powered by GPT-4o • Isaac's Knowledge Base
+                </p>
+              </div>
             </div>
           </div>
           </div>
         </div>
       </div>
+      
+      {/* Performance Dashboard Modal */}
+      <PerformanceDashboard 
+        isOpen={showPerformanceDashboard}
+        onClose={() => setShowPerformanceDashboard(false)}
+      />
     </section>
   );
 };
