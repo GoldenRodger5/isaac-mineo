@@ -218,6 +218,15 @@ class EnhancedVoiceService {
     try {
       console.log('🎙️ Starting real audio listening...');
       
+      // Clean up any existing audio context
+      if (this.audioContext && this.audioContext.state !== 'closed') {
+        try {
+          await this.audioContext.close();
+        } catch (e) {
+          console.warn('Failed to close existing audio context:', e);
+        }
+      }
+      
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           sampleRate: 16000,
@@ -237,7 +246,12 @@ class EnhancedVoiceService {
       
       // Use modern AudioWorkletNode instead of deprecated ScriptProcessorNode
       try {
-        await this.audioContext.audioWorklet.addModule('/voice-audio-processor.js');
+        // Try different paths for the worklet module
+        const workletPath = window.location.origin.includes('localhost') 
+          ? '/voice-audio-processor.js'
+          : '/voice-audio-processor.js';
+          
+        await this.audioContext.audioWorklet.addModule(workletPath);
         this.processor = new AudioWorkletNode(this.audioContext, 'voice-audio-processor');
         
         // Listen for audio data from the worklet
@@ -250,11 +264,20 @@ class EnhancedVoiceService {
           }
         };
         
-        // Connect the audio processing chain
+        // Connect source to processor (no need to connect to destination)
         source.connect(this.processor);
+        console.log('✅ AudioWorkletNode connected successfully');
         
       } catch (error) {
         console.warn('AudioWorklet not supported, falling back to ScriptProcessorNode:', error);
+        
+        // Clean up failed worklet attempt
+        if (this.processor) {
+          try {
+            this.processor.disconnect();
+          } catch (e) {}
+          this.processor = null;
+        }
         
         // Fallback to ScriptProcessorNode for older browsers
         this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
@@ -280,9 +303,11 @@ class EnhancedVoiceService {
           }
         };
         
-        // Connect the audio processing chain
+        // Connect the audio processing chain for fallback
         source.connect(this.processor);
+        // Note: For ScriptProcessorNode, we need to connect to destination to keep it alive
         this.processor.connect(this.audioContext.destination);
+        console.log('⚠️ Using ScriptProcessorNode fallback');
       }
       
       this.isListening = true;
@@ -323,7 +348,11 @@ class EnhancedVoiceService {
       
       // Stop audio processing
       if (this.processor) {
-        this.processor.disconnect();
+        try {
+          this.processor.disconnect();
+        } catch (e) {
+          console.warn('Error disconnecting processor:', e);
+        }
         this.processor = null;
       }
       
