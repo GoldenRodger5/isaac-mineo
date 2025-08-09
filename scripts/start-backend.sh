@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 echo -e "${BLUE}🚀 Isaac Mineo Portfolio - Starting Backend${NC}"
 
 # Navigate to project root
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 # Check if virtual environment exists
 if [ ! -d "venv" ]; then

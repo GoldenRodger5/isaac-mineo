@@ -57,7 +57,8 @@ else
     
     # Start backend in background
     export BACKEND_PORT=$BACKEND_PORT
-    ./start-backend.sh &
+    cd "$(dirname "$0")/.."
+    ./scripts/start-backend.sh &
     BACKEND_PID=$!
     
     # Wait for backend to start

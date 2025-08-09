@@ -16,8 +16,8 @@ NC='\033[0m' # No Color
 echo -e "${PURPLE}🚀 Isaac Mineo Portfolio - Full Stack Development Server${NC}"
 echo -e "${BLUE}=================================================${NC}"
 
-# Navigate to project root
-cd "$(dirname "$0")"
+# Navigate to project root (go up one level since script is in scripts/ directory)
+cd "$(dirname "$0")/.."
 
 # Load environment variables from centralized .env
 if [ -f ".env" ]; then
@@ -53,7 +53,7 @@ trap cleanup SIGINT SIGTERM EXIT
 
 # Start backend in background
 echo -e "${BLUE}🔧 Starting backend server...${NC}"
-./start-backend.sh > backend.log 2>&1 &
+./scripts/start-backend.sh > backend.log 2>&1 &
 BACKEND_PID=$!
 
 # Wait for backend to start
@@ -91,7 +91,7 @@ export VITE_API_BASE_URL="http://localhost:$BACKEND_PORT/api"
 
 # Start frontend in background
 echo -e "${BLUE}🎨 Starting frontend server...${NC}"
-VITE_BACKEND_URL="http://localhost:$BACKEND_PORT" VITE_API_BASE_URL="http://localhost:$BACKEND_PORT/api" ./start-frontend.sh > frontend.log 2>&1 &
+VITE_BACKEND_URL="http://localhost:$BACKEND_PORT" VITE_API_BASE_URL="http://localhost:$BACKEND_PORT/api" ./scripts/start-frontend.sh > frontend.log 2>&1 &
 FRONTEND_PID=$!
 
 # Wait for frontend to start

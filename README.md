@@ -31,6 +31,23 @@ isaac-mineo/
 │   └── requirements.txt    # Python dependencies
 ├── frontend/               # ⚛️ React Frontend
 │   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── services/       # API clients & utilities
+│   │   ├── pages/          # Page components
+│   │   └── assets/         # Static assets
+│   ├── public/             # Public static files
+│   └── package.json        # Node.js dependencies
+├── scripts/                # 🔧 Development & Deployment Scripts
+│   ├── start-dev.sh        # Start development environment
+│   ├── deploy-backend.sh   # Deploy backend to Render
+│   ├── deploy-frontend.sh  # Deploy frontend to Vercel
+│   └── test-production-voice-websocket.js # Production voice test
+├── knowledge-base/         # 📚 Knowledge Base
+│   └── isaac-mineo-complete.md # Portfolio content & context
+└── README.md               # Project documentation
+```
+├── frontend/               # ⚛️ React Frontend
+│   ├── src/
 │   │   ├── components/     # React components & UI
 │   │   ├── services/       # API client services
 │   │   ├── contexts/       # React context providers
