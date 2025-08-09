@@ -235,36 +235,63 @@ class EnhancedVoiceService {
       
       const source = this.audioContext.createMediaStreamSource(stream);
       
-      // Use ScriptProcessorNode for compatibility (we'll upgrade this later)
-      this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
-      
-      this.processor.onaudioprocess = (event) => {
-        if (!this.isListening) return;
+      // Use modern AudioWorkletNode instead of deprecated ScriptProcessorNode
+      try {
+        await this.audioContext.audioWorklet.addModule('/voice-audio-processor.js');
+        this.processor = new AudioWorkletNode(this.audioContext, 'voice-audio-processor');
         
-        // Get raw audio data as Float32Array
-        const inputBuffer = event.inputBuffer;
-        const inputData = inputBuffer.getChannelData(0);
+        // Listen for audio data from the worklet
+        this.processor.port.onmessage = (event) => {
+          if (event.data.type === 'audioData') {
+            // Send raw PCM data that Deepgram expects
+            if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+              this.websocket.send(event.data.data);
+            }
+          }
+        };
         
-        // Convert Float32Array to Int16Array (PCM format expected by Deepgram)
-        const pcmData = new Int16Array(inputData.length);
-        for (let i = 0; i < inputData.length; i++) {
-          // Convert from [-1, 1] to [-32768, 32767] and clamp
-          const sample = Math.max(-1, Math.min(1, inputData[i]));
-          pcmData[i] = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
-        }
+        // Connect the audio processing chain
+        source.connect(this.processor);
         
-        // Send raw PCM data that Deepgram expects
-        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
-          this.websocket.send(pcmData.buffer);
-        }
-      };
-      
-      // Connect the audio processing chain
-      source.connect(this.processor);
-      this.processor.connect(this.audioContext.destination);
+      } catch (error) {
+        console.warn('AudioWorklet not supported, falling back to ScriptProcessorNode:', error);
+        
+        // Fallback to ScriptProcessorNode for older browsers
+        this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+        
+        this.processor.onaudioprocess = (event) => {
+          if (!this.isListening) return;
+          
+          // Get raw audio data as Float32Array
+          const inputBuffer = event.inputBuffer;
+          const inputData = inputBuffer.getChannelData(0);
+          
+          // Convert Float32Array to Int16Array (PCM format expected by Deepgram)
+          const pcmData = new Int16Array(inputData.length);
+          for (let i = 0; i < inputData.length; i++) {
+            // Convert from [-1, 1] to [-32768, 32767] and clamp
+            const sample = Math.max(-1, Math.min(1, inputData[i]));
+            pcmData[i] = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+          }
+          
+          // Send raw PCM data that Deepgram expects
+          if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+            this.websocket.send(pcmData.buffer);
+          }
+        };
+        
+        // Connect the audio processing chain
+        source.connect(this.processor);
+        this.processor.connect(this.audioContext.destination);
+      }
       
       this.isListening = true;
       this.audioStream = stream;
+      
+      // Start audio processing in the worklet
+      if (this.processor && this.processor.port) {
+        this.processor.port.postMessage({ command: 'start' });
+      }
       
       // Notify UI of listening state change
       if (this.onListeningStateChange) {
@@ -289,6 +316,11 @@ class EnhancedVoiceService {
     if (!this.isListening) return;
     
     try {
+      // Stop audio processing in the worklet
+      if (this.processor && this.processor.port) {
+        this.processor.port.postMessage({ command: 'stop' });
+      }
+      
       // Stop audio processing
       if (this.processor) {
         this.processor.disconnect();
