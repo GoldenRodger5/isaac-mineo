@@ -1,20 +1,31 @@
-// Ultra-Simple Voice Service - Text-Based Implementation
-// This will work reliably by using text input instead of complex audio processing
+// Enhanced Voice Service - Real Audio Input with Live Transcription
+// Now includes microphone capture and real-time transcription display
 
 import { apiClient } from './apiClient.js';
 
-class SimpleVoiceService {
+class EnhancedVoiceService {
   constructor() {
     this.websocket = null;
     this.isEnabled = false;
     this.status = 'checking';
     this.currentAudio = null;
+    this.isListening = false;
+    this.audioContext = null;
+    this.mediaRecorder = null;
+    this.audioStream = null;
+    this.processor = null;
     
-    // Simple event callbacks
+    // Real-time transcription
+    this.liveTranscript = '';
+    this.finalTranscript = '';
+    
+    // Event callbacks
     this.onStatusChange = null;
     this.onResponse = null;
     this.onError = null;
     this.onListeningStateChange = null;
+    this.onTranscript = null;
+    this.onLiveTranscript = null;
     
     this.checkVoiceSupport();
   }
@@ -28,7 +39,7 @@ class SimpleVoiceService {
       this.isEnabled = data.voice_enabled;
       this.status = data.voice_enabled ? 'ready' : 'backend_not_configured';
       
-      console.log('🎤 Simple Voice Service Status:', this.status);
+      console.log('🎤 Enhanced Voice Service Status:', this.status);
       
       if (this.onStatusChange) {
         this.onStatusChange(this.status, this.isEnabled);
@@ -41,6 +52,32 @@ class SimpleVoiceService {
     }
   }
   
+  async requestMicrophonePermission() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          sampleRate: 16000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        } 
+      });
+      
+      // Stop the stream immediately - we just wanted permission
+      stream.getTracks().forEach(track => track.stop());
+      
+      console.log('🎤 Microphone permission granted');
+      return true;
+    } catch (error) {
+      console.error('Microphone permission denied:', error);
+      if (this.onError) {
+        this.onError('Microphone permission denied. Please allow microphone access to use voice chat.');
+      }
+      return false;
+    }
+  }
+  
   async startVoiceChat(sessionId) {
     if (!this.isEnabled) {
       if (this.onError) {
@@ -50,7 +87,11 @@ class SimpleVoiceService {
     }
     
     try {
-      console.log('🎙️ Starting simple voice chat...');
+      console.log('🎙️ Starting enhanced voice chat...');
+      
+      // Request microphone permission first
+      const hasPermission = await this.requestMicrophonePermission();
+      if (!hasPermission) return false;
       
       // Connect WebSocket
       const baseUrl = apiClient.getApiBaseUrl();
@@ -65,11 +106,6 @@ class SimpleVoiceService {
           type: 'start_session',
           session_id: sessionId
         }));
-        
-        // Simulate "listening" state for UI
-        if (this.onListeningStateChange) {
-          this.onListeningStateChange(true);
-        }
       };
       
       this.websocket.onmessage = (event) => {
@@ -86,9 +122,7 @@ class SimpleVoiceService {
       
       this.websocket.onclose = () => {
         console.log('🔌 WebSocket closed');
-        if (this.onListeningStateChange) {
-          this.onListeningStateChange(false);
-        }
+        this.stopContinuousListening();
       };
       
       return true;
@@ -108,16 +142,39 @@ class SimpleVoiceService {
     switch (data.type) {
       case 'status':
         console.log('Voice status:', data.message);
-        // Auto-send a test message when ready
-        if (data.voice_enabled) {
-          setTimeout(() => {
-            this.sendTestMessage();
-          }, 1000);
+        // Start real audio listening when ready
+        if (data.voice_enabled && !this.isListening) {
+          this.startContinuousListening();
         }
         break;
         
       case 'transcript':
-        console.log('📝 Transcript:', data.text);
+        console.log('📝 Live Transcript:', data.text);
+        
+        // Check if this is interim or final transcript
+        if (data.is_final) {
+          this.finalTranscript = data.text;
+          this.liveTranscript = ''; // Clear live transcript
+          
+          if (this.onTranscript) {
+            this.onTranscript(data.text, true); // true = final
+          }
+          
+          // Auto-process final transcript after a short delay
+          setTimeout(() => {
+            if (this.finalTranscript.trim()) {
+              this.processTranscript(this.finalTranscript);
+              this.finalTranscript = '';
+            }
+          }, 1500); // 1.5 second delay for natural conversation flow
+          
+        } else {
+          this.liveTranscript = data.text;
+          
+          if (this.onLiveTranscript) {
+            this.onLiveTranscript(data.text);
+          }
+        }
         break;
         
       case 'ai_response':
@@ -144,27 +201,132 @@ class SimpleVoiceService {
     }
   }
   
-  // Send a test message to trigger AI response
-  sendTestMessage() {
+  processTranscript(transcript) {
     if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
-      console.log('📤 Sending test message...');
+      console.log('📤 Processing transcript:', transcript);
       this.websocket.send(JSON.stringify({
         type: 'process_transcript',
-        text: 'Hello, this is a test of the voice system',
-        session_id: `test_${Date.now()}`
+        text: transcript,
+        session_id: `voice_${Date.now()}`
       }));
     }
   }
   
-  // Method to send custom text (for testing)
+  async startContinuousListening() {
+    if (this.isListening || !this.websocket) return false;
+    
+    try {
+      console.log('🎙️ Starting real audio listening...');
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          sampleRate: 16000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        } 
+      });
+      
+      // Create AudioContext for processing raw audio data  
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+        sampleRate: 16000
+      });
+      
+      const source = this.audioContext.createMediaStreamSource(stream);
+      
+      // Use ScriptProcessorNode for compatibility (we'll upgrade this later)
+      this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+      
+      this.processor.onaudioprocess = (event) => {
+        if (!this.isListening) return;
+        
+        // Get raw audio data as Float32Array
+        const inputBuffer = event.inputBuffer;
+        const inputData = inputBuffer.getChannelData(0);
+        
+        // Convert Float32Array to Int16Array (PCM format expected by Deepgram)
+        const pcmData = new Int16Array(inputData.length);
+        for (let i = 0; i < inputData.length; i++) {
+          // Convert from [-1, 1] to [-32768, 32767] and clamp
+          const sample = Math.max(-1, Math.min(1, inputData[i]));
+          pcmData[i] = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+        }
+        
+        // Send raw PCM data that Deepgram expects
+        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+          this.websocket.send(pcmData.buffer);
+        }
+      };
+      
+      // Connect the audio processing chain
+      source.connect(this.processor);
+      this.processor.connect(this.audioContext.destination);
+      
+      this.isListening = true;
+      this.audioStream = stream;
+      
+      // Notify UI of listening state change
+      if (this.onListeningStateChange) {
+        this.onListeningStateChange(true);
+      }
+      
+      console.log('✅ Real audio listening started - speak now!');
+      return true;
+      
+    } catch (error) {
+      console.error('Failed to start audio listening:', error);
+      if (this.onError) {
+        this.onError('Failed to start audio listening: ' + error.message);
+      }
+      return false;
+    }
+  }
+  
+  stopContinuousListening() {
+    console.log('🛑 Stopping continuous listening...');
+    
+    if (!this.isListening) return;
+    
+    try {
+      // Stop audio processing
+      if (this.processor) {
+        this.processor.disconnect();
+        this.processor = null;
+      }
+      
+      if (this.audioContext && this.audioContext.state !== 'closed') {
+        this.audioContext.close();
+        this.audioContext = null;
+      }
+      
+      // Stop all audio tracks
+      if (this.audioStream) {
+        this.audioStream.getTracks().forEach(track => track.stop());
+        this.audioStream = null;
+      }
+      
+      this.isListening = false;
+      this.liveTranscript = '';
+      this.finalTranscript = '';
+      
+      // Notify UI of listening state change
+      if (this.onListeningStateChange) {
+        this.onListeningStateChange(false);
+      }
+      
+      console.log('🎙️ Continuous listening stopped');
+      
+    } catch (error) {
+      console.error('Error stopping continuous listening:', error);
+    }
+  }
+  
+  // Method to send custom text (for testing - keeping this for backward compatibility)
   sendText(text) {
     if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
       console.log('📤 Sending text:', text);
-      this.websocket.send(JSON.stringify({
-        type: 'process_transcript',
-        text: text,
-        session_id: `manual_${Date.now()}`
-      }));
+      this.processTranscript(text);
     }
   }
   
@@ -186,6 +348,8 @@ class SimpleVoiceService {
   }
   
   stopVoiceChat() {
+    this.stopContinuousListening();
+    
     if (this.currentAudio) {
       this.currentAudio.pause();
       this.currentAudio = null;
@@ -197,53 +361,35 @@ class SimpleVoiceService {
       this.websocket = null;
     }
     
-    if (this.onListeningStateChange) {
-      this.onListeningStateChange(false);
-    }
-    
-    console.log('🔊 Simple voice chat stopped');
+    console.log('🔊 Enhanced voice chat stopped');
   }
   
-  // Compatibility methods
-  async requestMicrophonePermission() { 
-    console.log('🎤 Microphone permission granted (simulated)');
-    return true; 
-  }
-  
+  // Event handler setters for compatibility
   setOnResponse(callback) { this.onResponse = callback; }
   setOnError(callback) { this.onError = callback; }
   setOnStatusChange(callback) { this.onStatusChange = callback; }
-  setOnTranscript(callback) { /* Not used in simple version */ }
-  setOnLiveTranscript(callback) { /* Not used in simple version */ }
-  setOnAIStateChange(callback) { /* Not used in simple version */ }
+  setOnTranscript(callback) { this.onTranscript = callback; }
+  setOnLiveTranscript(callback) { this.onLiveTranscript = callback; }
   setOnListeningStateChange(callback) { this.onListeningStateChange = callback; }
   
-  // Legacy methods
-  async startContinuousListening() { 
-    console.log('🎙️ Starting continuous listening (simulated)');
-    if (this.onListeningStateChange) {
-      this.onListeningStateChange(true);
-    }
-    return true; 
-  }
+  // Additional compatibility methods
+  setOnAIStateChange(callback) { /* Not used in this version */ }
   
-  stopContinuousListening() { 
-    console.log('🛑 Stopping continuous listening (simulated)');
-    if (this.onListeningStateChange) {
-      this.onListeningStateChange(false);
-    }
-  }
+  // Legacy methods for compatibility
+  async startRecording() { return this.startContinuousListening(); }
+  stopRecording() { this.stopContinuousListening(); }
 }
 
 // Export singleton instance
-const voiceService = new SimpleVoiceService();
+const voiceService = new EnhancedVoiceService();
 
-// Add global method for manual testing
+// Add global method for manual testing (keeping for backward compatibility)
 window.sendVoiceText = (text) => {
   voiceService.sendText(text || 'Hello, can you hear me?');
 };
 
-console.log('🎤 Simple Voice Service loaded. Test with: sendVoiceText("hello")');
+console.log('🎤 Enhanced Voice Service loaded with real audio input and live transcription!');
+console.log('🎙️ Use sendVoiceText("text") for manual testing or just speak into your microphone!');
 
 export { voiceService };
 export default voiceService;
