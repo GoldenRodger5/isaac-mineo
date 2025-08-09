@@ -487,5 +487,4 @@ async def periodic_cleanup():
         await asyncio.sleep(3600)  # Every hour
         await enhanced_performance_service.cleanup_old_performance_data()
 
-# Start cleanup task
-asyncio.create_task(periodic_cleanup())
+# Don't start cleanup task here - it will be started in the FastAPI lifespan event

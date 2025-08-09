@@ -104,6 +104,11 @@ async def startup_event():
         await analytics_service.cache_manager.connect()
         print("✅ Analytics service initialized")
         
+        # Start performance cleanup task
+        from app.services.enhanced_performance_service import periodic_cleanup
+        asyncio.create_task(periodic_cleanup())
+        print("✅ Performance cleanup task started")
+        
     except Exception as e:
         print(f"❌ Error initializing services: {e}")
         error_handler.log_error(e, {"startup": True})

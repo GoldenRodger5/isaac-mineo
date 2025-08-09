@@ -1,20 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-import About from './components/About';
-import Projects from './components/Projects';
-import Resume from './components/Resume';
-import Contact from './components/Contact';
-import AIChat from './components/AIChat';
-import AIChatbot from './components/AIChatbot';
-import CodeExplainer from './components/CodeExplainer';
-import PublicAnalytics from './components/PublicAnalytics';
-import AdminAnalytics from './components/AdminAnalytics';
 import { AuthProvider } from './contexts/AuthContext';
-import BottomNavigation from './components/BottomNavigation';
-import HorizontalTabNavigation from './components/HorizontalTabNavigation';
-import SwipeableTabContainer from './components/SwipeableTabContainer';
 import analyticsService from './services/analyticsService';
+
+// Enhanced Mobile Components
+import { AdvancedMobileNavigation, MobileHeader, MobileModal } from './components/mobile/MobileNavigation';
+import { MobileTouchButton, PullToRefresh } from './components/mobile/MobileTouchComponents';
+import { useMobilePerformance, SmartAnimation } from './components/mobile/MobilePerformance';
+
+// Lazy load components for better mobile performance
+const About = lazy(() => import('./components/About'));
+const Projects = lazy(() => import('./components/Projects'));
+const Resume = lazy(() => import('./components/Resume'));
+const Contact = lazy(() => import('./components/Contact'));
+const AIChat = lazy(() => import('./components/AIChat'));
+const AIChatbot = lazy(() => import('./components/AIChatbot'));
+const CodeExplainer = lazy(() => import('./components/CodeExplainer'));
+const PublicAnalytics = lazy(() => import('./components/PublicAnalytics'));
+const AdminAnalytics = lazy(() => import('./components/AdminAnalytics'));
+
+// Fallback components for legacy support
+const BottomNavigation = lazy(() => import('./components/BottomNavigation'));
+const HorizontalTabNavigation = lazy(() => import('./components/HorizontalTabNavigation'));
+const SwipeableTabContainer = lazy(() => import('./components/SwipeableTabContainer'));
 
 const CORRECT_PASSWORD = import.meta.env.VITE_SITE_PASSWORD;
 
@@ -32,6 +41,10 @@ function App() {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [authToken, setAuthToken] = useState(null);
+  const [useMobileNavigation, setUseMobileNavigation] = useState(false);
+
+  // Mobile performance monitoring
+  const { batteryStatus, networkStatus, performanceMetrics, optimalSettings } = useMobilePerformance();
 
   const tabs = [
     { id: 'about', label: 'About', icon: '👨‍💻' },
@@ -41,6 +54,50 @@ function App() {
     { id: 'code-explainer', label: 'Claude Code Explorer', icon: '🔍' },
     { id: 'contact', label: 'Contact', icon: '📬' }
   ];
+
+  // Detect mobile device and enable enhanced mobile experience
+  useEffect(() => {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      window.innerWidth <= 768;
+    setUseMobileNavigation(isMobile);
+    
+    // Handle device orientation changes
+    const handleOrientationChange = () => {
+      setTimeout(() => {
+        setUseMobileNavigation(window.innerWidth <= 768);
+      }, 100);
+    };
+
+    window.addEventListener('orientationchange', handleOrientationChange);
+    window.addEventListener('resize', handleOrientationChange);
+    
+    return () => {
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      window.removeEventListener('resize', handleOrientationChange);
+    };
+  }, []);
+
+  // Pull-to-refresh handler
+  const handleRefresh = async () => {
+    try {
+      // Refresh current component data
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Trigger haptic feedback
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+      
+      // Optional: reload specific data based on active tab
+      if (activeTab === 'projects') {
+        // Refresh projects data
+      } else if (activeTab === 'analytics') {
+        // Refresh analytics data
+      }
+    } catch (error) {
+      console.error('Refresh failed:', error);
+    }
+  };
 
   // Initialize app with error handling
   useEffect(() => {
