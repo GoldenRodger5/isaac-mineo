@@ -110,7 +110,37 @@ class OptimizedAPIClient {
     
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const result = await this.baseClient.makeRequest(endpoint, options);
+        // Use the appropriate baseClient method based on endpoint
+        let result;
+        
+        if (endpoint === '/chatbot' || endpoint.includes('/chatbot')) {
+          const body = options.body ? JSON.parse(options.body) : {};
+          result = await this.baseClient.sendMessage(body.question, body.sessionId);
+        } else if (endpoint === '/contact' || endpoint.includes('/contact')) {
+          const body = options.body ? JSON.parse(options.body) : {};
+          result = await this.baseClient.sendContactEmail(body);
+        } else if (endpoint === '/projects' || endpoint.includes('/projects')) {
+          result = await this.baseClient.getProjects();
+        } else if (endpoint === '/health' || endpoint.includes('/health')) {
+          const healthy = await this.baseClient.healthCheck();
+          result = { success: true, data: { status: healthy ? 'healthy' : 'unhealthy' } };
+        } else {
+          // Generic fetch for other endpoints
+          const url = endpoint.startsWith('http') ? endpoint : `${this.baseClient.baseURL}${endpoint}`;
+          const response = await fetch(url, {
+            method: options.method || 'GET',
+            headers: options.headers || { 'Content-Type': 'application/json' },
+            body: options.body
+          });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          
+          const data = await response.json();
+          result = { success: true, data };
+        }
+        
         return result;
       } catch (error) {
         lastError = error;

@@ -242,6 +242,12 @@ class EnhancedVoiceService {
         sampleRate: 16000
       });
       
+      // Resume AudioContext if suspended (required by some browsers)
+      if (this.audioContext.state === 'suspended') {
+        await this.audioContext.resume();
+        console.log('📱 AudioContext resumed');
+      }
+      
       const source = this.audioContext.createMediaStreamSource(stream);
       
       // Use modern AudioWorkletNode instead of deprecated ScriptProcessorNode
@@ -254,17 +260,23 @@ class EnhancedVoiceService {
         await this.audioContext.audioWorklet.addModule(workletPath);
         this.processor = new AudioWorkletNode(this.audioContext, 'voice-audio-processor');
         
-        // Listen for audio data from the worklet
-        this.processor.port.onmessage = (event) => {
-          if (event.data.type === 'audioData') {
-            // Send raw PCM data that Deepgram expects
-            if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
-              this.websocket.send(event.data.data);
+          // Listen for audio data from the worklet
+          this.processor.port.onmessage = (event) => {
+            if (event.data.type === 'audioData') {
+              // Send raw PCM data that Deepgram expects
+              if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                this.websocket.send(event.data.data);
+              }
+            } else if (event.data.type === 'speechStart') {
+              console.log('🎤 Speech detected by VAD');
+            } else if (event.data.type === 'speechEnd') {
+              console.log('🤫 Speech ended, duration:', event.data.duration?.toFixed(2), 's');
+            } else if (event.data.type === 'processorReady') {
+              console.log('✅ Audio processor ready');
+            } else if (event.data.type === 'processorError') {
+              console.error('🚨 Audio processor error:', event.data.error);
             }
-          }
-        };
-        
-        // Connect source to processor (no need to connect to destination)
+          };        // Connect source to processor (no need to connect to destination)
         source.connect(this.processor);
         console.log('✅ AudioWorkletNode connected successfully');
         
