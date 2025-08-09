@@ -257,10 +257,44 @@ class VoiceService {
       
       const source = this.audioContext.createMediaStreamSource(stream);
       
-      // Use AudioWorkletProcessor for modern audio processing
-      // But fallback to ScriptProcessorNode for compatibility with Deepgram's expected raw PCM format
+      // Try to use modern AudioWorkletNode first, fallback to ScriptProcessorNode
+      let audioProcessingSetup = false;
+      
       try {
-        // Try modern approach first - but convert to PCM for Deepgram
+        // Modern approach: AudioWorkletNode (preferred)
+        await this.audioContext.audioWorklet.addModule('/audioWorkletProcessor.js');
+        
+        this.processor = new AudioWorkletNode(this.audioContext, 'voice-audio-processor', {
+          processorOptions: {
+            sampleRate: 16000
+          }
+        });
+        
+        // Handle messages from AudioWorkletProcessor
+        this.processor.port.onmessage = (event) => {
+          if (event.data.type === 'audioData' && this.isListening) {
+            const audioBuffer = event.data.data;
+            const sampleCount = event.data.samples;
+            
+            // Send PCM data to WebSocket
+            if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+              console.log('🎤 Sending PCM audio data:', sampleCount, 'samples');
+              this.websocket.send(audioBuffer);
+            }
+          }
+        };
+        
+        // Connect audio chain
+        source.connect(this.processor);
+        this.processor.connect(this.audioContext.destination);
+        
+        console.log('🎙️ Using modern AudioWorkletNode for PCM audio processing');
+        audioProcessingSetup = true;
+        
+      } catch (workletError) {
+        console.warn('AudioWorkletNode setup failed, falling back to ScriptProcessorNode:', workletError);
+        
+        // Fallback to ScriptProcessorNode (deprecated but widely supported)
         this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
         
         this.processor.onaudioprocess = (event) => {
@@ -289,11 +323,12 @@ class VoiceService {
         source.connect(this.processor);
         this.processor.connect(this.audioContext.destination);
         
-        console.log('🎙️ Using ScriptProcessorNode for PCM audio processing');
-        
-      } catch (audioProcessorError) {
-        console.warn('Failed to set up audio processor:', audioProcessorError);
-        throw new Error('Audio processing setup failed');
+        console.log('🎙️ Using ScriptProcessorNode for PCM audio processing (fallback)');
+        audioProcessingSetup = true;
+      }
+      
+      if (!audioProcessingSetup) {
+        throw new Error('Failed to set up audio processing');
       }
       
       this.isListening = true;
@@ -335,6 +370,10 @@ class VoiceService {
       
       // Stop audio processing
       if (this.processor) {
+        // If it's an AudioWorkletNode, send stop message
+        if (this.processor.port) {
+          this.processor.port.postMessage({ type: 'stop' });
+        }
         this.processor.disconnect();
         this.processor = null;
       }
@@ -359,11 +398,6 @@ class VoiceService {
       this.isListening = false;
       this.liveTranscript = '';
       this.finalTranscript = '';
-      
-      // Notify UI of listening state change
-      if (this.onListeningStateChange) {
-        this.onListeningStateChange(false);
-      }
       
       // Notify UI of listening state change
       if (this.onListeningStateChange) {
