@@ -14,6 +14,11 @@ class APIClient {
     console.log('🔗 API Base URL:', this.baseURL);
   }
 
+  // Get API base URL (for compatibility with other services)
+  getApiBaseUrl() {
+    return this.baseURL;
+  }
+
   // Generic fetch with retry logic
   async fetchWithRetry(url, options = {}, attempt = 1) {
     try {
