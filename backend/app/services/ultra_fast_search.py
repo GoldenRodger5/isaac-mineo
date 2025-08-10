@@ -160,8 +160,76 @@ class UltraFastSearchService:
             else:
                 return "Signalflow: Advanced trading analysis platform providing real-time insights and predictive analytics for financial professionals."
         
+        # Tech stack and skills specific fallbacks
+        elif any(word in query_lower for word in ["tech stack", "technology", "technologies", "skills", "technical", "programming", "development", "expertise"]):
+            if complexity == "detailed":
+                return """Isaac Mineo - Complete Technology Stack & Expertise:
+
+🚀 **FRONTEND TECHNOLOGIES:**
+• **React 18** (Expert) - Hooks, Context, state management, performance optimization
+  - Used in: Nutrivize (PWA), Portfolio Website, Quizium
+• **JavaScript/TypeScript** (Expert) - ES6+, async/await, modern patterns
+  - Projects: All frontend applications, API integrations
+• **HTML5/CSS3** (Expert) - Semantic markup, animations, responsive design
+  - Used in: All web projects with custom animations and responsive layouts
+• **Tailwind CSS** (Expert) - Utility-first styling, custom components, responsive design
+  - Projects: Portfolio Website, Nutrivize UI, modern component design
+• **Vite** (Proficient) - Build tool, dev server, optimizations
+  - Used in: Portfolio Website for lightning-fast development and builds
+
+🔧 **BACKEND TECHNOLOGIES:**
+• **Python** (Expert) - OOP, async programming, clean architecture
+  - Projects: Nutrivize backend, EchoPod processing, SignalFlow algorithms
+• **FastAPI** (Expert) - REST APIs, async programming, documentation, WebSockets
+  - Used in: Nutrivize API, Portfolio backend, real-time chat systems
+• **Node.js** (Proficient) - Express, REST APIs, middleware
+  - Projects: Quizium backend, API development
+
+🤖 **AI & MACHINE LEARNING:**
+• **OpenAI API Integration** (Expert) - GPT-4, embeddings, vision models, prompt engineering
+  - Used in: Nutrivize food recognition, Portfolio AI chat, EchoPod content generation
+• **Claude API** (Proficient) - Anthropic's AI models, conversation design
+  - Projects: Nutrivize nutrition companion, advanced AI interactions
+• **Vector Databases** (Learning) - Pinecone, embeddings, semantic search
+  - Used in: Portfolio AI chat knowledge base, intelligent search systems
+• **Prompt Engineering** (Expert) - Context design, response optimization
+  - Applied across all AI-powered features and applications
+
+💾 **DATABASES & STORAGE:**
+• **MongoDB** (Expert) - Document design, aggregation, indexing, Atlas cloud
+  - Projects: Nutrivize user data, SignalFlow trading data, complex data structures
+• **Redis** (Proficient) - Caching, session management, rate limiting
+  - Used in: Portfolio performance optimization, Nutrivize caching layer
+• **Firebase** (Proficient) - Authentication, real-time database, cloud functions
+  - Projects: Nutrivize user authentication, real-time data sync
+
+☁️ **CLOUD & DEPLOYMENT:**
+• **Vercel** (Expert) - Frontend deployment, serverless functions, domains
+  - Used in: Portfolio Website, Nutrivize frontend, optimized deployments
+• **Render** (Proficient) - Backend deployment, databases, monitoring
+  - Projects: FastAPI backends, database hosting, production environments
+• **AWS** (Learning) - S3, Lambda, cloud infrastructure
+  - Exploring: Scalable cloud architecture, serverless computing
+
+🛠️ **DEVELOPMENT TOOLS:**
+• **Git/GitHub** (Expert) - Version control, collaboration, CI/CD workflows
+• **VS Code** (Expert) - Extensions, debugging, productivity optimization
+• **Docker** (Basic) - Containerization, development environments
+• **Chrome DevTools** (Expert) - Debugging, performance analysis, optimization
+
+📊 **REAL-WORLD PROJECT APPLICATIONS:**
+• **Nutrivize**: React + FastAPI + MongoDB + OpenAI + Redis + Vercel/Render
+• **Portfolio**: React + Vite + Tailwind + FastAPI + Pinecone + OpenAI
+• **EchoPod**: Python + NLP + Voice Synthesis + Audio Processing
+• **SignalFlow**: Python + FastAPI + MongoDB + Real-time Data + Analytics
+• **Quizium**: React + Node.js + Spaced Repetition Algorithms
+
+Each project demonstrates full-stack capabilities with modern best practices, AI integration, and production deployment experience."""
+            else:
+                return "Isaac's tech stack: React, TypeScript, Python, FastAPI, MongoDB, Redis, OpenAI APIs, Tailwind CSS, Vercel/Render deployment. Expert in full-stack development with AI integration across multiple production projects."
+
         # General technical skills and experience
-        elif any(word in query_lower for word in ["skills", "experience", "technical", "expertise", "background"]):
+        elif any(word in query_lower for word in ["skills", "experience", "expertise", "background"]):
             if complexity == "detailed":
                 return """Isaac Mineo - Full-stack Developer & AI Engineer:
 

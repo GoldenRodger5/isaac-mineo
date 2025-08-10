@@ -131,33 +131,55 @@ def extract_entities(text: str) -> Dict[str, List[str]]:
     
     # Projects
     project_patterns = {
-        "nutrivize": ["nutrivize", "nutrition tracker", "food recognition"],
-        "echopod": ["echopod", "podcast", "echo pod"],
-        "quizium": ["quizium", "quiz", "flashcard"],
-        "signalflow": ["signalflow", "signal flow", "trading"]
+        "nutrivize": ["nutrivize", "nutrition tracker", "food recognition", "health app"],
+        "echopod": ["echopod", "podcast", "echo pod", "voice synthesis"],
+        "quizium": ["quizium", "quiz", "flashcard", "study app"],
+        "signalflow": ["signalflow", "signal flow", "trading", "ai trading"],
+        "portfolio": ["portfolio", "this website", "this site", "personal website"]
     }
     
     for project, keywords in project_patterns.items():
         if any(keyword in text_lower for keyword in keywords):
             entities["projects"].append(project)
     
-    # Topics
+    # Detailed Topics for Better Response Targeting
     topic_patterns = {
-        "tech_stack": ["tech stack", "technology", "technologies", "programming languages"],
-        "experience": ["experience", "background", "career", "work history"],
-        "skills": ["skills", "abilities", "expertise", "proficient"],
-        "education": ["education", "degree", "university", "college", "school"],
-        "contact": ["contact", "reach", "email", "phone", "connect"]
+        "tech_stack": ["tech stack", "technology", "technologies", "programming languages", "what tech", "built with", "tools used"],
+        "experience": ["experience", "background", "career", "work history", "professional", "years", "how long"],
+        "skills": ["skills", "abilities", "expertise", "proficient", "good at", "strengths", "capabilities"],
+        "education": ["education", "degree", "university", "college", "school", "middlebury", "study"],
+        "contact": ["contact", "reach", "email", "phone", "connect", "hire", "available"],
+        "projects_overview": ["projects", "what built", "what made", "work on", "created", "developed"],
+        "career_goals": ["looking for", "seeking", "job", "role", "position", "career goals", "next step"],
+        "ai_experience": ["ai", "artificial intelligence", "machine learning", "ml", "openai", "gpt"],
+        "architecture": ["architecture", "design", "structure", "how works", "system design"],
+        "challenges": ["challenges", "difficult", "problems", "obstacles", "hard", "complex"],
+        "learning": ["learn", "learning", "self taught", "education", "how did you", "start"],
+        "deployment": ["deploy", "deployment", "hosting", "live", "production", "cloud"],
+        "performance": ["performance", "speed", "fast", "optimization", "scalable"],
+        "why_chosen": ["why", "choice", "reason", "decide", "choose", "picked"],
+        "future_plans": ["future", "next", "plans", "roadmap", "upcoming", "working on"]
     }
     
     for topic, keywords in topic_patterns.items():
         if any(keyword in text_lower for keyword in keywords):
             entities["topics"].append(topic)
     
-    # Skills
-    skill_keywords = ["react", "fastapi", "python", "javascript", "ai", "machine learning", "mongodb", "redis"]
-    for skill in skill_keywords:
-        if skill in text_lower:
+    # Enhanced Skills Detection
+    skill_patterns = {
+        "react": ["react", "reactjs", "jsx", "hooks"],
+        "python": ["python", "py", "django", "flask"],
+        "fastapi": ["fastapi", "fast api", "api"],
+        "javascript": ["javascript", "js", "node", "nodejs"],
+        "ai": ["ai", "machine learning", "ml", "openai", "gpt", "llm"],
+        "databases": ["database", "db", "mongodb", "mongo", "redis", "sql", "postgresql"],
+        "frontend": ["frontend", "front-end", "ui", "ux", "css", "html", "tailwind"],
+        "backend": ["backend", "back-end", "server", "api"],
+        "cloud": ["cloud", "aws", "vercel", "render", "deployment"]
+    }
+    
+    for skill, keywords in skill_patterns.items():
+        if any(keyword in text_lower for keyword in keywords):
             entities["skills"].append(skill)
     
     return entities
@@ -179,18 +201,48 @@ def get_contextual_instructions(entities: Dict[str, List[str]], conversation_his
     for entity_type, entity_list in entities.items():
         current_entities.update(entity_list)
     
-    # Determine context
+    # Specific contextual guidance based on question types
+    if "tech_stack" in current_entities:
+        if "nutrivize" in recent_entities or "nutrivize" in current_entities:
+            instructions.append("Focus on Nutrivize's comprehensive tech stack: React 18 + Vite + Tailwind CSS frontend, FastAPI + Python backend, MongoDB Atlas + Redis Cloud for data, Firebase Auth, OpenAI GPT-4 Vision for food recognition, deployed on Vercel + Render.")
+        elif "echopod" in recent_entities or "echopod" in current_entities:
+            instructions.append("Focus on EchoPod's AI-powered tech stack: Python + FastAPI for backend processing, advanced AI voice synthesis, NLP for script optimization, audio processing pipelines, React frontend for user interface.")
+        elif "signalflow" in recent_entities or "signalflow" in current_entities:
+            instructions.append("Focus on SignalFlow's trading tech stack: Python 3.11+ with FastAPI, Streamlit dashboards, MongoDB Atlas for data, OpenAI GPT-4o + Claude for AI analysis, Polygon.io + Alpaca APIs for market data, Railway cloud deployment, Telegram bot integration.")
+        elif "portfolio" in recent_entities or "portfolio" in current_entities:
+            instructions.append("Focus on this portfolio's tech stack: React + Vite + Tailwind CSS frontend, FastAPI + Python backend, Pinecone vector database for AI knowledge base, OpenAI GPT-4o for chat, WebSocket for voice features, Deepgram + ElevenLabs for voice processing.")
+        else:
+            instructions.append("Provide Isaac's COMPLETE technology stack organized by categories (Frontend, Backend, AI/ML, Databases, Cloud) with proficiency levels and specific project examples for each technology.")
+    
+    if "experience" in current_entities or "background" in current_entities:
+        instructions.append("Emphasize Isaac's self-directed learning journey (2021-present), production applications, and real-world impact. Include specific examples from Nutrivize (active users), portfolio (AI integration), and growth from basics to expert-level full-stack development.")
+    
+    if "projects_overview" in current_entities:
+        instructions.append("Provide detailed overview of Isaac's key projects: Nutrivize (AI nutrition tracker with computer vision), EchoPod (AI podcast generator), Quizium (intelligent flashcards), SignalFlow (AI trading analysis), and this portfolio (AI-powered with voice chat).")
+    
+    if "career_goals" in current_entities or "looking for" in [item.lower() for item in current_entities]:
+        instructions.append("Detail Isaac's target roles (Backend Engineer, AI Engineer, Full-Stack), preferred industries (HealthTech, AI tools, Developer tooling), what he brings (speed + quality, AI expertise, full-stack capabilities), and ideal work environment (collaborative, learning-focused, impact-driven).")
+    
+    if "ai_experience" in current_entities:
+        instructions.append("Highlight Isaac's AI expertise: OpenAI GPT-4/Vision integration (Nutrivize food recognition, portfolio chat), Claude API usage, vector databases (Pinecone), prompt engineering, and building AI-first applications rather than just using AI tools.")
+    
+    if "challenges" in current_entities:
+        instructions.append("Discuss specific technical challenges Isaac has solved: real-time food recognition accuracy, conversation context management, scalable API design, performance optimization, AI response quality, and production deployment complexities.")
+    
+    if "learning" in current_entities:
+        instructions.append("Emphasize Isaac's self-taught journey: started with HTML/CSS/JS in 2021, progressed to React/Node.js in 2022, mastered FastAPI/AI integration by 2023, now expert-level with focus on AI-powered applications. Continuous learning through documentation, projects, and experimentation.")
+    
+    if "why_chosen" in current_entities:
+        instructions.append("Explain Isaac's technology choices: React for component reusability, FastAPI for Python performance + async, MongoDB for flexible data models, Redis for caching, OpenAI for cutting-edge AI capabilities, Vercel/Render for deployment simplicity and scalability.")
+    
+    # Context-aware follow-up detection
+    if "what" in [item.lower() for item in current_entities] and recent_entities:
+        last_project = next((p for p in ["nutrivize", "echopod", "quizium", "signalflow", "portfolio"] if p in recent_entities), None)
+        if last_project:
+            instructions.append(f"This appears to be a follow-up question about {last_project}. Provide detailed, specific information about {last_project}.")
+    
     if current_entities & recent_entities:
-        instructions.append("This is a follow-up question. Reference the previous context.")
-    
-    if "nutrivize" in recent_entities and "tech_stack" in current_entities:
-        instructions.append("User is asking about Nutrivize's tech stack specifically.")
-    
-    if "echopod" in recent_entities and "tech_stack" in current_entities:
-        instructions.append("User is asking about EchoPod's tech stack specifically.")
-    
-    if "quizium" in recent_entities and "tech_stack" in current_entities:
-        instructions.append("User is asking about Quizium's tech stack specifically.")
+        instructions.append("This is a follow-up question. Build upon the previous context and provide deeper, more specific details.")
     
     return " ".join(instructions) if instructions else ""
 
@@ -321,6 +373,44 @@ async def chat_with_assistant_core(request: ChatRequest, client_ip: str = "unkno
 5. Stay professional but conversational
 6. Use the knowledge base as your primary source
 
+🔧 SPECIAL HANDLING FOR COMMON PORTFOLIO QUESTIONS:
+
+**TECH STACK QUESTIONS:** When asked about "tech stack", "technologies", "what tech", provide COMPREHENSIVE breakdown with:
+- Specific technologies organized by categories (Frontend, Backend, AI/ML, Databases, Cloud, Dev Tools)
+- Proficiency levels for each technology
+- Real project examples showing practical usage
+- How technologies work together in Isaac's projects
+
+**PROJECT QUESTIONS:** When asked about "projects", "what built", "work on":
+- Provide detailed information about each project's purpose, impact, and technical implementation
+- Include specific features, architecture decisions, and technical challenges solved
+- Mention current status (Live, In Development, etc.) and real-world usage
+
+**EXPERIENCE QUESTIONS:** When asked about "experience", "background", "how long":
+- Detail Isaac's self-directed learning journey from 2021 to present
+- Include specific timeline of skill development and technology adoption
+- Mention production applications and real-world impact
+
+**CAREER/JOB QUESTIONS:** When asked about "looking for", "career", "job":
+- Specify target roles, preferred industries, and company types
+- Detail what Isaac brings to teams and his ideal work environment
+- Include specific technologies and types of projects he's excited about
+
+**AI QUESTIONS:** When asked about "AI", "machine learning", "intelligent":
+- Emphasize Isaac's AI-first development approach
+- Detail specific AI integrations and real implementations
+- Mention experience with OpenAI, Claude, vector databases, and prompt engineering
+
+**CHALLENGE/PROBLEM QUESTIONS:** When asked about "challenges", "difficult", "problems":
+- Provide specific technical challenges Isaac has solved
+- Include approaches used and technologies employed
+- Connect to real projects and measurable outcomes
+
+**LEARNING QUESTIONS:** When asked about "learn", "self-taught", "education":
+- Detail Isaac's continuous learning approach and self-directed path
+- Include timeline of skill development and how he stays current
+- Mention specific resources and methodologies used
+
 CONTEXTUAL INSTRUCTIONS: {contextual_instructions}
 
 Use markdown formatting extensively for better readability. Be thorough and informative while maintaining a conversational tone that reflects Isaac's personality and expertise. Include specific examples, technical details, and context from the knowledge base.
@@ -333,14 +423,64 @@ CONTEXT: {conversation_context}{entity_context}
 
 QUESTION: {request.question}
 
-Provide a comprehensive, detailed response about Isaac. Be thorough and informative, using specific examples and concrete details from the knowledge base. Use markdown formatting for better readability:
+Provide a comprehensive, detailed response about Isaac. Be thorough and informative, using specific examples and concrete details from the knowledge base. 
+
+SPECIAL INSTRUCTIONS FOR DETAILED RESPONSES:
+
+**TECH STACK QUESTIONS:** Provide comprehensive technology breakdown including:
+  * Frontend: React 18 (Expert - Hooks, Context, performance) used in Nutrivize + Portfolio
+  * Backend: Python + FastAPI (Expert - async, APIs, documentation) in all projects  
+  * AI/ML: OpenAI GPT-4/Vision (Expert - Nutrivize food recognition, portfolio chat), Claude API, Pinecone vector DB
+  * Databases: MongoDB Atlas (production), Redis Cloud (caching), Firebase Auth
+  * Cloud: Vercel (frontend), Render (backend), performance optimization
+  * Dev Tools: VS Code, Git/GitHub, Postman, Chrome DevTools
+  * Specific project tech combinations and why chosen
+
+**PROJECT QUESTIONS:** For each project provide:
+  * **Nutrivize**: AI nutrition tracker, React+FastAPI+MongoDB, OpenAI Vision for food recognition, active users, production-ready
+  * **EchoPod**: AI podcast generator, Python+NLP+voice synthesis, advanced audio processing
+  * **SignalFlow**: AI trading analysis, Python+Streamlit+MongoDB, 60-65% win rate, multi-agent architecture  
+  * **Portfolio**: This site, React+FastAPI+Pinecone, AI chat with voice features, innovative design
+  * Technical challenges solved, architecture decisions, real-world impact
+
+**EXPERIENCE QUESTIONS:** Detail Isaac's journey:
+  * 2021: Started with HTML/CSS/JavaScript fundamentals
+  * 2022: Advanced to React, Node.js, modern development practices  
+  * 2023: Mastered FastAPI, AI integration, cloud deployment, full-stack architecture
+  * 2024-Present: Expert-level with focus on AI-powered applications and scalable systems
+  * Self-taught through projects, documentation, continuous experimentation
+  * Production applications with real users and measurable impact
+
+**CAREER QUESTIONS:** Specify Isaac's goals:
+  * Target roles: Backend Engineer, AI Engineer, Full-Stack Developer, Senior positions
+  * Industries: HealthTech, AI/Productivity Tools, Developer Tooling, Innovative Startups
+  * What he brings: Speed+Quality, AI expertise, full-stack capabilities, performance focus
+  * Ideal environment: Collaborative teams, learning culture, impact-focused, technical excellence
+  * Remote preferred, open to relocation for right opportunity
+
+**AI/ML QUESTIONS:** Highlight Isaac's expertise:
+  * AI-first development approach (builds AI-powered apps, not just uses AI tools)
+  * OpenAI integration: GPT-4 for analysis, Vision for image recognition (Nutrivize)
+  * Vector databases: Pinecone for semantic search (portfolio knowledge base)
+  * Prompt engineering: Context design, response optimization
+  * Real implementations: Food recognition, conversational AI, intelligent recommendations
+
+**CHALLENGE QUESTIONS:** Specific technical problems solved:
+  * Real-time food recognition accuracy improvements
+  * Conversation context management and entity tracking
+  * Scalable API design handling concurrent users
+  * Performance optimization (sub-2s load times)
+  * AI response quality and relevance tuning
+  * Production deployment and monitoring
+
+Use markdown formatting for better readability:
 - **Bold** for important points and key terms
 - *Italics* for emphasis 
 - Bullet points for lists
 - Line breaks for better structure
 - Code blocks for technical details when relevant
 
-Make your response engaging and conversational while maintaining professionalism. Aim for depth and detail rather than brevity."""
+Make your response engaging and conversational while maintaining professionalism. Aim for depth and detail rather than brevity, especially for technical questions."""
 
     # Call OpenAI API with GPT-4o
     completion = openai_client.chat.completions.create(
@@ -500,23 +640,211 @@ def get_fallback_info(question: str) -> str:
     return "Isaac is a Full-Stack Developer and AI Engineer specializing in React, FastAPI, Python, and AI integrations."
 
 def get_fallback_response(question: str) -> str:
-    """Enhanced fallback responses when everything fails"""
+    """Enhanced fallback responses when everything fails - provide detailed, specific information"""
     question_lower = question.lower()
     
-    if any(word in question_lower for word in ['tech', 'stack', 'technologies']):
-        return "Isaac's main tech stack includes React, FastAPI, Python, MongoDB, and Redis. He specializes in AI integrations with OpenAI APIs and building scalable backend systems."
+    # Tech Stack - Comprehensive Response
+    if any(word in question_lower for word in ['tech', 'stack', 'technologies', 'skills', 'programming']):
+        return """**Isaac's Complete Technology Stack:**
+
+🚀 **Frontend (Expert Level)**
+• **React 18** - Hooks, Context, performance optimization - Used in Nutrivize, Portfolio
+• **JavaScript/TypeScript** - ES6+, async programming - All projects
+• **Tailwind CSS** - Utility-first styling - Portfolio UI, responsive design
+• **HTML5/CSS3** - Semantic markup, animations - Professional interfaces
+
+⚙️ **Backend (Expert Level)**  
+• **Python + FastAPI** - Async APIs, documentation - Nutrivize backend, Portfolio API
+• **Node.js** - Server-side JavaScript - API development experience
+• **RESTful API Design** - Clean architecture, error handling - Production APIs
+• **WebSocket** - Real-time communication - Voice chat features
+
+🤖 **AI & Machine Learning (Expert Level)**
+• **OpenAI GPT-4/Vision** - Food recognition (Nutrivize), AI chat (Portfolio)
+• **Claude API** - Advanced conversation handling
+• **Vector Databases** - Pinecone for semantic search - Portfolio knowledge base
+• **Prompt Engineering** - Context optimization, response quality
+
+💾 **Databases & Storage**
+• **MongoDB Atlas** - Document storage - Nutrivize user data, production-ready
+• **Redis Cloud** - Caching, session management - Performance optimization
+• **Firebase Auth** - Authentication systems - Multi-provider support
+
+☁️ **Cloud & Deployment**
+• **Vercel** - Frontend hosting - Portfolio, optimized deployment
+• **Render** - Backend hosting - FastAPI services, database management
+• **Performance Optimization** - Sub-2s load times, caching strategies
+
+**Real Projects:** Nutrivize (AI nutrition), SignalFlow (trading analysis), EchoPod (AI podcasts), Portfolio (AI chat)"""
     
-    elif any(word in question_lower for word in ['nutrivize', 'project']):
-        return "Nutrivize is Isaac's flagship project - an AI-powered nutrition tracker using computer vision for food recognition. It's built with React, FastAPI, and integrates OpenAI's GPT-4 Vision for intelligent meal tracking."
+    # Projects - Detailed Overview
+    elif any(word in question_lower for word in ['project', 'built', 'made', 'work', 'developed']):
+        return """**Isaac's Key Projects:**
+
+🍎 **Nutrivize** (Live - Flagship Project)
+• **Purpose:** AI-powered nutrition tracker with computer vision food recognition
+• **Tech:** React 18 + FastAPI + MongoDB Atlas + OpenAI GPT-4 Vision + Redis Cloud
+• **Features:** Photo food recognition, macro tracking, AI meal suggestions, real-time sync
+• **Impact:** Active users, production-ready, demonstrates full-stack + AI expertise
+• **Live:** https://nutrivize.com
+
+🎙️ **EchoPod** (AI Podcast Generator)
+• **Purpose:** Revolutionary AI-powered podcast creation from text content
+• **Tech:** Python + FastAPI + Advanced voice synthesis + NLP processing
+• **Features:** Script optimization, natural voice synthesis, automated production pipeline
+• **Impact:** Democratizing podcast creation through AI
+
+📊 **SignalFlow** (AI Trading System)  
+• **Purpose:** Comprehensive AI trading analysis with multi-agent architecture
+• **Tech:** Python 3.11+ + FastAPI + Streamlit + MongoDB + OpenAI + Claude + Railway
+• **Features:** 60-65% win rate, Kelly Criterion math, real-time analysis, Telegram bot
+• **Impact:** Professional-grade trading system with supervised learning
+• **Live:** https://web-production-3e19d.up.railway.app
+
+💼 **AI Portfolio** (This Website)
+• **Purpose:** Modern portfolio with AI chat, voice features, performance optimization
+• **Tech:** React + Vite + Tailwind + FastAPI + Pinecone + WebSocket + Deepgram + ElevenLabs
+• **Features:** AI knowledge base, voice chat, glassmorphism UI, PWA capabilities
+• **Impact:** Innovative developer portfolio showcasing AI integration"""
     
-    elif any(word in question_lower for word in ['experience', 'background']):
-        return "Isaac is a Full-Stack Developer and AI Engineer specializing in intelligent, scalable web applications. He focuses on clean code, performance optimization, and building tools with real-world impact."
+    # Experience/Background - Detailed Journey
+    elif any(word in question_lower for word in ['experience', 'background', 'career', 'journey', 'history']):
+        return """**Isaac's Development Journey:**
+
+📈 **Self-Directed Learning Path (2021-Present)**
+• **2021:** Started with HTML, CSS, JavaScript fundamentals - Built first websites
+• **2022:** Advanced to React, Node.js, modern development practices - Component-based thinking
+• **2023:** Mastered FastAPI, AI integration, cloud deployment - Full-stack architecture
+• **2024-Present:** Expert-level AI-powered applications - Production systems at scale
+
+🎯 **Core Expertise Developed**
+• **Full-Stack Development:** End-to-end application architecture and implementation  
+• **AI Integration:** OpenAI, Claude, vector databases - Building intelligent applications
+• **Performance Engineering:** Sub-2s load times, scalable APIs, caching strategies
+• **Production Systems:** Real users, monitoring, deployment automation
+
+🏆 **Real-World Impact**
+• **Nutrivize:** Active users improving their health through AI-powered nutrition tracking
+• **Portfolio:** Innovative AI chat helping people learn about Isaac's background
+• **Production Experience:** Live applications with monitoring, scaling, user feedback
+
+📚 **Continuous Learning**
+• Follows industry blogs, documentation, technical communities
+• Experiments with new technologies through side projects
+• Masters technologies through hands-on building and iteration
+• Stays current with rapidly evolving AI and web technologies
+
+**Education:** Middlebury College (2019-2023) - Liberal Arts with analytical thinking focus"""
     
-    elif any(word in question_lower for word in ['contact', 'email', 'reach']):
-        return "You can reach Isaac at isaac@isaacmineo.com, GitHub at github.com/GoldenRodger5, or LinkedIn at linkedin.com/in/isaacmineo. He's always open to discussing opportunities!"
+    # Career/Job Questions - Specific Goals
+    elif any(word in question_lower for word in ['job', 'career', 'looking', 'seeking', 'hiring', 'opportunity']):
+        return """**Isaac's Career Goals & Opportunities:**
+
+🎯 **Target Roles**
+• **Backend Engineer** - Building scalable APIs and intelligent systems
+• **AI Engineer** - Integrating AI capabilities into products and workflows
+• **Full-Stack Developer** - End-to-end feature development with modern technologies
+• **Senior Developer** - Technical leadership and architecture decisions
+
+🏢 **Preferred Industries**
+• **HealthTech** - Building tools that improve people's health (like Nutrivize)
+• **AI/Productivity Tools** - Creating intelligent applications that enhance productivity
+• **Developer Tooling** - Building tools that help other developers be more effective
+• **Innovative Startups** - Companies focused on making real-world impact
+
+💪 **What Isaac Brings**
+• **Speed + Quality** - Ship features quickly without sacrificing code quality
+• **AI Integration Expertise** - Experience building intelligent, context-aware applications  
+• **Full-Stack Capabilities** - Handle everything from database design to user interfaces
+• **Performance Focus** - Always optimizing for speed, scalability, user experience
+• **Problem-Solving Mindset** - Enjoys tackling complex technical challenges
+
+🌟 **Ideal Work Environment**
+• **Collaborative Teams** - Smart, creative people who push each other to excel
+• **Learning Culture** - Environment encouraging growth and staying current with technology
+• **Impact-Focused** - Building products that solve real problems for real people
+• **Technical Excellence** - Teams valuing code quality, testing, best practices
+
+📍 **Work Preferences:** Remote-first preferred, open to relocation for exceptional opportunities
+📧 **Contact:** isaac@isaacmineo.com"""
     
+    # AI/ML Specific Questions
+    elif any(word in question_lower for word in ['ai', 'artificial intelligence', 'machine learning', 'ml', 'intelligent']):
+        return """**Isaac's AI & Machine Learning Expertise:**
+
+🧠 **AI-First Development Approach**
+Isaac doesn't just use AI tools - he builds AI-powered applications from the ground up.
+
+⚡ **Core AI Technologies**
+• **OpenAI Integration** - GPT-4 for analysis, Vision for image recognition (Nutrivize food detection)
+• **Claude API** - Advanced conversation handling and content generation
+• **Vector Databases** - Pinecone for semantic search and knowledge retrieval
+• **Prompt Engineering** - Context design, response optimization, conversation flow
+
+🚀 **Real AI Implementations**
+• **Nutrivize Food Recognition** - Computer vision for automatic meal identification and nutrition analysis
+• **Portfolio AI Chat** - Context-aware conversations with memory and entity tracking
+• **SignalFlow Analysis** - Multi-agent AI architecture for trading decisions with 60-65% accuracy
+• **EchoPod Generation** - AI-powered content-to-podcast conversion with voice synthesis
+
+💡 **AI Architecture Experience**
+• **Multi-Agent Systems** - Coordinated AI agents for complex tasks (SignalFlow)
+• **Conversation Management** - Session tracking, context preservation, entity recognition
+• **Performance Optimization** - Efficient AI API usage, response caching, fallback handling
+• **Real-time Processing** - WebSocket integration for live AI interactions
+
+📊 **Measurable Results**
+• Food recognition accuracy improvements through iterative prompt engineering
+• Conversation quality metrics and user engagement optimization
+• AI response time optimization (sub-3s responses with caching)
+• Production AI systems serving real users daily"""
+    
+    # Contact Information
+    elif any(word in question_lower for word in ['contact', 'email', 'reach', 'hire', 'connect']):
+        return """**Contact Isaac Mineo:**
+
+📧 **Primary Email:** isaac@isaacmineo.com  
+⚡ **Response Time:** Typically within 24 hours  
+
+🌐 **Professional Links:**
+• **GitHub:** https://github.com/GoldenRodger5 - All public projects and code
+• **LinkedIn:** https://linkedin.com/in/isaacmineo2001 - Professional network and updates  
+• **Portfolio:** https://isaacmineo.com - This website with full project details
+
+💼 **Best For Contacting:**
+• Job opportunities and career discussions
+• Technical collaborations and project partnerships  
+• Questions about projects, code, or technical approaches
+• Speaking opportunities or technical consultations
+
+🚀 **Current Status:** 
+Actively seeking new opportunities in backend, AI engineering, or full-stack development roles.
+
+📞 **Interview Availability:** 
+Flexible schedule for calls, technical interviews, and project discussions.
+
+🏠 **Location Preferences:**
+Remote-first preferred, open to relocation for exceptional opportunities. Particularly interested in tech hubs but values company culture over specific location."""
+    
+    # Default comprehensive response
     else:
-        return "Isaac is a Full-Stack Developer specializing in AI-powered applications. Ask me about his tech stack, projects like Nutrivize, experience, or career goals. Contact him at isaac@isaacmineo.com!"
+        return """**Isaac Mineo - Full-Stack Developer & AI Engineer**
+
+🚀 **Quick Overview:**
+Expert in React, Python, FastAPI, and AI integration. Builds production-ready applications with real users like Nutrivize (AI nutrition tracker) and innovative projects like AI-powered trading systems.
+
+💻 **Core Technologies:**
+React 18, Python, FastAPI, MongoDB, Redis, OpenAI APIs, Vector Databases, Cloud Deployment
+
+🎯 **Featured Projects:**
+• **Nutrivize** - AI nutrition tracker with computer vision (Live)
+• **SignalFlow** - AI trading analysis with 60-65% win rate (Live)  
+• **EchoPod** - AI podcast generator with voice synthesis
+• **Portfolio** - This AI-powered website with voice chat
+
+📧 **Contact:** isaac@isaacmineo.com | [GitHub](https://github.com/GoldenRodger5) | [LinkedIn](https://linkedin.com/in/isaacmineo2001)
+
+*Ask me about Isaac's tech stack, specific projects, AI experience, or career goals for detailed information!*"""
 
 @router.post("/contact", response_model=ContactResponse)
 async def submit_contact_form(request: ContactRequest, req: Request):

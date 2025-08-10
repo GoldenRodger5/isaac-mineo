@@ -259,12 +259,51 @@ Please provide a helpful, professional, and engaging response about Isaac based 
 function getFallbackResponse(question) {
   const lowerQuestion = question.toLowerCase();
   
-  // Tech stack questions
-  if (lowerQuestion.includes('tech') || lowerQuestion.includes('stack') || lowerQuestion.includes('technologies')) {
+  // Tech stack questions - Enhanced comprehensive responses
+  if (lowerQuestion.includes('tech') || lowerQuestion.includes('stack') || lowerQuestion.includes('technologies') || lowerQuestion.includes('technical skills')) {
     const techResponses = [
-      "Isaac's main tech stack includes React, FastAPI, Python, MongoDB, and Redis. He specializes in AI integrations with OpenAI APIs and building scalable backend systems.",
-      "Isaac works with React 18, FastAPI, Python, and MongoDB. He's particularly skilled with AI integration using OpenAI APIs and has experience with Redis for caching.",
-      "On the tech side, Isaac's strongest with React, FastAPI, Python, and MongoDB. He loves building AI-powered applications and has deep experience with OpenAI's APIs."
+      `**Isaac's Complete Technology Stack:**
+
+🚀 **Frontend:** React 18, TypeScript, Tailwind CSS, HTML5/CSS3, Vite
+📡 **Backend:** Python, FastAPI, Node.js, REST APIs, WebSockets
+🤖 **AI/ML:** OpenAI GPT-4, Claude API, Vector databases, Prompt engineering
+💾 **Databases:** MongoDB, Redis, Firebase, PostgreSQL
+☁️ **Cloud:** Vercel, Render, AWS (learning), Docker (basic)
+
+**Project Applications:**
+• **Nutrivize**: React + FastAPI + MongoDB + OpenAI Vision + Redis
+• **Portfolio**: React + Vite + Tailwind + FastAPI + Pinecone + AI Chat
+• **EchoPod**: Python + NLP + Voice Synthesis + Audio Processing
+• **SignalFlow**: Python + FastAPI + MongoDB + Real-time Analytics
+
+Isaac specializes in full-stack development with AI integration and has production experience across all these technologies.`,
+      
+      `**Isaac's Technical Expertise by Category:**
+
+**Frontend Development (Expert):**
+- React 18 with Hooks & Context (Nutrivize, Portfolio)
+- TypeScript/JavaScript ES6+ (All projects)
+- Tailwind CSS & responsive design (Portfolio, modern UIs)
+
+**Backend Development (Expert):**
+- Python & FastAPI (Nutrivize API, Portfolio backend)
+- RESTful APIs & WebSocket support (Real-time features)
+- Database design & optimization (MongoDB, Redis)
+
+**AI & Machine Learning (Expert):**
+- OpenAI API integration (GPT-4, Vision, embeddings)
+- Claude API for advanced conversations (Nutrivize)
+- Vector search & semantic databases (Portfolio AI)
+- Prompt engineering & context optimization
+
+**Cloud & DevOps (Proficient):**
+- Vercel/Render deployment (All production apps)
+- Performance optimization & caching strategies
+- Git/GitHub workflows & collaboration
+
+Real-world experience building and deploying scalable AI-powered applications.`,
+
+      "Isaac's core stack: **React + Python + FastAPI + MongoDB + OpenAI APIs**. Expert level across all technologies with production deployments. Specializes in AI-powered full-stack applications like Nutrivize (nutrition tracker) and this portfolio's AI chat. Strong with Redis caching, Tailwind CSS, and modern deployment on Vercel/Render."
     ];
     return techResponses[Math.floor(Math.random() * techResponses.length)];
   }

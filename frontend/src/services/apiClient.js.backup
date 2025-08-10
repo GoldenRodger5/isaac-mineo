@@ -61,13 +61,13 @@ class APIClient {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw new Error("string concatenation");
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       return await response.json();
     } catch (error) {
       if (attempt < this.retryAttempts && !error.name === 'AbortError') {
-        console.warn("string concatenation", error);
+        console.warn(`API call failed (attempt ${attempt}/${this.retryAttempts}), retrying...`, error);
         await this.delay(this.retryDelay * attempt);
         return this.fetchWithRetry(url, options, attempt + 1);
       }
@@ -83,7 +83,7 @@ class APIClient {
   // Health check endpoint with better error handling for development
   async healthCheck() {
     try {
-      const response = await this.fetchWithRetry("string concatenation");
+      const response = await this.fetchWithRetry(`${this.baseURL.replace('/api', '')}/health`);
       return true;
     } catch (error) {
       // In development, don't spam console with connection errors
@@ -104,7 +104,7 @@ class APIClient {
         sessionId
       };
 
-      const response = await this.fetchWithRetry("string concatenation", {
+      const response = await this.fetchWithRetry(`${this.baseURL}/chatbot`, {
         method: 'POST',
         body: JSON.stringify(payload),
       });
@@ -121,7 +121,7 @@ class APIClient {
         success: false,
         data: {
           response: this.getFallbackResponse(question),
-          sessionId: sessionId || "string concatenation",
+          sessionId: sessionId || `fallback_${Date.now()}`,
           searchMethod: 'fallback',
           cached: false,
           error: true,
@@ -135,17 +135,17 @@ class APIClient {
   async sendContactEmail(contactData) {
     const startTime = Date.now();
     
-    console.log("string concatenation");
+    console.log(`📧 Sending contact email via ${this.environment} environment...`);
     
     try {
-      console.log("string concatenation");
-      const response = await this.fetchWithRetry("string concatenation", {
+      console.log(`🎯 Using FastAPI backend: ${this.baseURL}/contact`);
+      const response = await this.fetchWithRetry(`${this.baseURL}/contact`, {
         method: 'POST',
         body: JSON.stringify(contactData),
       });
 
       const elapsed = Date.now() - startTime;
-      console.log("string concatenation");
+      console.log(`✅ Contact email sent successfully in ${elapsed}ms`);
       
       return {
         success: true,
@@ -169,7 +169,7 @@ class APIClient {
   // Get projects data
   async getProjects() {
     try {
-      const response = await this.fetchWithRetry("string concatenation");
+      const response = await this.fetchWithRetry(`${this.baseURL}/projects`);
       return {
         success: true,
         data: response

@@ -53,28 +53,57 @@ Keep simple responses brief and friendly. Use markdown formatting for clarity.""
 
 Isaac Mineo - Full-stack Developer & AI Engineer:
 
-**Technical Expertise:**
-• Frontend: React, JavaScript, HTML5/CSS3, responsive design
-• Backend: Python, FastAPI, API development, microservices
-• AI/ML: Machine learning integration, OpenAI APIs, intelligent systems
-• Cloud: AWS, deployment, scaling, database design
-• Tools: Git, Docker, CI/CD, testing frameworks
+**COMPLETE TECHNICAL STACK:**
 
-**Featured Projects:**
-• Nutrivize: AI-powered nutrition tracker with ML recommendations and personalized dietary guidance
-• EchoPod: Revolutionary AI podcast generator with advanced voice synthesis technology
-• Quizium: Intelligent flashcard creator using spaced repetition for optimal learning
-• Signalflow: Advanced trading analysis platform with real-time market insights
+🚀 Frontend Technologies:
+• React 18 (Expert) - Hooks, Context, performance optimization - Used in Nutrivize, Portfolio
+• JavaScript/TypeScript (Expert) - ES6+, async programming - All frontend projects  
+• Tailwind CSS (Expert) - Utility-first styling - Portfolio Website, modern UI/UX
+• HTML5/CSS3 (Expert) - Semantic markup, animations - All web applications
+• Vite (Proficient) - Build optimization - Portfolio development environment
 
-**Education:** Computer Science with specialization in AI/ML
+🔧 Backend Technologies:
+• Python (Expert) - OOP, async programming - Nutrivize, EchoPod, SignalFlow backends
+• FastAPI (Expert) - REST APIs, WebSockets - Nutrivize API, Portfolio chat system
+• Node.js (Proficient) - Express, middleware - Quizium backend development
 
-**Contact Information:**
-• Email: isaacmineo@gmail.com
-• LinkedIn: https://linkedin.com/in/isaac-mineo
-• GitHub: https://github.com/isaac-mineo
-• Phone: Available upon request
+🤖 AI & Machine Learning:
+• OpenAI API (Expert) - GPT-4, Vision, embeddings - Nutrivize food recognition, Portfolio AI
+• Claude API (Proficient) - Advanced conversations - Nutrivize nutrition companion
+• Vector Databases (Learning) - Pinecone semantic search - Portfolio knowledge base
+• Prompt Engineering (Expert) - Context optimization - All AI-powered features
 
-Create detailed, professional responses with markdown formatting. Highlight technical achievements and innovation."""
+💾 Databases & Cloud:
+• MongoDB (Expert) - Document design, Atlas - Nutrivize user data, SignalFlow analytics
+• Redis (Proficient) - Caching, sessions - Portfolio performance, Nutrivize optimization
+• Firebase (Proficient) - Authentication, real-time - Nutrivize user management
+• Vercel/Render (Expert) - Deployment, scaling - All production applications
+
+**FEATURED PROJECT IMPLEMENTATIONS:**
+
+• **Nutrivize**: Full-stack AI nutrition tracker
+  - Tech: React PWA + Python FastAPI + MongoDB + OpenAI Vision + Redis caching
+  - Features: AI food recognition, ML recommendations, real-time analytics
+  
+• **Portfolio Website**: AI-powered professional showcase  
+  - Tech: React + Vite + Tailwind + FastAPI + Pinecone + OpenAI chat
+  - Features: Vector search, conversational AI, performance optimization
+
+• **EchoPod**: AI podcast generation platform
+  - Tech: Python + NLP + Voice synthesis + Audio processing
+  - Features: Automated content creation, voice personality customization
+
+• **SignalFlow**: Trading analysis platform
+  - Tech: Python + FastAPI + MongoDB + Real-time data + Analytics dashboards
+  - Features: Multi-agent AI, risk management, performance tracking
+
+**Education:** Computer Science with AI/ML specialization
+**Contact:** isaacmineo@gmail.com | LinkedIn | GitHub
+
+SPECIAL INSTRUCTIONS FOR TECH STACK QUESTIONS:
+When users ask about "tech stack", "technologies", "what tech", provide the COMPLETE detailed breakdown above with specific project examples and proficiency levels. Always reference which projects use which technologies and explain real-world applications.
+
+Create detailed, professional responses with markdown formatting. Highlight technical achievements and innovation with specific examples from actual projects."""
 
     async def process_message(self, question: str, session_id: Optional[str] = None, client_ip: str = "unknown") -> Dict[str, Any]:
         """Main entry point for all chat processing"""
