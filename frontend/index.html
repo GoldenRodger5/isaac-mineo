@@ -66,6 +66,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/isaac-photo.jpg" as="image" type="image/jpeg">
+    <link rel="preload" href="/src/main.jsx" as="script" crossorigin>
+    <link rel="preload" href="/favicon-32.png" as="image" type="image/png">
+    
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#667eea" />
@@ -159,6 +164,18 @@
       // Track PWA usage
       if (window.matchMedia('(display-mode: standalone)').matches) {
         console.log('Running as PWA');
+      }
+    </script>
+    
+    <!-- Premium Mobile Test Suite (Development Only) -->
+    <script>
+      // Load premium mobile tests in development
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        const script = document.createElement('script');
+        script.src = '/scripts/premiumMobileTests.js';
+        script.type = 'module';
+        document.head.appendChild(script);
+        console.log('🏆 Premium mobile test suite loaded for development');
       }
     </script>
     

@@ -3,11 +3,16 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { AuthProvider } from './contexts/AuthContext';
 import analyticsService from './services/analyticsService';
+import ErrorBoundary from './components/ErrorBoundary';
 
-// Enhanced Mobile Components
+// Enhanced Mobile Components (simplified)
 import { AdvancedMobileNavigation, MobileHeader, MobileModal } from './components/mobile/MobileNavigation';
 import { MobileTouchButton, PullToRefresh } from './components/mobile/MobileTouchComponents';
-import { useMobilePerformance, SmartAnimation } from './components/mobile/MobilePerformance';
+
+// Remove complex utilities that cause issues
+// import './utils/advancedTouchGestures';
+// import './utils/mobileDeviceManager';  
+// import './utils/mobileAccessibilityManager';
 
 // Lazy load components for better mobile performance
 const About = lazy(() => import('./components/About'));
@@ -24,6 +29,27 @@ const AdminAnalytics = lazy(() => import('./components/AdminAnalytics'));
 const BottomNavigation = lazy(() => import('./components/BottomNavigation'));
 const HorizontalTabNavigation = lazy(() => import('./components/HorizontalTabNavigation'));
 const SwipeableTabContainer = lazy(() => import('./components/SwipeableTabContainer'));
+
+// Loading component for Suspense fallback
+const LoadingFallback = ({ message = "Loading..." }) => (
+  <div className="flex items-center justify-center py-12">
+    <div className="text-center">
+      <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
+      <p className="text-gray-600 font-medium">{message}</p>
+    </div>
+  </div>
+);
+
+// Component loading fallback for tab content
+const TabLoadingFallback = () => (
+  <div className="flex items-center justify-center py-20">
+    <div className="text-center">
+      <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-6"></div>
+      <h3 className="text-xl font-semibold text-gray-800 mb-2">Loading Content</h3>
+      <p className="text-gray-600">Please wait while we load this section...</p>
+    </div>
+  </div>
+);
 
 const CORRECT_PASSWORD = import.meta.env.VITE_SITE_PASSWORD;
 
@@ -43,8 +69,14 @@ function App() {
   const [authToken, setAuthToken] = useState(null);
   const [useMobileNavigation, setUseMobileNavigation] = useState(false);
 
-  // Mobile performance monitoring
-  const { batteryStatus, networkStatus, performanceMetrics, optimalSettings } = useMobilePerformance();
+  // Simplified mobile detection
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // Simplified tab change handler - removed problematic debouncing
+  const handleTabChange = (newTab) => {
+    if (activeTab === newTab) return; // Prevent unnecessary changes
+    setActiveTab(newTab);
+  };
 
   const tabs = [
     { id: 'about', label: 'About', icon: '👨‍💻' },
@@ -57,25 +89,34 @@ function App() {
 
   // Detect mobile device and enable enhanced mobile experience
   useEffect(() => {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-      window.innerWidth <= 768;
-    setUseMobileNavigation(isMobile);
-    
-    // Handle device orientation changes
-    const handleOrientationChange = () => {
-      setTimeout(() => {
-        setUseMobileNavigation(window.innerWidth <= 768);
-      }, 100);
+    const detectMobile = () => {
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768;
+      setUseMobileNavigation(isMobile);
+      setIsMobile(isMobile);
     };
 
-    window.addEventListener('orientationchange', handleOrientationChange);
-    window.addEventListener('resize', handleOrientationChange);
+    // Initial detection
+    detectMobile();
+    
+    // Handle device orientation changes with debouncing
+    let resizeTimeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        detectMobile();
+      }, 150);
+    };
+
+    window.addEventListener('orientationchange', handleResize);
+    window.addEventListener('resize', handleResize);
     
     return () => {
-      window.removeEventListener('orientationchange', handleOrientationChange);
-      window.removeEventListener('resize', handleOrientationChange);
+      window.removeEventListener('orientationchange', handleResize);
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimeout);
     };
-  }, []);
+  }, []); // Empty dependency array to run only once
 
   // Pull-to-refresh handler
   const handleRefresh = async () => {
@@ -156,20 +197,30 @@ function App() {
   // Analytics tracking for tab changes
   useEffect(() => {
     if (unlocked && isAppReady) {
-      analyticsService.trackPageView('portfolio', activeTab);
+      try {
+        analyticsService.trackPageView('portfolio', activeTab);
+      } catch (error) {
+        console.warn('Analytics tracking error:', error);
+        // Don't break the app if analytics fails
+      }
     }
   }, [activeTab, unlocked, isAppReady]);
 
   // Track app unlock
   useEffect(() => {
     if (unlocked && isAppReady) {
-      analyticsService.trackPageView('portfolio', 'unlocked');
-      
-      // Auto-enable admin access if user has JWT token
-      const existingToken = localStorage.getItem('access_token');
-      if (existingToken) {
-        setAuthToken(existingToken);
-        console.log('🔐 Admin access enabled via existing JWT token');
+      try {
+        analyticsService.trackPageView('portfolio', 'unlocked');
+        
+        // Auto-enable admin access if user has JWT token
+        const existingToken = localStorage.getItem('access_token');
+        if (existingToken) {
+          setAuthToken(existingToken);
+          console.log('🔐 Admin access enabled via existing JWT token');
+        }
+      } catch (error) {
+        console.warn('App unlock tracking error:', error);
+        // Don't break the app if analytics or token handling fails
       }
     }
   }, [unlocked, isAppReady]);
@@ -455,7 +506,7 @@ function App() {
                   <button
                     key={tab.id}
                     onClick={() => {
-                      setActiveTab(tab.id);
+                      handleTabChange(tab.id);
                       setIsMenuOpen(false);
                     }}
                     className={`w-full flex items-center space-x-4 px-5 py-4 rounded-2xl transition-all duration-300 group active:scale-95 ${
@@ -527,7 +578,7 @@ function App() {
           {/* Enhanced Action Buttons */}
           <div className="flex flex-col gap-4 md:flex-row md:gap-6 justify-center mb-6 md:mb-8 px-2">
             <button
-              onClick={() => setActiveTab('projects')}
+              onClick={() => handleTabChange('projects')}
               className="group bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-700 hover:to-accent-700 text-white px-8 py-4 md:px-10 md:py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 animate-magnetic active:scale-95"
             >
               <span className="flex items-center justify-center text-base md:text-base">
@@ -538,7 +589,7 @@ function App() {
               </span>
             </button>
             <button
-              onClick={() => setActiveTab('ai-chat')}
+              onClick={() => handleTabChange('ai-chat')}
               className="group bg-gradient-to-r from-neural-600 to-purple-600 hover:from-neural-700 hover:to-purple-700 text-white px-8 py-4 md:px-10 md:py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 animate-magnetic active:scale-95"
             >
               <span className="flex items-center justify-center text-base md:text-base">
@@ -549,7 +600,7 @@ function App() {
               </span>
             </button>
             <button
-              onClick={() => setActiveTab('resume')}
+              onClick={() => handleTabChange('resume')}
               className="group border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-8 py-4 md:px-10 md:py-4 rounded-2xl font-semibold transition-all duration-300 animate-magnetic shadow-sm hover:shadow-lg active:scale-95"
             >
               <span className="flex items-center justify-center text-base md:text-base">
@@ -564,77 +615,93 @@ function App() {
       </section>
 
       {/* Tab Navigation - Desktop */}
-      <HorizontalTabNavigation 
-        tabs={tabs}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        className="hidden md:block"
-      />
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback message="Loading navigation..." />}>
+          <HorizontalTabNavigation 
+            tabs={tabs}
+            activeTab={activeTab}
+            setActiveTab={handleTabChange}
+            className="hidden md:block"
+          />
+        </Suspense>
+      </ErrorBoundary>
 
       {/* Main Content with Swipe Support */}
-      <SwipeableTabContainer
-        tabs={tabs}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      >
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback message="Loading content container..." />}>
+          <SwipeableTabContainer
+            tabs={tabs}
+            activeTab={activeTab}
+            setActiveTab={handleTabChange}
+          >
         <main className="relative z-20 py-4 pb-24 md:pb-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
               <div className="p-4 md:p-6 lg:p-8">
-                {(() => {
-                  try {
-                    switch (activeTab) {
-                      case 'about':
+                <ErrorBoundary>
+                  <Suspense fallback={<TabLoadingFallback />}>
+                    {(() => {
+                      try {
+                        switch (activeTab) {
+                          case 'about':
+                            return (
+                              <>
+                                <About />
+                                {showAnalytics && <PublicAnalytics />}
+                              </>
+                            );
+                          case 'projects':
+                            return <Projects />;
+                          case 'resume':
+                            return <Resume />;
+                          case 'ai-chat':
+                            return <AIChat />;
+                          case 'code-explainer':
+                            return <CodeExplainer />;
+                          case 'contact':
+                            return <Contact />;
+                          default:
+                            return <About />;
+                        }
+                      } catch (error) {
+                        console.error('Component render error:', error);
                         return (
-                          <>
-                            <About />
-                            {showAnalytics && <PublicAnalytics />}
-                          </>
+                          <div className="text-center py-12">
+                            <div className="text-red-500 text-4xl mb-4">⚠️</div>
+                            <h3 className="text-xl font-semibold text-gray-800 mb-2">Component Error</h3>
+                            <p className="text-gray-600 mb-4">
+                              There was an error loading this section.
+                            </p>
+                            <button
+                              onClick={() => handleTabChange('about')}
+                              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                            >
+                              Go to About
+                            </button>
+                          </div>
                         );
-                      case 'projects':
-                        return <Projects />;
-                      case 'resume':
-                        return <Resume />;
-                      case 'ai-chat':
-                        return <AIChat />;
-                      case 'code-explainer':
-                        return <CodeExplainer />;
-                      case 'contact':
-                        return <Contact />;
-                      default:
-                        return <About />;
-                    }
-                  } catch (error) {
-                    console.error('Component render error:', error);
-                    return (
-                      <div className="text-center py-12">
-                        <div className="text-red-500 text-4xl mb-4">⚠️</div>
-                        <h3 className="text-xl font-semibold text-gray-800 mb-2">Component Error</h3>
-                        <p className="text-gray-600 mb-4">
-                          There was an error loading this section.
-                        </p>
-                        <button
-                          onClick={() => setActiveTab('about')}
-                          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-                        >
-                          Go to About
-                        </button>
-                      </div>
-                    );
-                  }
-                })()}
+                      }
+                    })()}
+                  </Suspense>
+                </ErrorBoundary>
               </div>
             </div>
           </div>
         </main>
-      </SwipeableTabContainer>
+          </SwipeableTabContainer>
+        </Suspense>
+      </ErrorBoundary>
 
       {/* Bottom Navigation - Mobile */}
-      <BottomNavigation 
-        tabs={tabs}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback message="Loading mobile navigation..." />}>
+          <BottomNavigation 
+            tabs={tabs}
+            activeTab={activeTab}
+            setActiveTab={handleTabChange}
+          />
+        </Suspense>
+      </ErrorBoundary>
 
       {/* Footer */}
       <footer className="relative z-20 mt-20 bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 text-white pb-20 md:pb-0">
@@ -691,14 +758,22 @@ function App() {
       </footer>
 
       {/* Floating AI Assistant */}
-      <AIChatbot />
+      <ErrorBoundary>
+        <Suspense fallback={null}>
+          <AIChatbot />
+        </Suspense>
+      </ErrorBoundary>
 
       {/* Analytics Components */}
       {showAdminDashboard && authToken && (
-        <AdminAnalytics 
-          authToken={authToken}
-          onClose={() => setShowAdminDashboard(false)}
-        />
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingFallback message="Loading admin dashboard..." />}>
+            <AdminAnalytics 
+              authToken={authToken}
+              onClose={() => setShowAdminDashboard(false)}
+            />
+          </Suspense>
+        </ErrorBoundary>
       )}
 
       {/* Floating Analytics Toggle */}
@@ -743,6 +818,20 @@ function App() {
           <SpeedInsights />
         </>
       )}
+
+      {/* Accessibility Announcements for Screen Reader Support */}
+      <div 
+        id="accessibility-announcements" 
+        aria-live="polite" 
+        aria-atomic="true" 
+        className="sr-only"
+      ></div>
+      
+      {/* Skip Links for Keyboard Navigation */}
+      <a href="#main-content" className="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white p-2 rounded z-50">
+        Skip to main content
+      </a>
+      
       </div>
     </AuthProvider>
   );

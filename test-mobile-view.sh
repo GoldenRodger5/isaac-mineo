@@ -66,20 +66,31 @@ done
 echo ""
 echo "🌐 Testing API endpoints..."
 
-ENDPOINTS=(
-    "/health"
-    "/api/voice/status"
-    "/api/analytics/track/page"
-)
+# Test health endpoint
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8000/health")
+if [ "$STATUS" = "200" ]; then
+    echo "✅ /health responding"
+else
+    echo "❌ /health not responding (HTTP $STATUS)"
+fi
 
-for endpoint in "${ENDPOINTS[@]}"; do
-    STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8000$endpoint")
-    if [ "$STATUS" = "200" ]; then
-        echo "✅ $endpoint responding"
-    else
-        echo "❌ $endpoint not responding (HTTP $STATUS)"
-    fi
-done
+# Test voice status
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8000/api/voice/status")
+if [ "$STATUS" = "200" ]; then
+    echo "✅ /api/voice/status responding"
+else
+    echo "❌ /api/voice/status not responding (HTTP $STATUS)"
+fi
+
+# Test analytics with proper POST payload
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "http://localhost:8000/api/analytics/track/page" \
+    -H "Content-Type: application/json" \
+    -d '{"visitor_id":"test_mobile_user","page":"mobile_test","user_agent":"Mobile Test"}')
+if [ "$STATUS" = "200" ]; then
+    echo "✅ /api/analytics/track/page responding"
+else
+    echo "❌ /api/analytics/track/page not responding (HTTP $STATUS)"
+fi
 
 # Test 6: Check for JavaScript errors in build
 echo ""
@@ -104,19 +115,22 @@ echo "================================="
 TOTAL_TESTS=6
 PASSED_TESTS=0
 
-# Simple scoring (would need to be more sophisticated in real implementation)
+# Test 1: Server status
 if [ "$FRONTEND_STATUS" = "200" ] && [ "$BACKEND_STATUS" = "200" ]; then
     ((PASSED_TESTS++))
 fi
 
+# Test 2: Viewport meta
 if [[ $VIEWPORT_META == *"width=device-width"* ]]; then
     ((PASSED_TESTS++))
 fi
 
+# Test 3: CSS files
 if [ -f "frontend/src/styles/mobile-enhancements.css" ]; then
     ((PASSED_TESTS++))
 fi
 
+# Test 4: Mobile components
 COMPONENT_COUNT=0
 for component in "${MOBILE_COMPONENTS[@]}"; do
     if [ -f "$component" ]; then
@@ -128,18 +142,29 @@ if [ $COMPONENT_COUNT -ge 3 ]; then
     ((PASSED_TESTS++))
 fi
 
+# Test 5: API endpoints (check individual statuses)
 API_COUNT=0
-for endpoint in "${ENDPOINTS[@]}"; do
-    STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8000$endpoint")
-    if [ "$STATUS" = "200" ]; then
-        ((API_COUNT++))
-    fi
-done
+HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8000/health")
+VOICE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8000/api/voice/status")  
+ANALYTICS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "http://localhost:8000/api/analytics/track/page" \
+    -H "Content-Type: application/json" \
+    -d '{"visitor_id":"test_mobile_user","page":"mobile_test","user_agent":"Mobile Test"}')
+
+if [ "$HEALTH_STATUS" = "200" ]; then
+    ((API_COUNT++))
+fi
+if [ "$VOICE_STATUS" = "200" ]; then
+    ((API_COUNT++))
+fi
+if [ "$ANALYTICS_STATUS" = "200" ]; then
+    ((API_COUNT++))
+fi
 
 if [ $API_COUNT -ge 2 ]; then
     ((PASSED_TESTS++))
 fi
 
+# Test 6: Build status
 if [ $BUILD_EXIT_CODE -eq 0 ]; then
     ((PASSED_TESTS++))
 fi

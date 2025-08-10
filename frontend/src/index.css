@@ -11,6 +11,12 @@
   --safe-area-inset-right: env(safe-area-inset-right);
   --safe-area-inset-bottom: env(safe-area-inset-bottom);
   --safe-area-inset-left: env(safe-area-inset-left);
+  
+  /* Touch target minimum size */
+  --touch-target-min: 44px;
+  
+  /* Font scaling for accessibility */
+  --font-scale: clamp(0.875rem, 2.5vw, 1.125rem);
 }
 
 /* Responsive body with safe areas */
@@ -21,6 +27,7 @@ body {
   padding-left: var(--safe-area-inset-left);
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  font-size: var(--font-scale);
 }
 
 /* Custom animations and styles */
@@ -675,4 +682,39 @@ iframe {
 .flex-1-strict {
   flex: 1 1 0% !important;
   min-height: 0 !important;
+}
+
+/* Performance Adaptation Classes for 100% Mobile Score */
+.perf-battery-saver * {
+  animation-duration: 0.1s !important;
+  transition-duration: 0.1s !important;
+}
+
+.perf-battery-saver .animation-disabled {
+  animation: none !important;
+  transition: none !important;
+}
+
+.perf-high-performance .enhanced-animations {
+  animation-duration: 0.4s;
+  transition-duration: 0.4s;
+}
+
+.perf-balanced {
+  /* Balanced performance profile */
+  animation-timing-function: ease-out;
+  transition-timing-function: ease-out;
+}
+
+/* Data saving mode optimizations */
+.data-saving img {
+  filter: contrast(0.9) brightness(0.9);
+}
+
+.data-saving video {
+  display: none;
+}
+
+.data-saving .lazy-load {
+  background-color: #f0f0f0;
 }

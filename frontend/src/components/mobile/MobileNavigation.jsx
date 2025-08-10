@@ -90,12 +90,11 @@ const AdvancedMobileNavigation = ({
   return (
     <nav 
       ref={navRef}
-      className={`
-        fixed bottom-0 left-0 right-0 z-50
-        bg-white/95 backdrop-blur-lg border-t border-gray-200
-        safe-area-pb-4
-        ${className}
-      `}
+      className={`mobile-navigation relative bg-white border-t border-gray-200 shadow-lg ${className}`}
+      data-mobile-nav="true"
+      data-swipeable="true"
+      role="navigation"
+      aria-label="Mobile Navigation"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

@@ -58,7 +58,12 @@ const MobileChatInterface = ({
   };
 
   return (
-    <div className={`flex flex-col h-full bg-white ${isKeyboardVisible ? 'keyboard-open' : ''}`}>
+    <div 
+      className={`flex flex-col h-full bg-white ${isKeyboardVisible ? 'keyboard-open' : ''}`}
+      style={{
+        '--vh': `${window.innerHeight * 0.01}px`
+      }}
+    >
       {/* Messages Container - Optimized */}
       <div className="flex-1 overflow-y-auto p-3 space-y-3">
         {messages.map((message, index) => (
@@ -126,15 +131,16 @@ const MobileChatInterface = ({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Suggested Questions - Optimized */}
+      {/* Suggested Questions - Mobile Optimized */}
       {suggestedQuestions.length > 0 && messages.length <= 1 && (
-        <div className="px-3 py-3 border-t border-gray-200">
+        <div className="px-4 py-4 border-t border-gray-200">
+          <p className="text-sm font-semibold text-gray-700 mb-3">💡 Try asking:</p>
           <div className="flex flex-wrap gap-2">
-            {suggestedQuestions.slice(0, 3).map((question, index) => (
+            {suggestedQuestions.slice(0, 6).map((question, index) => (
               <button
                 key={index}
                 onClick={() => handleSend(question)}
-                className="bg-gray-50 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-100 transition-colors duration-200 border border-gray-200"
+                className="bg-gray-50 text-gray-700 px-4 py-3 rounded-lg text-sm hover:bg-gray-100 transition-colors duration-200 border border-gray-200 min-h-[44px] flex items-center justify-center"
                 disabled={isLoading}
               >
                 {question}
@@ -144,8 +150,8 @@ const MobileChatInterface = ({
         </div>
       )}
 
-      {/* Input Area - Optimized */}
-      <div className="border-t border-gray-200 p-3 bg-white">
+      {/* Input Area - Optimized for Mobile */}
+      <div className="border-t border-gray-200 p-4 bg-white">
         <div className="flex items-end space-x-3">
           <div className="flex-1 relative">
             <textarea
@@ -154,14 +160,18 @@ const MobileChatInterface = ({
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={placeholder}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-900 placeholder-gray-500"
+              className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base text-gray-900 placeholder-gray-500 leading-relaxed"
               rows={3}
-              style={{ minHeight: '90px', maxHeight: '225px' }}
+              style={{ 
+                minHeight: '120px', 
+                maxHeight: '180px',
+                fontSize: '16px' // Prevents zoom on iOS
+              }}
               disabled={isLoading}
             />
             {/* Character count for long messages */}
             {inputValue.length > 200 && (
-              <div className="absolute -top-5 right-2 text-xs text-gray-500">
+              <div className="absolute -top-6 right-2 text-xs text-gray-500 bg-white px-2 py-1 rounded">
                 {inputValue.length}/500
               </div>
             )}
@@ -181,12 +191,18 @@ const MobileChatInterface = ({
           <button
             onClick={() => handleSend()}
             disabled={!inputValue.trim() || isLoading}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-3 rounded-xl hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex-shrink-0 shadow-sm"
+            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-xl hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex-shrink-0 shadow-sm min-w-[56px] min-h-[56px] flex items-center justify-center"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
             </svg>
           </button>
+        </div>
+        
+        {/* Helper text */}
+        <div className="mt-3 flex items-center justify-between">
+          <p className="text-xs text-gray-500">Tap and hold the voice button to record</p>
+          <p className="text-xs text-gray-500">Press Enter to send</p>
         </div>
       </div>
     </div>

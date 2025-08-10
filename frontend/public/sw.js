@@ -1,34 +1,40 @@
-// Service Worker for Isaac Mineo Portfolio
-// Provides offline functionality, caching, and PWA features
+// Enhanced Service Worker for Isaac Mineo Portfolio
+// Provides advanced offline functionality, intelligent caching, and premium PWA features
 
-const CACHE_NAME = 'isaac-mineo-portfolio-v1';
-const STATIC_CACHE_NAME = 'isaac-mineo-static-v1';
-const DYNAMIC_CACHE_NAME = 'isaac-mineo-dynamic-v1';
+const CACHE_NAME = 'isaac-mineo-portfolio-v2';
+const STATIC_CACHE_NAME = 'isaac-mineo-static-v2';
+const DYNAMIC_CACHE_NAME = 'isaac-mineo-dynamic-v2';
+const API_CACHE_NAME = 'isaac-mineo-api-v1';
 
-// Files to cache immediately on install
+// Enhanced mobile-optimized caching strategy
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/src/main.jsx',
   '/src/App.jsx',
   '/src/index.css',
+  '/src/styles/mobile-enhancements.css',
   '/src/components/About.jsx',
   '/src/components/Projects.jsx',
   '/src/components/Resume.jsx',
+  '/src/components/mobile/MobileNavigation.jsx',
+  '/src/components/mobile/EnhancedMobileLayout.jsx',
+  '/src/components/mobile/MobileTouchComponents.jsx',
+  '/src/components/mobile/MobilePerformance.jsx',
   '/manifest.json',
   '/favicon.ico',
   '/favicon-32.png',
   '/icon-192.png',
   '/icon-512.png',
-  '/IsaacMineo_Resume.pdf',
-  '/Mineo, Isaac, Resume.pdf',
-  '/Mineo, Isaac, Transcript.pdf'
+  '/Isaac_Mineo_Resume.pdf',
+  '/Isaac_Mineo_Transcript.pdf'
 ];
 
-// Network-first resources (always try network first)
+// Smart network strategies for mobile optimization
 const NETWORK_FIRST = [
   '/src/',
-  '/api/'
+  '/api/',
+  '/scripts/'
 ];
 
 // Cache-first resources (serve from cache if available)

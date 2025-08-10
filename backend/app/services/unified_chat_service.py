@@ -29,39 +29,25 @@ class UnifiedChatService:
         # AI routing prompts
         self.classifier_prompt = """Classify this query into one of these categories:
 
-1. SIMPLE - Only for very basic greetings like "hi", "hello", "thanks", "ok" (< 15 characters)
+1. SIMPLE - Basic greetings, acknowledgments, and short phrases like "hi", "hello", "hey", "thanks", "thank you", "ok", "goodbye", "nice", "cool" (< 20 characters, no specific questions)
 2. DETAILED - All substantive questions about projects, skills, experience, technology, etc. (DEFAULT)
 3. CONTACT - Direct requests for contact information only
-
-Default to DETAILED unless it's clearly a simple greeting or contact request.
 
 Query: {query}
 Response: Just the category name (SIMPLE/DETAILED/CONTACT)"""
 
-        self.simple_prompt = """You are Isaac Mineo's portfolio assistant. Provide clear, informative responses about Isaac's work and experience.
+        self.simple_prompt = """You are Isaac Mineo's friendly portfolio assistant. For simple greetings and basic interactions, respond warmly and briefly, then offer to help with more specific information.
 
 Isaac is a full-stack developer and AI engineer specializing in modern web technologies and intelligent applications.
 
-**Technical Skills:**
-• Frontend: React 18, JavaScript/TypeScript, Tailwind CSS, HTML5/CSS3, responsive design
-• Backend: Python, FastAPI, Node.js, API development, database design
-• AI/ML: OpenAI APIs, Claude API, machine learning integration, intelligent systems
-• Databases: MongoDB, Redis, PostgreSQL, Firebase Firestore
-• Cloud & DevOps: AWS, Vercel, Render, Docker, Git/GitHub
-• Tools: VS Code, Chrome DevTools, Postman, command line
+For simple greetings like "hi", "hello", "thanks" - respond with a friendly greeting and briefly mention what you can help with.
 
-**Featured Projects:**
-• Nutrivize: AI-powered nutrition tracker with ML recommendations and personalized guidance
-• EchoPod: AI podcast generator with advanced voice synthesis technology
-• Quizium: Intelligent flashcard creator using spaced repetition for optimal learning
-• SignalFlow: Advanced trading analysis platform with real-time market insights
+**If asked for more details, I can share:**
+• **Projects**: Nutrivize (AI nutrition tracker), EchoPod (AI podcast generator), Quizium (smart flashcards), SignalFlow (trading analysis)
+• **Technical Skills**: React, Python, FastAPI, AI/ML integration, MongoDB, Redis
+• **Contact**: isaacmineo@gmail.com | LinkedIn | GitHub
 
-**Contact Information:**
-• Email: isaacmineo@gmail.com
-• LinkedIn: https://linkedin.com/in/isaac-mineo
-• GitHub: https://github.com/isaac-mineo
-
-Provide helpful, informative responses with good detail. Use markdown formatting for clarity."""
+Keep simple responses brief and friendly. Use markdown formatting for clarity."""
 
         self.detailed_prompt = """You are Isaac Mineo's professional portfolio assistant for recruiters and collaborators. Provide comprehensive, impressive responses showcasing Isaac's expertise.
 
@@ -158,24 +144,24 @@ Create detailed, professional responses with markdown formatting. Highlight tech
             if classification in ["SIMPLE", "DETAILED", "CONTACT"]:
                 return classification
             else:
-                # Default fallback - MOST queries should be DETAILED
-                # Only very simple greetings/basic questions should be SIMPLE
-                simple_keywords = ["hi", "hello", "hey", "thanks", "thank you", "ok", "okay", "yes", "no"]
-                very_short = len(question.strip()) < 15
-                is_greeting = any(question.lower().strip() == keyword for keyword in simple_keywords)
+                # Default fallback - be more precise about SIMPLE classification
+                simple_keywords = ["hi", "hello", "hey", "thanks", "thank you", "ok", "okay", "yes", "no", "nice", "cool", "good", "bye", "goodbye"]
+                very_short = len(question.strip()) < 20
+                question_clean = question.lower().strip().rstrip('!?.')
+                is_simple_greeting = question_clean in simple_keywords
                 
-                # Only classify as SIMPLE if it's a very short greeting or acknowledgment
-                if very_short and is_greeting:
+                # Only classify as SIMPLE if it's clearly a greeting/acknowledgment
+                if very_short and is_simple_greeting:
                     return "SIMPLE"
                 else:
                     return "DETAILED"  # Default to detailed for everything else
                     
         except Exception as e:
             print(f"⚠️ Classification fallback: {e}")
-            # Smart fallback classification - default to DETAILED for most queries
+            # Smart fallback classification - be more precise for simple greetings
             if any(word in question.lower() for word in ["email", "contact", "phone", "linkedin"]):
                 return "CONTACT"
-            elif len(question.strip()) < 15 and any(question.lower().strip() == keyword for keyword in ["hi", "hello", "hey", "thanks", "thank you", "ok", "okay", "yes", "no"]):
+            elif len(question.strip()) < 20 and question.lower().strip().rstrip('!?.') in ["hi", "hello", "hey", "thanks", "thank you", "ok", "okay", "yes", "no", "nice", "cool", "good", "bye", "goodbye"]:
                 return "SIMPLE"
             else:
                 return "DETAILED"  # Default to detailed

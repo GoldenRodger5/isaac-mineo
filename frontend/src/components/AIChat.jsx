@@ -247,9 +247,9 @@ const AIChat = () => {
           </p>
         </div>
 
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto px-2 md:px-4">
           {/* Mobile Chat Interface */}
-          <div className="md:hidden glass-heavy rounded-2xl border border-white/20 shadow-2xl h-[85vh]">
+          <div className="md:hidden glass-heavy rounded-2xl border border-white/20 shadow-2xl h-[85vh] max-h-[800px]">
             <MobileChatInterface
               messages={messages}
               onSendMessage={handleSendMessage}
@@ -405,17 +405,17 @@ const AIChat = () => {
             </div>
           </div>
 
-          {/* Suggested Questions - Enhanced */}
+          {/* Suggested Questions - Enhanced Mobile-Friendly */}
           {showSuggestions && (
-            <div className="glass-heavy border-x border-white/20 px-8 py-6 shadow-inner">
-              <p className="text-base font-bold text-gray-900 mb-4">💡 Suggested questions:</p>
-              <div className="flex flex-wrap gap-3">
+            <div className="glass-heavy border-x border-white/20 px-4 md:px-8 py-4 md:py-6 shadow-inner">
+              <p className="text-sm md:text-base font-bold text-gray-900 mb-3 md:mb-4">💡 Suggested questions:</p>
+              <div className="flex flex-wrap gap-2 md:gap-3">
                 {suggestedQuestions.map((question, index) => (
                   <button
                     key={index}
                     onClick={() => handleSendMessage(question)}
                     disabled={isLoading}
-                    className="text-sm bg-white hover:bg-gray-50 disabled:hover:bg-white text-gray-900 px-4 py-3 rounded-xl transition-all duration-300 disabled:opacity-50 border-2 border-gray-300 hover:border-primary-500 font-medium shadow-lg"
+                    className="text-xs md:text-sm bg-white hover:bg-gray-50 disabled:hover:bg-white text-gray-900 px-3 md:px-4 py-2 md:py-3 rounded-lg md:rounded-xl transition-all duration-300 disabled:opacity-50 border-2 border-gray-300 hover:border-primary-500 font-medium shadow-lg min-h-[40px] flex items-center justify-center"
                   >
                     {question}
                   </button>
@@ -424,8 +424,8 @@ const AIChat = () => {
             </div>
           )}
 
-          {/* Voice Chat Controls */}
-          <div className="glass-heavy rounded-lg border border-white/30 p-4 shadow-xl mb-4">
+          {/* Voice Chat Controls - Mobile Optimized */}
+          <div className="glass-heavy rounded-lg border border-white/30 p-3 md:p-4 shadow-xl mb-3 md:mb-4">
             <VoiceChat 
               sessionId={sessionId}
               onVoiceResponse={handleVoiceResponse}
@@ -433,37 +433,41 @@ const AIChat = () => {
             />
           </div>
 
-          {/* Input Area - Enhanced Professional Design */}
-          <div className="glass-heavy rounded-b-2xl border border-white/30 p-8 shadow-2xl">
-            <div className="flex space-x-6">
+          {/* Input Area - Enhanced Professional Design with Mobile Optimization */}
+          <div className="glass-heavy rounded-b-2xl border border-white/30 p-4 md:p-8 shadow-2xl">
+            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6">
               <textarea
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask me anything about Isaac's background, skills, projects, or career goals..."
-                className="flex-1 glass-light border-2 border-white/30 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500/50 resize-none text-gray-900 placeholder-gray-600 backdrop-blur-sm font-medium text-base shadow-inner bg-white/90"
-                rows={3}
+                className="flex-1 glass-light border-2 border-white/30 rounded-2xl px-4 md:px-6 py-4 focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500/50 resize-none text-gray-900 placeholder-gray-600 backdrop-blur-sm font-medium text-base shadow-inner bg-white/90 min-h-[120px] md:min-h-[90px]"
+                rows={4}
                 disabled={isLoading}
+                style={{ fontSize: '16px' }} // Prevents zoom on iOS
               />
               <button
                 onClick={() => handleSendMessage()}
                 disabled={!inputValue.trim() || isLoading}
-                className="bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 disabled:from-gray-600 disabled:to-gray-600 text-white px-8 py-4 rounded-2xl font-bold transition-all duration-300 disabled:cursor-not-allowed flex items-center justify-center shadow-xl text-base hover:shadow-2xl"
+                className="bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 disabled:from-gray-600 disabled:to-gray-600 text-white px-6 md:px-8 py-4 rounded-2xl font-bold transition-all duration-300 disabled:cursor-not-allowed flex items-center justify-center shadow-xl text-base hover:shadow-2xl w-full md:w-auto min-h-[56px]"
               >
                 {isLoading ? (
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2v4m0 12v4m9-9h-4M5 12H1m15.364-7.364L19.778 2.222M4.222 19.778l2.414-2.414M19.778 19.778l-2.414-2.414M4.222 4.222l2.414 2.414" />
                   </svg>
                 ) : (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
+                  <>
+                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    <span className="md:hidden">Send Message</span>
+                  </>
                 )}
               </button>
             </div>
-            <div className="mt-4 flex items-center justify-between text-sm text-gray-800">
-              <p className="font-medium">💡 Press Enter to send, Shift+Enter for new line</p>
-              <div className="flex items-center space-x-4">
+            <div className="mt-4 flex flex-col md:flex-row items-start md:items-center justify-between text-sm text-gray-800 space-y-2 md:space-y-0">
+              <p className="font-medium text-xs md:text-sm">💡 Press Enter to send, Shift+Enter for new line</p>
+              <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-4">
                 <button
                   onClick={() => setShowPerformanceDashboard(true)}
                   className="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-lg transition-colors duration-200 font-medium"
@@ -471,7 +475,7 @@ const AIChat = () => {
                 >
                   📊 Performance
                 </button>
-                <p className="bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent font-bold">
+                <p className="bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent font-bold text-xs md:text-sm">
                   ⚡ Powered by GPT-4o • Isaac's Knowledge Base
                 </p>
               </div>
