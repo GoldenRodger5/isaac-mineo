@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { apiClient } from '../services/apiClient';
 import { optimizedApiClient } from '../services/optimizedApiClient';
 import MobileChatInterface from './MobileChatInterface';
-import VoiceChat from './VoiceChat';
+// import VoiceChat from './VoiceChat'; // Commented out - voice functionality disabled
 import PerformanceDashboard from './PerformanceDashboard';
 
 const AIChat = () => {
@@ -257,8 +257,9 @@ const AIChat = () => {
               suggestedQuestions={suggestedQuestions}
               placeholder="Ask me anything about Isaac's background, skills, projects, or career goals..."
               sessionId={sessionId}
-              onVoiceResponse={handleVoiceResponse}
-              onVoiceError={(error) => console.error('Voice error:', error)}
+              // Voice functionality disabled
+              // onVoiceResponse={handleVoiceResponse}
+              // onVoiceError={(error) => console.error('Voice error:', error)}
             />
           </div>
 
@@ -424,7 +425,7 @@ const AIChat = () => {
             </div>
           )}
 
-          {/* Voice Chat Controls - Mobile Optimized */}
+          {/* Voice Chat Controls - Disabled for now
           <div className="glass-heavy rounded-lg border border-white/30 p-3 md:p-4 shadow-xl mb-3 md:mb-4">
             <VoiceChat 
               sessionId={sessionId}
@@ -432,6 +433,7 @@ const AIChat = () => {
               onError={handleVoiceError}
             />
           </div>
+          */}
 
           {/* Input Area - Enhanced Professional Design with Mobile Optimization */}
           <div className="glass-heavy rounded-b-2xl border border-white/30 p-4 md:p-8 shadow-2xl">

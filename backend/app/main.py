@@ -39,35 +39,26 @@ app = FastAPI(
     version="4.0.0"
 )
 
-# Configure CORS with explicit origins and robust fallback
+# Configure CORS with explicit origins
 allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
-default_origins = [
-    "http://localhost:5173",
-    "http://localhost:5174", 
-    "http://localhost:5175",
-    "http://localhost:3000",
-    "https://isaac-mineo.vercel.app",
+allowed_origins = [
     "https://isaacmineo.com",
     "https://www.isaacmineo.com",
-    "https://isaac-mineo-frontend.vercel.app"
+    "https://isaac-mineo.vercel.app", 
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:3000"
 ]
 
 if allowed_origins_env:
-    allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",")]
-else:
-    allow_origins=[
-        "https://isaacmineo.com",
-        "https://www.isaacmineo.com", 
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:3000"
-    ],
+    additional_origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+    allowed_origins.extend(additional_origins)
 
 print(f"🌐 CORS Allowed Origins: {allowed_origins}")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Temporarily allow all origins for debugging
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],

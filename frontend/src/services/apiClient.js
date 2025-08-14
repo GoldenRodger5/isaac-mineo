@@ -78,7 +78,18 @@ class APIClient {
       const elapsed = Date.now() - startTime;
       
       console.log('✅ Chat response received in ' + elapsed + 'ms');
-      return { success: true, data, elapsed };
+      return { 
+        success: true, 
+        data: {
+          response: data.response || data.message || "No response received",
+          sessionId: data.sessionId || data.session_id || sessionId,
+          searchMethod: data.searchMethod,
+          cached: data.cached,
+          timestamp: data.timestamp,
+          conversationLength: data.conversationLength
+        }, 
+        elapsed 
+      };
 
     } catch (error) {
       console.error('❌ Chat API failed:', error.message);
@@ -87,9 +98,10 @@ class APIClient {
         return {
           success: false,
           data: {
-            message: this.getFallbackResponse(question),
+            response: this.getFallbackResponse(question),
             sessionId: sessionId || ('fallback_' + Date.now()),
-            fallback: true
+            fallback: true,
+            searchMethod: 'fallback'
           },
           error: error.message
         };

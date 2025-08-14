@@ -10,14 +10,16 @@ class SimpleVoiceService {
     this.mediaRecorder = null;
     this.audioStream = null;
     this.isEnabled = false;
-    this.status = 'checking';
+    this.status = 'disabled'; // Changed from 'checking' to 'disabled'
     
     // Simple event callbacks
     this.onStatusChange = null;
     this.onResponse = null;
     this.onError = null;
     
-    this.checkVoiceSupport();
+    // VOICE SUPPORT CHECK DISABLED FOR DEBUGGING
+    // this.checkVoiceSupport();
+    console.log('🚫 Simple Voice Service: Disabled for debugging');
   }
   
   async checkVoiceSupport() {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import VoiceChat from './VoiceChat';
+// import VoiceChat from './VoiceChat'; // Commented out - voice functionality disabled
 
 const MobileChatInterface = ({ 
   messages, 
@@ -177,7 +177,7 @@ const MobileChatInterface = ({
             )}
           </div>
           
-          {/* Voice Controls */}
+          {/* Voice Controls - Disabled
           {onVoiceResponse && (
             <VoiceChat
               onVoiceResponse={onVoiceResponse}
@@ -187,6 +187,7 @@ const MobileChatInterface = ({
               className="mobile-voice-controls"
             />
           )}
+          */}
           
           <button
             onClick={() => handleSend()}
@@ -199,9 +200,8 @@ const MobileChatInterface = ({
           </button>
         </div>
         
-        {/* Helper text */}
-        <div className="mt-3 flex items-center justify-between">
-          <p className="text-xs text-gray-500">Tap and hold the voice button to record</p>
+        {/* Helper text - Voice functionality disabled */}
+        <div className="mt-3 flex items-center justify-center">
           <p className="text-xs text-gray-500">Press Enter to send</p>
         </div>
       </div>

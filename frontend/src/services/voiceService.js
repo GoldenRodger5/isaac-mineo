@@ -7,7 +7,7 @@ class EnhancedVoiceService {
   constructor() {
     this.websocket = null;
     this.isEnabled = false;
-    this.status = 'checking';
+    this.status = 'disabled'; // Changed from 'checking' to 'disabled'
     this.currentAudio = null;
     this.isListening = false;
     this.audioContext = null;
@@ -27,7 +27,9 @@ class EnhancedVoiceService {
     this.onTranscript = null;
     this.onLiveTranscript = null;
     
-    this.checkVoiceSupport();
+    // VOICE SUPPORT CHECK DISABLED FOR DEBUGGING
+    // this.checkVoiceSupport();
+    console.log('🚫 Voice Service: Constructor - voice support disabled for debugging');
   }
   
   async checkVoiceSupport() {
@@ -456,13 +458,15 @@ class EnhancedVoiceService {
 // Export singleton instance
 const voiceService = new EnhancedVoiceService();
 
+// VOICE FUNCTIONALITY TEMPORARILY DISABLED
 // Add global method for manual testing (keeping for backward compatibility)
-window.sendVoiceText = (text) => {
-  voiceService.sendText(text || 'Hello, can you hear me?');
-};
+// window.sendVoiceText = (text) => {
+//   voiceService.sendText(text || 'Hello, can you hear me?');
+// };
 
-console.log('🎤 Enhanced Voice Service loaded with real audio input and live transcription!');
-console.log('🎙️ Use sendVoiceText("text") for manual testing or just speak into your microphone!');
+// console.log('🎤 Enhanced Voice Service loaded with real audio input and live transcription!');
+// console.log('🎙️ Use sendVoiceText("text") for manual testing or just speak into your microphone!');
+console.log('🚫 Voice Service: Temporarily disabled for debugging');
 
 export { voiceService };
 export default voiceService;

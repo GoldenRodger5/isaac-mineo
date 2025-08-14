@@ -115,15 +115,17 @@ class OptimizedAPIClient {
         
         if (endpoint === '/chatbot' || endpoint.includes('/chatbot')) {
           const body = options.body ? JSON.parse(options.body) : {};
-          result = await this.baseClient.sendMessage(body.question, body.sessionId);
+          // Fix: Use sendChatMessage instead of sendMessage
+          result = await this.baseClient.sendChatMessage(body.question, body.session_id || body.sessionId);
         } else if (endpoint === '/contact' || endpoint.includes('/contact')) {
           const body = options.body ? JSON.parse(options.body) : {};
-          result = await this.baseClient.sendContactEmail(body);
+          // Fix: Use sendContactMessage instead of sendContactEmail  
+          result = await this.baseClient.sendContactMessage(body.name, body.email, body.message);
         } else if (endpoint === '/projects' || endpoint.includes('/projects')) {
           result = await this.baseClient.getProjects();
         } else if (endpoint === '/health' || endpoint.includes('/health')) {
-          const healthy = await this.baseClient.healthCheck();
-          result = { success: true, data: { status: healthy ? 'healthy' : 'unhealthy' } };
+          const healthResult = await this.baseClient.healthCheck();
+          result = { success: healthResult.success, data: healthResult.data || { status: healthResult.success ? 'healthy' : 'unhealthy' } };
         } else {
           // Generic fetch for other endpoints
           const url = endpoint.startsWith('http') ? endpoint : `${this.baseClient.baseURL}${endpoint}`;
