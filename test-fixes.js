@@ -34,7 +34,7 @@ console.log('- ✅ Analytics working');
 console.log('');
 
 console.log('🚀 Expected Clean Console:');
-console.log('- "🔗 API Base URL: https://isaac-mineo-backend.onrender.com/api"');
+console.log('- "🔗 API Base URL: https://isaac-mineo-api.onrender.com"');
 console.log('- "🚫 Voice Service: Temporarily disabled for debugging"');
 console.log('- Chat messages working normally');
 console.log('- NO "this.baseClient.sendMessage is not a function" errors');

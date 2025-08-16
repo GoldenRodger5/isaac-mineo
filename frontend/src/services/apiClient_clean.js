@@ -4,7 +4,7 @@ class APIClient {
     
     // Dynamic base URL configuration
     this.baseURL = this.environment === 'production' 
-      ? 'https://isaac-mineo-backend.onrender.com/api'
+      ? 'https://isaac-mineo-api.onrender.com'
       : import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
       
     this.retryAttempts = 3;
