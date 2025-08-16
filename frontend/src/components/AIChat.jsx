@@ -75,7 +75,7 @@ const AIChat = () => {
     const startTime = Date.now();
     try {
       // Use optimized API client for better performance
-      const result = await optimizedApiClient.optimizedRequest('/chatbot', {
+      const result = await optimizedApiClient.optimizedRequest('/api/chatbot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question, sessionId })
