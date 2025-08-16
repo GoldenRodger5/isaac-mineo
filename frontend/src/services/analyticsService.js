@@ -27,7 +27,7 @@ class AnalyticsService {
       
       if (!this.visitorId) {
         // Track new visitor
-        const response = await fetch(`${this.baseURL}/analytics/track/visitor`, {
+        const response = await fetch(`${this.baseURL}/api/analytics/track/visitor`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ class AnalyticsService {
       // Calculate time spent on previous page
       const timeSpent = Date.now() - this.pageStartTime;
       
-      await fetch(`${this.baseURL}/analytics/track/page`, {
+      await fetch(`${this.baseURL}/api/analytics/track/page`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ class AnalyticsService {
     if (!this.visitorId) return;
 
     try {
-      await fetch(`${this.baseURL}/analytics/track/ai-interaction`, {
+      await fetch(`${this.baseURL}/api/analytics/track/ai-interaction`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ class AnalyticsService {
     if (!this.visitorId) return;
 
     try {
-      await fetch(`${this.baseURL}/analytics/track/project`, {
+      await fetch(`${this.baseURL}/api/analytics/track/project`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ class AnalyticsService {
     if (!this.visitorId) return;
 
     try {
-      await fetch(`${this.baseURL}/analytics/track/contact`, {
+      await fetch(`${this.baseURL}/api/analytics/track/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ class AnalyticsService {
    */
   async getPublicMetrics() {
     try {
-      const response = await fetch(`${this.baseURL}/analytics/public/metrics`);
+      const response = await fetch(`${this.baseURL}/api/analytics/public/metrics`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -195,7 +195,7 @@ class AnalyticsService {
    */
   async getAdminAnalytics(authToken) {
     try {
-      const response = await fetch(`${this.baseURL}/analytics/admin/dashboard`, {
+      const response = await fetch(`${this.baseURL}/api/analytics/admin/dashboard`, {
         headers: {
           'Authorization': `Bearer ${authToken}`,
           'Content-Type': 'application/json',
@@ -219,7 +219,7 @@ class AnalyticsService {
    */
   async exportAnalytics(authToken, format = 'json') {
     try {
-      const response = await fetch(`${this.baseURL}/analytics/admin/export?format=${format}`, {
+      const response = await fetch(`${this.baseURL}/api/analytics/admin/export?format=${format}`, {
         headers: {
           'Authorization': `Bearer ${authToken}`,
           'Content-Type': 'application/json',

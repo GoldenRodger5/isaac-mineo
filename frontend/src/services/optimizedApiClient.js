@@ -117,11 +117,11 @@ class OptimizedAPIClient {
           const body = options.body ? JSON.parse(options.body) : {};
           // Fix: Use sendChatMessage instead of sendMessage
           result = await this.baseClient.sendChatMessage(body.question, body.session_id || body.sessionId);
-        } else if (endpoint === '/contact' || endpoint.includes('/contact')) {
+        } else if (endpoint === '/api/contact' || endpoint.includes('/api/contact')) {
           const body = options.body ? JSON.parse(options.body) : {};
           // Fix: Use sendContactMessage instead of sendContactEmail  
           result = await this.baseClient.sendContactMessage(body.name, body.email, body.message);
-        } else if (endpoint === '/projects' || endpoint.includes('/projects')) {
+        } else if (endpoint === '/api/projects' || endpoint.includes('/api/projects')) {
           result = await this.baseClient.getProjects();
         } else if (endpoint === '/health' || endpoint.includes('/health')) {
           const healthResult = await this.baseClient.healthCheck();

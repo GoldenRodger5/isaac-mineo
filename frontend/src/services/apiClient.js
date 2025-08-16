@@ -117,8 +117,8 @@ class APIClient {
     console.log('📧 Sending contact email via ' + this.environment + ' environment...');
     
     try {
-      console.log('🎯 Using FastAPI backend: ' + this.baseURL + '/contact');
-      const response = await this.fetchWithRetry(this.baseURL + '/contact', {
+      console.log('🎯 Using FastAPI backend: ' + this.baseURL + '/api/contact');
+      const response = await this.fetchWithRetry(this.baseURL + '/api/contact', {
         method: 'POST',
         body: JSON.stringify({ name, email, message }),
       });
@@ -145,7 +145,7 @@ class APIClient {
   // Projects API
   async getProjects() {
     try {
-      const response = await this.fetchWithRetry(this.baseURL + '/projects');
+      const response = await this.fetchWithRetry(this.baseURL + '/api/projects');
       const data = await response.json();
       return { success: true, data };
     } catch (error) {
