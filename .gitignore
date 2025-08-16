@@ -64,3 +64,4 @@ yarn-error.log*
 # macOS
 .AppleDouble
 .LSOverride
+.env*.local

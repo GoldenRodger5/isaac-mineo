@@ -69,7 +69,7 @@ class APIClient {
     const startTime = Date.now();
     
     try {
-      const response = await this.fetchWithRetry(this.baseURL + '/chatbot', {
+      const response = await this.fetchWithRetry(this.baseURL + '/api/chatbot', {
         method: 'POST',
         body: JSON.stringify({ question, session_id: sessionId }),
       });

@@ -113,7 +113,7 @@ class OptimizedAPIClient {
         // Use the appropriate baseClient method based on endpoint
         let result;
         
-        if (endpoint === '/chatbot' || endpoint.includes('/chatbot')) {
+        if (endpoint === '/api/chatbot' || endpoint.includes('/api/chatbot')) {
           const body = options.body ? JSON.parse(options.body) : {};
           // Fix: Use sendChatMessage instead of sendMessage
           result = await this.baseClient.sendChatMessage(body.question, body.session_id || body.sessionId);
@@ -291,9 +291,9 @@ class OptimizedAPIClient {
   // Preload frequently accessed data
   async preloadFrequentData() {
     const frequentQueries = [
-      { endpoint: '/chatbot', options: { body: JSON.stringify({ question: "What is Isaac's technical stack?" }) } },
-      { endpoint: '/chatbot', options: { body: JSON.stringify({ question: "Tell me about Nutrivize" }) } },
-      { endpoint: '/chatbot', options: { body: JSON.stringify({ question: "What roles is Isaac looking for?" }) } }
+      { endpoint: '/api/chatbot', options: { body: JSON.stringify({ question: "What is Isaac's technical stack?" }) } },
+      { endpoint: '/api/chatbot', options: { body: JSON.stringify({ question: "Tell me about Nutrivize" }) } },
+      { endpoint: '/api/chatbot', options: { body: JSON.stringify({ question: "What roles is Isaac looking for?" }) } }
     ];
     
     console.log('🚀 Preloading frequent data...');
